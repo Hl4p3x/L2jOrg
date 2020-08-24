@@ -31,7 +31,6 @@ public class ExOlympiadRecord extends ServerPacket {
     protected void writeImpl(GameClient client)  {
         writeId(ServerExPacketId.EX_OLYMPIAD_RECORD);
 
-        // current season
         writeInt(0); // points
         writeInt(0); // win count
         writeInt(0); // lose count
@@ -54,12 +53,11 @@ public class ExOlympiadRecord extends ServerPacket {
         writeInt(0); // prev lose count
 
         writeInt(0); // prev grade
-
         writeInt(2020); // season year
         writeInt(6); // season month
-        writeByte(true); // match open
-        writeInt(2); // season
+        writeByte(false); // match open
+        writeInt(1); // season
         writeByte(false); // registered
-        writeByte(1); // game rule type (0 - 3v3)
+        writeByte(3); // game rule type (0 - 3v3)
     }
 }

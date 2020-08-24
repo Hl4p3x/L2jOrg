@@ -294,7 +294,7 @@ public class AdminEditChar implements IAdminCommandHandler
 				final String val = command.substring(14);
 				final int fame = Integer.parseInt(val);
 				final WorldObject target = activeChar.getTarget();
-				if (isPlayer(target))
+				if ((target != null) && isPlayer(target))
 				{
 					final Player player = (Player) target;
 					player.setFame(fame);

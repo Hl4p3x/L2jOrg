@@ -59,7 +59,6 @@ public enum EffectType {
     ROOT,
     SLEEP,
     STEAL_ABNORMAL,
-    STUN,
     BLOCK_ACTIONS,
     KNOCK,
     SUMMON,

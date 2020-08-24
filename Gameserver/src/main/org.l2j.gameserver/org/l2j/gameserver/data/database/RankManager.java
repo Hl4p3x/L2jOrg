@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.l2j.gameserver.engine.rank;
+package org.l2j.gameserver.data.database;
 
 import io.github.joealisson.primitive.IntMap;
 import org.l2j.commons.threading.ThreadPool;
@@ -53,12 +53,12 @@ import static org.l2j.commons.util.Util.doIfNonNull;
 /**
  * @author JoeAlisson
  */
-public class RankEngine {
+public class RankManager {
 
     private IntMap<RankData> rankersSnapshot;
     private ScheduledFuture<?> bowTask;
 
-    private RankEngine() {
+    private RankManager() {
         var listeners = Listeners.players();
         listeners.addListener(new ConsumerEventListener(listeners, EventType.ON_PLAYER_LOGIN, (Consumer<OnPlayerLogin>) e -> addRankersSkills(e.getPlayer()), this));
         listeners.addListener(new ConsumerEventListener(listeners, EventType.ON_PLAYER_PEACE_ZONE_ENTER, (Consumer<OnPlayerPeaceZoneEnter>) this::scheduleBow, this));
@@ -215,11 +215,11 @@ public class RankEngine {
         getInstance().loadRankers();
     }
 
-    public static RankEngine getInstance() {
+    public static RankManager getInstance() {
         return Singleton.INSTANCE;
     }
 
     private static class Singleton {
-        private static final RankEngine INSTANCE = new RankEngine();
+        private static final RankManager INSTANCE = new RankManager();
     }
 }

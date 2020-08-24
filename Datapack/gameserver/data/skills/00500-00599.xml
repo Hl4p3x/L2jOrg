@@ -203,13 +203,11 @@
         </conditions>
         <effects>
             <stat-modify mode="PER" stat="DEFENCE_CRITICAL_DAMAGE" stat-add="DEFENCE_CRITICAL_DAMAGE_ADD">
-                <power initial="-10.0">
-                    <value level="2">-15.0</value>                   
-                </power>
+                <power initial="10.0"/>
             </stat-modify>
             <stat-modify mode="PER" stat="BLOW_RATE">
-                <power initial="-10.0">
-                    <value level="2">-20.0</value>
+                <power initial="15.0">
+                    <value level="2">20.0</value>
                 </power>
             </stat-modify>
         </effects>

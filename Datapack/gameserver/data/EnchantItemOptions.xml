@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <list xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xmlns="http://l2j.org" xsi:schemaLocation="http://l2j.org xsd/EnchantItemOptions.xsd">
 	<!-- RB Weapon -->
-	<item id="92404"> <!-- Zaken's_Blood_Sword-->
+	<item id="92404"> <!-- Zaken's Blood Sword-->
 		<options level="0" option1="33448" />
 		<options level="1" option1="33449" />
 		<options level="2" option1="33450" />
@@ -14,7 +14,7 @@
 		<options level="9" option1="33457" />
 		<options level="10" option1="33458" />		
 	</item>
-	<item id="92405"> <!-- Core's_Plasmic_Bow-->
+	<item id="92405"> <!-- Core's Plasmic Bow-->
 		<options level="0" option1="33470" />
 		<options level="1" option1="33471" />
 		<options level="2" option1="33472" />
@@ -27,7 +27,7 @@
 		<options level="9" option1="33479" />
 		<options level="10" option1="33480" />		
 	</item>
-	<item id="92406"> <!-- Queen_Ant's_Stone_Spear-->
+	<item id="92406"> <!-- Queen Ant's Stone Spear-->
 		<options level="0" option1="33437" />
 		<options level="1" option1="33438" />
 		<options level="2" option1="33439" />
@@ -40,7 +40,7 @@
 		<options level="9" option1="33446" />
 		<options level="10" option1="33447" />		
 	</item>
-	<item id="92407"> <!-- Orfen's_Venomed_Sword-->
+	<item id="92407"> <!-- Orfen's Venomed Sword-->
 		<options level="0" option1="33459" />
 		<options level="1" option1="33460" />
 		<options level="2" option1="33461" />
@@ -53,7 +53,7 @@
 		<options level="9" option1="33468" />
 		<options level="10" option1="33469" />		
 	</item>
-	<item id="92408"> <!-- Baium's_Thunder_Breaker-->
+	<item id="92408"> <!-- Baium's Thunder Breaker-->
 		<options level="0" option1="33426" />
 		<options level="1" option1="33427" />
 		<options level="2" option1="33428" />
@@ -66,7 +66,7 @@
 		<options level="9" option1="33435" />
 		<options level="10" option1="33436" />		
 	</item>
-	<item id="92421"> <!-- Queen_Ant's_Stone_Breaker-->
+	<item id="92421"> <!-- Queen Ant's Stone Breaker-->
 		<options level="0" option1="33437" />
 		<options level="1" option1="33438" />
 		<options level="2" option1="33439" />
@@ -399,7 +399,7 @@
 	</item>
 	
 	<!-- Belt -->
-	<item id="91862"> <!-- Dragon_Belt-->
+	<item id="91862"> <!-- Dragon Belt-->
 		<options level="0" option1="33359" />
 		<options level="1" option1="33360" />
 		<options level="2" option1="33361" />
@@ -414,7 +414,7 @@
 	</item>
 	
 	<!-- Cloak -->
-	<item id="93041"> <!-- Adventurer's_Cloak -->
+	<item id="93041"> <!-- Adventurer's Cloak -->
 		<options level="0" option1="33481" />
 		<options level="1" option1="33482" />
 	</item>
@@ -949,6 +949,14 @@
 		<options level="10" option1="60219" />
 	</item>
 	
+	<!-- Talisman -->
+	<item id="49683"> <!-- Talisman of Baium -->
+		<options level="1" option1="33399" />
+		<options level="2" option1="33400" />
+		<options level="3" option1="33401" />
+		<options level="4" option1="33402" />
+		<options level="5" option1="33403" />
+	</item>
 	<item id="91745"> <!-- Talisman of Aden -->
 		<options level="0" option1="33338"  />
 		<options level="1" option1="33339" />
@@ -961,57 +969,6 @@
 		<options level="8" option1="33346" />
 		<options level="9" option1="33347" />
 		<options level="10" option1="33348" />
-	</item>
-	<item id="49676"> <!-- Talisman of Insolence Lv. 1 -->
-		<options level="0" option1="33370"  />		
-	</item>
-	<item id="49676"> <!-- Talisman of Insolence Lv. 2 -->
-		<options level="0" option1="33371"  />		
-	</item>
-	<item id="49676"> <!-- Talisman of Insolence Lv. 3 -->
-		<options level="0" option1="33372"  />		
-	</item>
-	<item id="49676"> <!-- Talisman of Insolence Lv. 4 -->
-		<options level="0" option1="33373"  />		
-	</item>
-	<item id="49676"> <!-- Talisman of Insolence Lv. 5 -->
-		<options level="0" option1="33374"  />		
-	</item>
-	<item id="49676"> <!-- Talisman of Insolence Lv. 6 -->
-		<options level="0" option1="33375"  />		
-	</item>
-	<item id="91952"> <!-- Ring of Insolence -->
-		<options level="0" option1="33376"  />
-		<options level="1" option1="33377" />
-		<options level="2" option1="33378" />
-		<options level="3" option1="33379" />
-		<options level="4" option1="33380" />
-		<options level="5" option1="33381" />
-		<options level="6" option1="33382" />
-		<options level="7" option1="33383" />
-		<options level="8" option1="33384" />
-		<options level="9" option1="33385" />
-		<options level="10" option1="33386" />
-	</item>	
-	<item id="91953"> <!-- Dragon valley earing -->
-		<options level="0" option1="33387" />
-		<options level="1" option1="33388" />
-		<options level="2" option1="33389" />
-		<options level="3" option1="33390" />
-		<options level="4" option1="33391" />
-		<options level="5" option1="33392" />
-		<options level="6" option1="33393" />
-		<options level="7" option1="33394" />
-		<options level="8" option1="33395" />
-		<options level="9" option1="33396" />
-		<options level="10" option1="33397" />
-	</item>	
-	<item id="49683"> <!-- Talisman_of_Baium -->
-		<options level="1" option1="33399" />
-		<options level="2" option1="33400" />
-		<options level="3" option1="33401" />
-		<options level="4" option1="33402" />
-		<options level="5" option1="33403" />
 	</item>
 	<item id="92018"> <!-- Talisman of Eva -->
 		<options level="0" option1="33404" />
@@ -1026,7 +983,7 @@
 		<options level="9" option1="33413" />
 		<options level="10" option1="33414" />
 	</item>
-	<item id="92403"> <!-- Talisman_of_Speed -->
+	<item id="92403"> <!-- Talisman of Speed -->
 		<options level="0" option1="33415" />
 		<options level="1" option1="33416" />
 		<options level="2" option1="33417" />
@@ -1039,61 +996,9 @@
 		<options level="9" option1="33424" />
 		<options level="10" option1="33425" />
 	</item>
-	
-	<item id="90993"> <!-- Damaged_Antharas'_Earring -->
-		<options level="0" option1="50300" />
-		<options level="1" option1="50301" />
-		<options level="2" option1="50302" />
-		<options level="3" option1="50303" />
-		<options level="4" option1="50304" />
-		<options level="5" option1="50305" />
-		<options level="6" option1="50306" />
-		<options level="7" option1="50307" />
-		<options level="8" option1="50308" />
-		<options level="9" option1="50309" />
-		<options level="10" option1="50310" />		
-	</item>
-	<item id="90994"> <!-- Damaged_Baium's_Ring -->
-		<options level="0" option1="50311" />
-		<options level="1" option1="50312" />
-		<options level="2" option1="50313" />
-		<options level="3" option1="50314" />
-		<options level="4" option1="50315" />
-		<options level="5" option1="50316" />
-		<options level="6" option1="50317" />
-		<options level="7" option1="50318" />
-		<options level="8" option1="50319" />
-		<options level="9" option1="50320" />
-		<options level="10" option1="50321" />		
-	</item>
-	<item id="91006"> <!-- Damaged_Zaken's_Earring -->
-		<options level="0" option1="50322" />
-		<options level="1" option1="50323" />
-		<options level="2" option1="50324" />
-		<options level="3" option1="50325" />
-		<options level="4" option1="50326" />
-		<options level="5" option1="50327" />
-		<options level="6" option1="50328" />
-		<options level="7" option1="50329" />
-		<options level="8" option1="50330" />
-		<options level="9" option1="50331" />
-		<options level="10" option1="50332" />		
-	</item>
 		
-	<item id="91119"> <!-- Ignis'_Necklace -->
-		<options level="0" option1="50333" />
-		<options level="1" option1="50334" />
-		<options level="2" option1="50335" />
-		<options level="3" option1="50336" />
-		<options level="4" option1="50337" />
-		<options level="5" option1="50338" />
-		<options level="6" option1="50339" />
-		<options level="7" option1="50340" />
-		<options level="8" option1="50341" />
-		<options level="9" option1="50342" />
-		<options level="10" option1="50343" />
-	</item>
-	<item id="91117"> <!-- Nebula's_Necklace -->
+	<!-- RB Necklace	 -->
+	<item id="91117"> <!-- Nebula's Necklace -->
 		<options level="0" option1="50344" />
 		<options level="1" option1="50345" />
 		<options level="2" option1="50346" />
@@ -1106,7 +1011,20 @@
 		<options level="9" option1="50353" />
 		<options level="10" option1="50354" />
 	</item>
-	<item id="91121"> <!-- Procella's_Necklace -->
+	<item id="91119"> <!-- Ignis' Necklace -->
+		<options level="0" option1="50333" />
+		<options level="1" option1="50334" />
+		<options level="2" option1="50335" />
+		<options level="3" option1="50336" />
+		<options level="4" option1="50337" />
+		<options level="5" option1="50338" />
+		<options level="6" option1="50339" />
+		<options level="7" option1="50340" />
+		<options level="8" option1="50341" />
+		<options level="9" option1="50342" />
+		<options level="10" option1="50343" />
+	</item>
+	<item id="91121"> <!-- Procella's Necklace -->
 		<options level="0" option1="50355" />
 		<options level="1" option1="50356" />
 		<options level="2" option1="50357" />
@@ -1119,7 +1037,7 @@
 		<options level="9" option1="50364" />
 		<options level="10" option1="50365" />
 	</item>
-	<item id="91123"> <!-- Petram's_Necklace -->
+	<item id="91123"> <!-- Petram's Necklace -->
 		<options level="0" option1="50366" />
 		<options level="1" option1="50367" />
 		<options level="2" option1="50368" />
@@ -1132,70 +1050,91 @@
 		<options level="9" option1="50375" />
 		<options level="10" option1="50376" />
 	</item>
-			
-	<item id="71691"> <!-- Dragon Pedant - Attack Type Lv. 1 -->
-		<options level="0" option1="81023" />
-		<options level="1" option1="81024" />
-		<options level="2" option1="81025" />
-		<options level="3" option1="81026" />
-		<options level="4" option1="81027" />
-		<options level="5" option1="81028" />
+	
+	<!-- Damaged RB accessory -->
+	<item id="90993"> <!-- Damaged Antharas' Earring -->
+		<options level="0" option1="50300" />
+		<options level="1" option1="50301" />
+		<options level="2" option1="50302" />
+		<options level="3" option1="50303" />
+		<options level="4" option1="50304" />
+		<options level="5" option1="50305" />
+		<options level="6" option1="50306" />
+		<options level="7" option1="50307" />
+		<options level="8" option1="50308" />
+		<options level="9" option1="50309" />
+		<options level="10" option1="50310" />		
 	</item>
-	<item id="71692"> <!-- Dragon Pedant - Attack Type Lv. 2 -->
-		<options level="0" option1="81029" />
-		<options level="1" option1="81030" />
-		<options level="2" option1="81031" />
-		<options level="3" option1="81032" />
-		<options level="4" option1="81033" />
-		<options level="5" option1="81034" />
+	<item id="90994"> <!-- Damaged Baium's Ring -->
+		<options level="0" option1="50311" />
+		<options level="1" option1="50312" />
+		<options level="2" option1="50313" />
+		<options level="3" option1="50314" />
+		<options level="4" option1="50315" />
+		<options level="5" option1="50316" />
+		<options level="6" option1="50317" />
+		<options level="7" option1="50318" />
+		<options level="8" option1="50319" />
+		<options level="9" option1="50320" />
+		<options level="10" option1="50321" />		
 	</item>
-	<item id="71693"> <!-- Dragon Pedant - Attack Type Lv. 3 -->
-		<options level="0" option1="81035" />
-		<options level="1" option1="81036" />
-		<options level="2" option1="81037" />
-		<options level="3" option1="81038" />
-		<options level="4" option1="81039" />
-		<options level="5" option1="81040" option2="81071" />
+	<item id="91006"> <!-- Damaged Zaken's Earring -->
+		<options level="0" option1="50322" />
+		<options level="1" option1="50323" />
+		<options level="2" option1="50324" />
+		<options level="3" option1="50325" />
+		<options level="4" option1="50326" />
+		<options level="5" option1="50327" />
+		<options level="6" option1="50328" />
+		<options level="7" option1="50329" />
+		<options level="8" option1="50330" />
+		<options level="9" option1="50331" />
+		<options level="10" option1="50332" />		
 	</item>
-	<item id="71694"> <!-- Dragon Pedant - Attack Type Lv. 4 -->
-		<options level="0" option1="81041" option2="81071" />
-		<options level="1" option1="81042" option2="81071" />
-		<options level="2" option1="81043" option2="81072" />
-		<options level="3" option1="81044" option2="81072" />
-		<options level="4" option1="81045" option2="81073" />
-		<options level="5" option1="81046" option2="81074" />
+	<item id="91953"> <!-- Dragon valley earing -->
+		<options level="0" option1="20001" />
+		<options level="1" option1="20002" />
+		<options level="2" option1="20003" />
+		<options level="3" option1="20004" />
+		<options level="4" option1="20005" />
+		<options level="5" option1="20006" />
+		<options level="6" option1="20007" />
+		<options level="7" option1="20007" />
+		<options level="8" option1="20007" />
+		<options level="9" option1="20010" />
+		<options level="10" option1="20011" />
 	</item>
 	
-	<item id="71695"> <!-- Dragon Pedant - Magic Type Lv. 1 -->
-		<options level="0" option1="81047" />
-		<options level="1" option1="81048" />
-		<options level="2" option1="81049" />
-		<options level="3" option1="81050" />
-		<options level="4" option1="81051" />
-		<options level="5" option1="81052" />
+	<item id="71691"> <!-- Dragon Pedant - Attack Type Lv. 1 -->
+		<options level="0" option1="50389" />
+		<options level="1" option1="50390" />
+		<options level="2" option1="50391" />
+		<options level="3" option1="50392" />
+		<options level="4" option1="50393" />
+		<options level="5" option1="50394" />
 	</item>
-	<item id="71696"> <!-- Dragon Pedant - Magic Type Lv. 2 -->
-		<options level="0" option1="81053" />
-		<options level="1" option1="81054" />
-		<options level="2" option1="81055" />
-		<options level="3" option1="81056" />
-		<options level="4" option1="81057" />
-		<options level="5" option1="81058" />
+	<item id="71692"> <!-- Dragon Pedant - Attack Type Lv. 2 -->
+		<options level="0" option1="50395" />
+		<options level="1" option1="50396" />
+		<options level="2" option1="50397" />
+		<options level="3" option1="50398" />
+		<options level="4" option1="50399" />
+		<options level="5" option1="50400" />
 	</item>
-	<item id="71697"> <!-- Dragon Pedant - Magic Type Lv. 3 -->
-		<options level="0" option1="81059" />
-		<options level="1" option1="81060" />
-		<options level="2" option1="81061" />
-		<options level="3" option1="81062" />
-		<options level="4" option1="81063" />
-		<options level="5" option1="81064" option2="81071" />
+	<item id="71693"> <!-- Dragon Pedant - Attack Type Lv. 3 -->
+		<options level="0" option1="50401" />
+		<options level="1" option1="50402" />
+		<options level="2" option1="50403" />
+		<options level="3" option1="50404" />
+		<options level="4" option1="50405" />
+		<options level="5" option1="50406" option2="81071" />
 	</item>
-	<item id="71698"> <!-- Dragon Pedant - Magic Type Lv. 4 -->
-		<options level="0" option1="81065" option2="81071" />
-		<options level="1" option1="81066" option2="81071" />
-		<options level="2" option1="81067" option2="81072" />
-		<options level="3" option1="81068" option2="81072" />
-		<options level="4" option1="81069" option2="81073" />
-		<options level="5" option1="81070" option2="81074" />
+	<item id="71694"> <!-- Dragon Pedant - Attack Type Lv. 4 -->
+		<options level="0" option1="50407" option2="81071" />
+		<options level="1" option1="50408" option2="81071" />
+		<options level="2" option1="50409" option2="81071" option3="50413" />
+		<options level="3" option1="50410" option2="81071" option3="50413" />
+		<options level="4" option1="50411" option2="81071" option3="50413" option4="81073" />
+		<options level="5" option1="50412" option2="81071" option3="50413" option4="81074" />
 	</item>
 </list>

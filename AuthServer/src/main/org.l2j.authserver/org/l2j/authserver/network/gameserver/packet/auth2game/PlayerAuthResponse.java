@@ -33,9 +33,9 @@ public class PlayerAuthResponse extends GameServerWritablePacket {
 
 	@Override
 	protected void writeImpl(ServerClient client)  {
-		writeByte(0x02);
+		writeByte((byte)0x02);
 		writeString(account);
-		writeByte(response);
+		writeByte((byte) (response ? 0x01 : 0x00));
 		if(response) {
 			var key  = AuthController.getInstance().getKeyForAccount(account);
 			writeInt(key.getGameServerSessionId());

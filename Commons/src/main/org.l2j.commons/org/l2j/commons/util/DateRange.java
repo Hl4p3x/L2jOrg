@@ -22,9 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
-
-import static org.l2j.commons.util.Util.parseLocalDateTime;
+import java.time.LocalDate;
 
 /**
  * @author Luis Arias
@@ -33,12 +31,12 @@ import static org.l2j.commons.util.Util.parseLocalDateTime;
 public class DateRange {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DateRange.class);
-    public static final DateRange STARTED_DAY = new DateRange(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
+    public static final DateRange STARTED_DAY = new DateRange(LocalDate.now(), LocalDate.now().plusDays(1));
 
-    private final LocalDateTime startDate;
-    private final LocalDateTime endDate;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
 
-    public DateRange(LocalDateTime from, LocalDateTime to) {
+    public DateRange(LocalDate from, LocalDate to) {
         startDate = from;
         endDate = to;
     }
@@ -52,7 +50,7 @@ public class DateRange {
      */
     public static DateRange parse(String startDate, String endDate) {
         try {
-            return new DateRange(parseLocalDateTime(startDate), parseLocalDateTime(endDate));
+            return new DateRange(LocalDate.parse(startDate), LocalDate.parse(endDate));
         } catch (Exception e) {
             LOGGER.warn(e.getMessage(), e);
         }
@@ -63,27 +61,27 @@ public class DateRange {
         return startDate.isBefore(endDate);
     }
 
-    public boolean isWithinRange(LocalDateTime date) {
+    public boolean isWithinRange(LocalDate date) {
         return startDate.isEqual(date) || endDate.isEqual(date) || (startDate.isBefore(date) && endDate.isAfter(date));
     }
 
-    public LocalDateTime getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public LocalDateTime getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
     public long millisToEnd() {
-        return Duration.between(LocalDateTime.now(), endDate).toMillis();
+        return Duration.between(LocalDate.now(), endDate).toMillis();
     }
 
-    public long secondsToStart(LocalDateTime today) {
+    public long secondsToStart(LocalDate today) {
         return Duration.between(today, startDate).toSeconds();
     }
 
-    public boolean isAfter(LocalDateTime date) {
+    public boolean isAfter(LocalDate date) {
         return startDate.isAfter(date);
     }
 

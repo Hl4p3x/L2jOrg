@@ -384,8 +384,6 @@
             <effect name="TargetCancel">
                 <power initial="40.0"/>
             </effect>
-            <effect name="BlockControl"/>
-            <effect name="Stun"/>
         </effects>
     </skill>
     <skill id="102" name="Entangle" max-level="18" debuff="true" action="A2">
@@ -1049,7 +1047,7 @@
         <attributes property="MAGIC" magic-critical-rate="5.0"/>
         <target/>
         <effects>
-            <stat-modify stat="PHYSICAL_ATTACK_RANGE">
+            <stat-modify stat="PHYSICAL_ATTACK_RANGE" stat-add="PHYSICAL_ATTACK_RANGE">
                 <power initial="200.0">
                     <value level="2">400.0</value>
                 </power>

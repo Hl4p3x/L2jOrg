@@ -6014,7 +6014,7 @@ public final class Player extends Playable {
      * @return True if the Player is on line.
      */
     public boolean isOnline() {
-        return _isOnline && getClient() != null;
+        return _isOnline;
     }
 
     public int isOnlineInt() {
@@ -6068,17 +6068,11 @@ public final class Player extends Playable {
     @Override
     public Skill removeSkill(Skill skill, boolean store) {
         removeCustomSkill(skill);
-        if(nonNull(skill)) {
-            sendSkillList();
-        }
         return store ? removeSkill(skill) : super.removeSkill(skill, true);
     }
 
     public Skill removeSkill(Skill skill, boolean store, boolean cancelEffect) {
         removeCustomSkill(skill);
-        if(nonNull(skill)) {
-            sendSkillList();
-        }
         return store ? removeSkill(skill) : super.removeSkill(skill, cancelEffect);
     }
 
@@ -8301,7 +8295,7 @@ public final class Player extends Playable {
         if (_movieHolder != null) {
             sendPacket(new ExStartScenePlayer(_movieHolder.getMovie()));
         }
-        if(nonNull(autoPlaySettings) && autoPlaySettings.isActive()) {
+        if(autoPlaySettings.isActive()) {
             AutoPlayEngine.getInstance().stopAutoPlay(this);
         }
     }
@@ -8401,10 +8395,6 @@ public final class Player extends Playable {
 
     public int getLastHtmlActionOriginId() {
         return _lastHtmlActionOriginObjId;
-    }
-
-    public void setLastHtmlActionOriginId(int objId) {
-        _lastHtmlActionOriginObjId = objId;
     }
 
     private boolean validateHtmlAction(Iterable<String> actionIter, String action) {

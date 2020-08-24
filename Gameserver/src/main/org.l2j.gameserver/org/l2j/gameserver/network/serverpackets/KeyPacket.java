@@ -38,17 +38,17 @@ public final class KeyPacket extends ServerPacket {
     public void writeImpl(GameClient client) {
         writeId(ServerPacketId.VERSION_CHECK);
 
-        writeByte(_result); // 0 - wrong protocol, 1 - protocol ok
+        writeByte((byte) _result); // 0 - wrong protocol, 1 - protocol ok
         for (int i = 0; i < 8; i++) {
             writeByte(_key[i]); // key
         }
         var serverSettings = getSettings(ServerSettings.class);
-        writeInt(true); // cipher enabled
+        writeInt(0x01); // ciphen enabled
         writeInt(serverSettings.serverId());
-        writeByte(false); // merged server
+        writeByte((byte) 0x00); // merged server
         writeInt(0x00); // obfuscation key
-        writeByte((serverSettings.type() & CLASSIC.getMask()) != 0); // isClassic
-        writeByte(0x00); // queued ?
+        writeByte((byte) ((serverSettings.type() & CLASSIC.getMask()) != 0 ? 0x01 : 0x00)); // isClassic
+        writeByte((byte) 0x00); // queued ?
     }
 
 }

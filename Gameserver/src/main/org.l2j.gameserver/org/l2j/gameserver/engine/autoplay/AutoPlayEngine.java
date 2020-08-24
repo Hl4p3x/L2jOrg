@@ -201,7 +201,7 @@ public final class AutoPlayEngine {
                 var range = setting.isNearTarget() ? 600 : 1400;
 
                 if (setting.isAutoPickUpOn()) {
-                    var item = World.getInstance().findAnyVisibleObject(player, Item.class, 200, false, it -> nonNull(it.getDropProtection().getOwner()) && it.getDropProtection().tryPickUp(player) && player.getInventory().validateCapacity(it));
+                    var item = World.getInstance().findAnyVisibleObject(player, Item.class, range, false, it -> it.getDropProtection().tryPickUp(player));
                     if (nonNull(item)) {
                         player.getAI().setIntention(CtrlIntention.AI_INTENTION_PICK_UP, item);
                         return;
@@ -356,6 +356,7 @@ public final class AutoPlayEngine {
                 !player.hasBlockActions() &&
                 !player.isControlBlocked() &&
                 !player.isAlikeDead() &&
+                !player.isInsideZone(ZoneType.PEACE) &&
                 !player.inObserverMode() &&
                 !player.isCastingNow();
     }

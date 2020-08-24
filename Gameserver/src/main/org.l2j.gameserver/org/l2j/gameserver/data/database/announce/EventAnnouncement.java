@@ -20,7 +20,7 @@ package org.l2j.gameserver.data.database.announce;
 
 import org.l2j.commons.util.DateRange;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -52,7 +52,7 @@ public class EventAnnouncement implements Announce {
 
     @Override
     public boolean isValid() {
-        return range.isWithinRange(LocalDateTime.now());
+        return range.isWithinRange(LocalDate.now());
     }
 
     @Override
