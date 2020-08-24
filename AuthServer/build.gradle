@@ -1,0 +1,96 @@
+import java.text.SimpleDateFormat
+import java.util.regex.Matcher
+
+plugins {
+    id "application"
+}
+ext.moduleName = 'org.l2j.authserver'
+mainClassName = "org.l2j.authserver.AuthServer"
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/org.l2j.authserver']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
+
+configurations.all {
+    // Check for updates every build
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+dependencies {
+    implementation project(':Commons')
+    implementation 'io.github.joealisson:async-mmocore:3.2.0-SNAPSHOT'
+
+    runtimeOnly 'org.apache.logging.log4j:log4j-slf4j18-impl:2.13.3'
+    runtimeOnly 'org.ehcache:ehcache:3.8.1'
+}
+
+jar {
+
+    exclude('config/**')
+    exclude('*.cfg')
+
+    manifest {
+        attributes('Built-By'    : System.getProperty('user.name'),
+                'Build-Timestamp': new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                'Build-Revision' : rootProject.ext.revision,
+                'Build-Version'  : rootProject.version,
+                'Build-Jdk'      : rootProject.ext.buildJDK,
+                'Main-Class'     : mainClassName)
+    }
+}
+
+run {
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        def args = jvmArgs
+        args << "--enable-preview" << "--module-path" << classpath.asPath << '--class-path' << classpath.asPath << '--add-exports' << 'java.base/jdk.internal.misc=io.github.joealisson.primitive' << '--module' << "$moduleName/$mainClassName".toString()
+        jvmArgs = args
+    }
+}
+
+startScripts {
+    inputs.property("moduleName", moduleName)
+    doFirst {
+        classpath = files()
+        defaultJvmOpts = [
+                '--enable-preview',
+                '--module-path', 'APP_HOME_LIBS',
+                '--module', "$moduleName/$mainClassName",
+                '--source', sourceCompatibility,
+                '--add-exports', 'java.base/jdk.internal.misc=io.github.joealisson.primitive'
+
+        ]
+    }
+    doLast{
+        def bashFile = new File(outputDir, applicationName)
+        String bashContent = bashFile.text
+        bashFile.text = bashContent.replaceFirst('APP_HOME_LIBS', Matcher.quoteReplacement('$APP_HOME/lib'))
+
+        def batFile = new File(outputDir, applicationName + ".bat")
+        String batContent = batFile.text
+        batFile.text = batContent.replaceFirst('APP_HOME_LIBS', Matcher.quoteReplacement('%APP_HOME%\\lib'))
+    }
+}
+
+task dist(type: Copy) {
+    from([configurations.compileClasspath, configurations.runtimeClasspath, jar]) {
+        include "*.jar"
+    }
+    into ("$buildDir/authserver/lib")
+
+    copy {
+        into("$buildDir/authserver")
+        from([sourceSets.main.resources, 'bin'])
+
+    }
+}
+
+build.finalizedBy dist

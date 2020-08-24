@@ -1,0 +1,75 @@
+plugins {
+    id "idea"
+    id "eclipse"
+    id "distribution"
+    id "net.nemerosa.versioning" version "2.8.2"
+}
+
+version '1.7.0'
+ext.revision = versioning.info.build
+ext.buildJDK = "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})".toString()
+
+defaultTasks('clean', 'build')
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+
+    compileJava.options.encoding = 'UTF-8'
+
+    repositories {
+        mavenCentral()
+
+        maven {
+            url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
+    }
+    
+    sourceCompatibility = JavaVersion.VERSION_14
+    targetCompatibility = JavaVersion.VERSION_14
+    
+    afterEvaluate {
+        compileJava {
+            inputs.property("moduleName", moduleName)
+            doFirst {
+                options.compilerArgs = [
+                    '--module-path', classpath.asPath,
+                    '-parameters', '--enable-preview'
+                ]
+                options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+                classpath = files()
+            }
+        }
+    }
+}
+
+distZip {
+    subprojects.each { dependsOn("${it.name}:build") }
+}
+
+distTar {
+    subprojects.each { dependsOn("${it.name}:build") }
+}
+
+distributions {
+    main {
+        contents {
+            from(["Datapack/authserver", "${project(':AuthServer').buildDir}/authserver"])  {
+                into("authserver")
+            }
+
+            from(["Datapack/gameserver", "${project(':Gameserver').buildDir}/gameserver"]) {
+                into("gameserver")
+            }
+
+            from("Datapack/database_installer") {
+                into("gameserver/sql")
+            }
+
+            from("Datapack/database_installer") {
+                into("authserver/sql")
+            }
+        }
+    }
+}

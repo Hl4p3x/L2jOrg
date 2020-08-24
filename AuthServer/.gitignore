@@ -1,0 +1,9 @@
+# Gradle
+/build/
+
+# IntelliJ
+out/
+*.iml
+
+/config/
+/logs/
