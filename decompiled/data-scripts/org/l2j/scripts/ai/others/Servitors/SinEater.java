@@ -16,6 +16,7 @@ import org.l2j.gameserver.model.events.annotations.RegisterEvent;
 import org.l2j.gameserver.model.events.impl.character.OnCreatureDeath;
 import org.l2j.gameserver.model.actor.Summon;
 import org.l2j.gameserver.network.NpcStringId;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.scripts.ai.AbstractNpcAI;
@@ -31,8 +32,8 @@ public final class SinEater extends AbstractNpcAI
     
     public String onAdvEvent(final String event, final Npc npc, final Player player) {
         if (event.equals("TALK") && player != null && player.getPet() != null) {
-            if (getRandom(100) < 30) {
-                final int random = getRandom(100);
+            if (Rnd.get(100) < 30) {
+                final int random = Rnd.get(100);
                 final Summon summon = (Summon)player.getPet();
                 if (random < 20) {
                     this.broadcastSummonSay(summon, NpcStringId.YAWWWWN_IT_S_SO_BORING_HERE_WE_SHOULD_GO_AND_FIND_SOME_ACTION);
@@ -59,7 +60,7 @@ public final class SinEater extends AbstractNpcAI
     @RegisterType(ListenerRegisterType.NPC)
     @Id({ 12564 })
     public void onCreatureKill(final OnCreatureDeath event) {
-        final int random = getRandom(100);
+        final int random = Rnd.get(100);
         final Summon summon = (Summon)event.getTarget();
         if (random < 30) {
             this.broadcastSummonSay(summon, NpcStringId.OH_THIS_IS_JUST_GREAT_WHAT_ARE_YOU_GOING_TO_DO_NOW);
@@ -76,8 +77,8 @@ public final class SinEater extends AbstractNpcAI
     @RegisterType(ListenerRegisterType.NPC)
     @Id({ 12564 })
     public void onCreatureAttacked(final OnCreatureAttacked event) {
-        if (getRandom(100) < 30) {
-            final int random = getRandom(100);
+        if (Rnd.get(100) < 30) {
+            final int random = Rnd.get(100);
             final Summon summon = (Summon)event.getTarget();
             if (random < 35) {
                 this.broadcastSummonSay(summon, NpcStringId.OH_THAT_SMARTS);
@@ -92,13 +93,13 @@ public final class SinEater extends AbstractNpcAI
     }
     
     public void onSummonSpawn(final Summon summon) {
-        this.broadcastSummonSay(summon, getRandomBoolean() ? NpcStringId.HEY_IT_SEEMS_LIKE_YOU_NEED_MY_HELP_DOESN_T_IT : NpcStringId.ALMOST_GOT_IT_OUCH_STOP_DAMN_THESE_BLOODY_MANACLES);
+        this.broadcastSummonSay(summon, Rnd.nextBoolean() ? NpcStringId.HEY_IT_SEEMS_LIKE_YOU_NEED_MY_HELP_DOESN_T_IT : NpcStringId.ALMOST_GOT_IT_OUCH_STOP_DAMN_THESE_BLOODY_MANACLES);
         this.startQuestTimer("TALK", 60000L, (Npc)null, summon.getOwner());
     }
     
     public void onSummonTalk(final Summon summon) {
-        if (getRandom(100) < 10) {
-            final int random = getRandom(100);
+        if (Rnd.get(100) < 10) {
+            final int random = Rnd.get(100);
             if (random < 25) {
                 this.broadcastSummonSay(summon, NpcStringId.USING_A_SPECIAL_SKILL_HERE_COULD_TRIGGER_A_BLOODBATH);
             }

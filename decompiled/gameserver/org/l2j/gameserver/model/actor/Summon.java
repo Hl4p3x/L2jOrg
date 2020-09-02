@@ -11,7 +11,6 @@ import org.l2j.gameserver.model.actor.status.PlayableStatus;
 import org.l2j.gameserver.network.serverpackets.InventoryUpdate;
 import org.l2j.commons.util.Util;
 import org.l2j.gameserver.enums.Race;
-import org.l2j.gameserver.network.serverpackets.TeleportToLocation;
 import org.l2j.gameserver.network.serverpackets.PetItemList;
 import org.l2j.gameserver.network.serverpackets.ExPartyPetWindowUpdate;
 import org.l2j.gameserver.network.serverpackets.PetStatusUpdate;
@@ -23,7 +22,6 @@ import org.l2j.gameserver.network.serverpackets.ActionFailed;
 import org.l2j.gameserver.world.zone.ZoneType;
 import org.l2j.gameserver.model.skills.targets.TargetType;
 import org.l2j.gameserver.model.skills.SkillCaster;
-import org.l2j.gameserver.engine.skill.api.Skill;
 import org.l2j.gameserver.model.item.Weapon;
 import org.l2j.gameserver.model.item.instance.Item;
 import org.l2j.gameserver.model.item.container.PetInventory;
@@ -66,8 +64,10 @@ import org.l2j.gameserver.network.serverpackets.RelationChanged;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.model.Location;
+import java.util.Iterator;
 import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.engine.geo.GeoEngine;
+import org.l2j.gameserver.engine.skill.api.Skill;
 import org.l2j.gameserver.enums.InstanceType;
 import org.l2j.gameserver.model.actor.templates.CreatureTemplate;
 import org.l2j.gameserver.model.actor.templates.NpcTemplate;
@@ -91,6 +91,9 @@ public abstract class Summon extends Playable
         this.setInstanceType(InstanceType.L2Summon);
         this.setInstance(owner.getInstanceWorld());
         this.setShowSummonAnimation(true);
+        for (final Skill skill : template.getSkills().values()) {
+            this.addSkill(skill);
+        }
         this._owner = owner;
         this.getAI();
         final int x = owner.getX();
@@ -601,22 +604,21 @@ public abstract class Summon extends Playable
     }
     
     @Override
-    public void sendInfo(final Player activeChar) {
-        if (activeChar == this._owner) {
-            activeChar.sendPacket(new PetInfo(this, this.isDead() ? 0 : 1));
+    public void sendInfo(final Player player) {
+        if (player == this._owner) {
+            player.sendPacket(new PetInfo(this, this.isTeleporting() ? 0 : 1));
             if (GameUtils.isPet(this)) {
-                activeChar.sendPacket(new PetItemList(this.getInventory().getItems()));
+                player.sendPacket(new PetItemList(this.getInventory().getItems()));
             }
         }
         else {
-            activeChar.sendPacket(new ExPetInfo(this, activeChar, 0));
+            player.sendPacket(new ExPetInfo(this, player, 0));
         }
     }
     
     @Override
     public void onTeleported() {
         super.onTeleported();
-        this.sendPacket(new TeleportToLocation(this, this.getX(), this.getY(), this.getZ(), this.getHeading()));
     }
     
     @Override

@@ -7,7 +7,6 @@ package org.l2j.gameserver.network.clientpackets;
 import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.model.TradeList;
 import org.l2j.gameserver.model.actor.instance.Player;
-import org.l2j.gameserver.data.sql.impl.OfflineTradersTable;
 import org.l2j.gameserver.enums.PrivateStoreType;
 import org.l2j.gameserver.model.interfaces.ILocational;
 import org.l2j.gameserver.util.MathUtil;
@@ -101,9 +100,6 @@ public final class RequestPrivateStoreSell extends ClientPacket
             ((GameClient)this.client).sendPacket(ActionFailed.STATIC_PACKET);
             RequestPrivateStoreSell.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, player.getName(), storePlayer.getName()));
             return;
-        }
-        if (Config.OFFLINE_TRADE_ENABLE && Config.STORE_OFFLINE_TRADE_IN_REALTIME && (storePlayer.getClient() == null || storePlayer.getClient().isDetached())) {
-            OfflineTradersTable.onTransaction(storePlayer, storeList.getItemCount() == 0, false);
         }
         if (storeList.getItemCount() == 0) {
             storePlayer.setPrivateStoreType(PrivateStoreType.NONE);

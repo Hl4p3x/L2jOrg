@@ -41,11 +41,11 @@ public abstract class GameXmlReader extends XmlReader
                     break;
                 }
                 case "skill": {
-                    parameters.put(this.parseString(attrs, "name"), new SkillHolder(this.parseInteger(attrs, "id"), this.parseInteger(attrs, "level")));
+                    parameters.put(this.parseString(attrs, "name"), new SkillHolder(this.parseInt(attrs, "id"), this.parseInt(attrs, "level")));
                     break;
                 }
                 case "location": {
-                    parameters.put(this.parseString(attrs, "name"), new Location(this.parseInteger(attrs, "x"), this.parseInteger(attrs, "y"), this.parseInteger(attrs, "z"), this.parseInteger(attrs, "heading", Integer.valueOf(0))));
+                    parameters.put(this.parseString(attrs, "name"), new Location(this.parseInt(attrs, "x"), this.parseInt(attrs, "y"), this.parseInt(attrs, "z"), this.parseInt(attrs, "heading", 0)));
                     break;
                 }
                 case "minions": {
@@ -53,7 +53,7 @@ public abstract class GameXmlReader extends XmlReader
                     for (Node minions_node = parameters_node.getFirstChild(); minions_node != null; minions_node = minions_node.getNextSibling()) {
                         if (minions_node.getNodeName().equalsIgnoreCase("npc")) {
                             attrs = minions_node.getAttributes();
-                            minions.add(new MinionHolder(this.parseInteger(attrs, "id"), this.parseInteger(attrs, "count"), this.parseInteger(attrs, "respawnTime"), this.parseInteger(attrs, "weightPoint")));
+                            minions.add(new MinionHolder(this.parseInt(attrs, "id"), this.parseInt(attrs, "count"), this.parseInt(attrs, "respawnTime"), this.parseInt(attrs, "weightPoint")));
                         }
                     }
                     if (!minions.isEmpty()) {
@@ -67,17 +67,17 @@ public abstract class GameXmlReader extends XmlReader
         return parameters;
     }
     
-    protected Location parseLocation(final Node n) {
+    public Location parseLocation(final Node n) {
         final NamedNodeMap attrs = n.getAttributes();
-        final int x = this.parseInteger(attrs, "x");
-        final int y = this.parseInteger(attrs, "y");
-        final int z = this.parseInteger(attrs, "z");
-        final int heading = this.parseInteger(attrs, "heading", Integer.valueOf(0));
+        final int x = this.parseInt(attrs, "x");
+        final int y = this.parseInt(attrs, "y");
+        final int z = this.parseInt(attrs, "z");
+        final int heading = this.parseInt(attrs, "heading", 0);
         return new Location(x, y, z, heading);
     }
     
-    protected ItemHolder parseItemHolder(final Node n) {
+    public ItemHolder parseItemHolder(final Node n) {
         final NamedNodeMap attrs = n.getAttributes();
-        return new ItemHolder(this.parseInt(attrs, "id"), this.parselong(attrs, "count"), this.parseInt(attrs, "enchant", 0));
+        return new ItemHolder(this.parseInt(attrs, "id"), this.parseLong(attrs, "count"), this.parseInt(attrs, "enchant", 0));
     }
 }

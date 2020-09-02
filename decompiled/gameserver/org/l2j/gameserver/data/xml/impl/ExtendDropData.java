@@ -70,9 +70,9 @@ public class ExtendDropData extends GameXmlReader
             set = new StatsSet(this.parseAttributes(dropNode));
             items = new ArrayList<ExtendDropItemHolder>(1);
             this.forEach(dropNode, "items", itemsNode -> this.forEach(itemsNode, "item", itemNode -> {
-                itemId = this.parseInteger(itemNode.getAttributes(), "id");
-                itemCount = this.parseInteger(itemNode.getAttributes(), "count");
-                itemMaxCount = this.parseInteger(itemNode.getAttributes(), "maxCount");
+                itemId = this.parseInt(itemNode.getAttributes(), "id");
+                itemCount = this.parseInt(itemNode.getAttributes(), "count");
+                itemMaxCount = this.parseInt(itemNode.getAttributes(), "maxCount");
                 itemChance = this.parseDouble(itemNode.getAttributes(), "chance");
                 itemAdditionalChance = this.parseDouble(itemNode.getAttributes(), "additionalChance");
                 list.add(new ExtendDropItemHolder(itemId, itemCount, itemMaxCount, itemChance, itemAdditionalChance));
@@ -94,7 +94,7 @@ public class ExtendDropData extends GameXmlReader
             systemMessages = new HashMap<Long, SystemMessageId>();
             this.forEach(dropNode, "systemMessages", systemMessagesNode -> this.forEach(systemMessagesNode, "systemMessage", systemMessageNode -> {
                 amount = this.parseLong(systemMessageNode.getAttributes(), "amount");
-                systemMessageId = SystemMessageId.getSystemMessageId(this.parseInteger(systemMessageNode.getAttributes(), "id"));
+                systemMessageId = SystemMessageId.getSystemMessageId(this.parseInt(systemMessageNode.getAttributes(), "id"));
                 map.put(amount, systemMessageId);
             }));
             set.set("systemMessages", systemMessages);

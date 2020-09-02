@@ -6,6 +6,7 @@ package org.l2j.scripts.quests.Q00370_AnElderSowsSeeds;
 
 import io.github.joealisson.primitive.HashIntMap;
 import io.github.joealisson.primitive.HashIntIntMap;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.quest.QuestState;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.model.actor.instance.Player;
@@ -86,7 +87,7 @@ public final class Q00370_AnElderSowsSeeds extends Quest
     public String onKill(final Npc npc, final Player player, final boolean isSummon) {
         final int npcId = npc.getId();
         if (Q00370_AnElderSowsSeeds.MOBS1.containsKey(npcId)) {
-            if (getRandom(100) < Q00370_AnElderSowsSeeds.MOBS1.get(npcId)) {
+            if (Rnd.get(100) < Q00370_AnElderSowsSeeds.MOBS1.get(npcId)) {
                 final Player luckyPlayer = this.getRandomPartyMember(player, npc);
                 if (luckyPlayer != null) {
                     giveItemRandomly(luckyPlayer, npc, 5916, 1L, 0L, 1.0, true);

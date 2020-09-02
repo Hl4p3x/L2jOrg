@@ -12,6 +12,7 @@ import org.l2j.gameserver.model.actor.Attackable;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.CreatureSay;
 import org.l2j.gameserver.enums.ChatType;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import io.github.joealisson.primitive.IntCollection;
@@ -32,9 +33,9 @@ public final class PolymorphingOnAttack extends AbstractNpcAI
     public String onAttack(final Npc npc, final Player attacker, final int damage, final boolean isSummon) {
         if (npc.isSpawned() && !npc.isDead()) {
             final List<Integer> tmp = (List<Integer>)PolymorphingOnAttack.MOBSPAWNS.get(npc.getId());
-            if (tmp != null && npc.getCurrentHp() <= npc.getMaxHp() * tmp.get(1) / 100.0 && getRandom(100) < tmp.get(2)) {
+            if (tmp != null && npc.getCurrentHp() <= npc.getMaxHp() * tmp.get(1) / 100.0 && Rnd.get(100) < tmp.get(2)) {
                 if (tmp.get(3) >= 0) {
-                    final NpcStringId npcString = PolymorphingOnAttack.MOBTEXTS[tmp.get(3)][getRandom(PolymorphingOnAttack.MOBTEXTS[tmp.get(3)].length)];
+                    final NpcStringId npcString = PolymorphingOnAttack.MOBTEXTS[tmp.get(3)][Rnd.get(PolymorphingOnAttack.MOBTEXTS[tmp.get(3)].length)];
                     npc.broadcastPacket((ServerPacket)new CreatureSay(npc.getObjectId(), ChatType.NPC_GENERAL, npc.getName(), npcString));
                 }
                 npc.deleteMe();

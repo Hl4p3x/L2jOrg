@@ -65,15 +65,15 @@ public final class MapRegionManager extends GameXmlReader
         final NamedNodeMap attributes;
         final String name;
         final String town;
-        final Integer loc;
-        final Integer bbs;
+        final int loc;
+        final int bbs;
         final MapRegion region;
         this.forEach((Node)doc, "list", nodeList -> this.forEach(nodeList, "region", regionNode -> {
             attributes = regionNode.getAttributes();
             name = this.parseString(attributes, "name");
             town = this.parseString(attributes, "town");
-            loc = this.parseInteger(attributes, "loc");
-            bbs = this.parseInteger(attributes, "bbs");
+            loc = this.parseInt(attributes, "loc");
+            bbs = this.parseInt(attributes, "bbs");
             region = new MapRegion(town, loc, bbs);
             this.parseRegion(regionNode, region);
             this.regions.put(name, region);
@@ -84,9 +84,9 @@ public final class MapRegionManager extends GameXmlReader
         for (Node node = regionNode.getFirstChild(); node != null; node = node.getNextSibling()) {
             final NamedNodeMap attributes = node.getAttributes();
             if ("respawn-point".equalsIgnoreCase(node.getNodeName())) {
-                final int spawnX = this.parseInteger(attributes, "x");
-                final int spawnY = this.parseInteger(attributes, "y");
-                final int spawnZ = this.parseInteger(attributes, "z");
+                final int spawnX = this.parseInt(attributes, "x");
+                final int spawnY = this.parseInt(attributes, "y");
+                final int spawnZ = this.parseInt(attributes, "z");
                 if (this.parseBoolean(attributes, "chaotic")) {
                     region.addChaoticSpawn(spawnX, spawnY, spawnZ);
                 }

@@ -11,6 +11,7 @@ import org.l2j.commons.util.Util;
 import org.l2j.gameserver.model.actor.instance.Monster;
 import org.l2j.gameserver.world.World;
 import org.l2j.gameserver.enums.ChatType;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.network.NpcStringId;
@@ -28,7 +29,7 @@ public final class PlainsOfDion extends AbstractNpcAI
     
     public String onAttack(final Npc npc, final Player player, final int damage, final boolean isSummon) {
         if (npc.isScriptValue(0)) {
-            final int i = getRandom(5);
+            final int i = Rnd.get(5);
             if (i < 2) {
                 npc.broadcastSay(ChatType.NPC_GENERAL, PlainsOfDion.MONSTERS_MSG[i], new String[] { player.getName() });
             }
@@ -38,7 +39,7 @@ public final class PlainsOfDion extends AbstractNpcAI
             World.getInstance().forEachVisibleObjectInRange((WorldObject)npc, (Class)Monster.class, npc.getTemplate().getClanHelpRange(), obj -> {
                 if (Util.contains(PlainsOfDion.DELU_LIZARDMEN, ((Monster)obj).getId()) && !((Monster)obj).isAttackingNow() && !((Monster)obj).isDead() && GeoEngine.getInstance().canSeeTarget((WorldObject)npc, obj)) {
                     this.addAttackPlayerDesire((Npc)obj, (Playable)player);
-                    ((Monster)obj).broadcastSay(ChatType.NPC_GENERAL, PlainsOfDion.MONSTERS_ASSIST_MSG[getRandom(3)], new String[0]);
+                    ((Monster)obj).broadcastSay(ChatType.NPC_GENERAL, PlainsOfDion.MONSTERS_ASSIST_MSG[Rnd.get(3)], new String[0]);
                 }
                 return;
             });

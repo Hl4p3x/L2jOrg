@@ -21,7 +21,7 @@ public class ExGetBookMarkInfoPacket extends ServerPacket
     public void writeImpl(final GameClient client) {
         this.writeId(ServerExPacketId.EX_USER_BOOKMARK);
         this.writeInt(0);
-        this.writeInt(this.player.getBookmarkslot());
+        this.writeInt(this.player.getBookMarkSlot());
         this.writeInt(this.player.getTeleportBookmarks().size());
         for (final TeleportBookmark tpbm : this.player.getTeleportBookmarks()) {
             this.writeInt(tpbm.getId());

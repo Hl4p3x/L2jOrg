@@ -44,8 +44,9 @@ public class HtmlUtil
         return getGauge(width, current, max, displayAsPercentage, invokedynamic(makeConcatWithConstants:(J)Ljava/lang/String;, level), invokedynamic(makeConcatWithConstants:(J)Ljava/lang/String;, level), 17L, -13L);
     }
     
-    private static String getGauge(final int width, long current, final long max, final boolean displayAsPercentage, final String backgroundImage, final String image, final long imageHeight, final long top) {
+    private static String getGauge(final int width, long current, long max, final boolean displayAsPercentage, final String backgroundImage, final String image, final long imageHeight, final long top) {
         current = Math.min(current, max);
+        max = Math.max(1L, max);
         final StringBuilder sb = new StringBuilder();
         sb.append("<table width=").append(width).append(" cellpadding=0 cellspacing=0>");
         sb.append("<tr>").append("<td background=\"").append(backgroundImage).append("\">");

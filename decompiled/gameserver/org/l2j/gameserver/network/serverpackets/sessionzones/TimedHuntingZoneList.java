@@ -4,17 +4,14 @@
 
 package org.l2j.gameserver.network.serverpackets.sessionzones;
 
-import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.network.ServerExPacketId;
 import org.l2j.gameserver.network.GameClient;
 import org.l2j.gameserver.model.actor.instance.Player;
-import org.slf4j.Logger;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 
 public class TimedHuntingZoneList extends ServerPacket
 {
-    private static Logger LOGGER;
     private final Player _player;
     private final boolean _isInTimedHuntingZone;
     
@@ -47,9 +44,5 @@ public class TimedHuntingZoneList extends ServerPacket
         this.writeByte((int)(this._isInTimedHuntingZone ? 0 : 1));
         this.writeByte(false);
         this.writeByte(true);
-    }
-    
-    static {
-        TimedHuntingZoneList.LOGGER = LoggerFactory.getLogger((Class)TimedHuntingZoneList.class);
     }
 }

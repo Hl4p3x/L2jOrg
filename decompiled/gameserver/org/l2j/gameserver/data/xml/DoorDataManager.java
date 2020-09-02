@@ -80,13 +80,13 @@ public final class DoorDataManager extends GameXmlReader
         this.forEach(doorNode, x$0 -> XmlReader.isNode(x$0), innerDoorNode -> {
             attrs = innerDoorNode.getAttributes();
             if (innerDoorNode.getNodeName().equals("nodes")) {
-                set.set("nodeZ", this.parseInteger(attrs, "nodeZ"));
+                set.set("nodeZ", this.parseInt(attrs, "nodeZ"));
                 count = new AtomicInteger();
                 this.forEach(innerDoorNode, x$0 -> XmlReader.isNode(x$0), nodes -> {
                     nodeAttrs = nodes.getAttributes();
                     if ("node".equals(nodes.getNodeName())) {
-                        set2.set(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, atomicInteger.get()), (Object)this.parseInteger(nodeAttrs, "x"));
-                        set2.set(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, atomicInteger.getAndIncrement()), (Object)this.parseInteger(nodeAttrs, "y"));
+                        set2.set(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, atomicInteger.get()), this.parseInt(nodeAttrs, "x"));
+                        set2.set(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, atomicInteger.getAndIncrement()), this.parseInt(nodeAttrs, "y"));
                     }
                 });
             }

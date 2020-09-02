@@ -12,7 +12,7 @@ import org.l2j.gameserver.network.serverpackets.SystemMessage;
 import org.l2j.gameserver.network.SystemMessageId;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.world.World;
-import org.l2j.gameserver.engine.olympiad.OlympiadEngine;
+import org.l2j.gameserver.engine.olympiad.Olympiad;
 import java.util.Collection;
 import java.util.ArrayList;
 import org.l2j.gameserver.world.zone.type.OlympiadStadiumZone;
@@ -56,7 +56,7 @@ public class OlympiadGameManager implements Runnable
     
     @Override
     public final void run() {
-        if (OlympiadEngine.getInstance().isMatchInProgress()) {
+        if (Olympiad.getInstance().isMatchesInProgress()) {
             List<Set<Integer>> readyClassed = OlympiadManager.getInstance().hasEnoughRegisteredClassed();
             boolean readyNonClassed = OlympiadManager.getInstance().hasEnoughRegisteredNonClassed();
             if (readyClassed != null || readyNonClassed) {

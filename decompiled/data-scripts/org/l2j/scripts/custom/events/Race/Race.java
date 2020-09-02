@@ -18,6 +18,7 @@ import org.l2j.gameserver.engine.skill.api.SkillEngine;
 import java.util.Iterator;
 import org.l2j.gameserver.model.interfaces.ILocational;
 import org.l2j.gameserver.util.MathUtil;
+import org.l2j.commons.util.Rnd;
 import org.l2j.commons.threading.ThreadPool;
 import org.l2j.gameserver.util.Broadcast;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,7 +64,6 @@ public final class Race extends Event
             return false;
         }
         if (!Config.CUSTOM_NPC_DATA) {
-            Race.LOGGER.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getName()));
             eventMaker.sendMessage(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getName()));
             return false;
         }
@@ -85,7 +85,7 @@ public final class Race extends Event
         }
         Race._isRaceStarted = true;
         Broadcast.toAllOnlinePlayers("Race started!");
-        final int location = getRandom(0, Race._locations.length - 1);
+        final int location = Rnd.get(Race._locations.length);
         Race._randspawn = Race._coords[location];
         this.recordSpawn(900104, Race._randspawn[0], Race._randspawn[1], Race._randspawn[2], Race._randspawn[3], false, 0L);
         for (final Player player : this._players) {
@@ -263,7 +263,7 @@ public final class Race extends Event
     }
     
     private void winRace(final Player player) {
-        final int[] _reward = Race._rewards[getRandom(Race._rewards.length - 1)];
+        final int[] _reward = Race._rewards[Rnd.get(Race._rewards.length - 1)];
         player.addItem("eventModRace", _reward[0], (long)_reward[1], (WorldObject)this._npc, true);
         Broadcast.toAllOnlinePlayers(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, player.getName()));
         this.eventStop();

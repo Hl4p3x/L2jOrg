@@ -103,6 +103,7 @@ public class Q10673_SagaOfLegend extends Quest
         switch (qs.getState()) {
             case 0: {
                 htmltext = "30857-01.htm";
+                break;
             }
             case 1: {
                 switch (qs.getCond()) {

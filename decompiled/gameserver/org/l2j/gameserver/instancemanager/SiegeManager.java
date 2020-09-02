@@ -5,6 +5,10 @@
 package org.l2j.gameserver.instancemanager;
 
 import org.slf4j.LoggerFactory;
+import java.sql.ResultSet;
+import java.sql.PreparedStatement;
+import java.sql.Connection;
+import org.l2j.commons.database.DatabaseFactory;
 import java.util.LinkedList;
 import org.l2j.gameserver.model.entity.Siege;
 import org.l2j.gameserver.model.interfaces.ILocational;
@@ -14,10 +18,8 @@ import java.util.StringTokenizer;
 import java.util.ArrayList;
 import org.l2j.gameserver.model.entity.Castle;
 import org.l2j.commons.util.PropertiesParser;
-import java.sql.ResultSet;
-import java.sql.PreparedStatement;
-import java.sql.Connection;
-import org.l2j.commons.database.DatabaseFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.SiegeDAO;
 import org.l2j.gameserver.model.Clan;
 import org.l2j.gameserver.engine.skill.api.SkillEngine;
 import org.l2j.gameserver.model.actor.instance.Player;
@@ -57,76 +59,8 @@ public final class SiegeManager
         SkillEngine.getInstance().addSiegeSkills(player);
     }
     
-    public final boolean checkIsRegistered(final Clan clan, final int castleid) {
-        if (clan == null) {
-            return false;
-        }
-        if (clan.getCastleId() > 0) {
-            return true;
-        }
-        boolean register = false;
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement statement = con.prepareStatement("SELECT clan_id FROM siege_clans where clan_id=? and castle_id=?");
-                try {
-                    statement.setInt(1, clan.getId());
-                    statement.setInt(2, castleid);
-                    final ResultSet rs = statement.executeQuery();
-                    try {
-                        if (rs.next()) {
-                            register = true;
-                        }
-                        if (rs != null) {
-                            rs.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (rs != null) {
-                            try {
-                                rs.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (statement != null) {
-                        statement.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t3) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception3) {
-                        t3.addSuppressed(exception3);
-                    }
-                }
-                throw t3;
-            }
-        }
-        catch (Exception e) {
-            SiegeManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName(), e.getMessage()), (Throwable)e);
-        }
-        return register;
+    public final boolean checkIsRegistered(final Clan clan, final int castleId) {
+        return clan != null && (clan.getCastleId() > 0 || ((SiegeDAO)DatabaseAccess.getDAO((Class)SiegeDAO.class)).isRegistered(clan.getId(), castleId));
     }
     
     public final void removeSiegeSkills(final Player player) {

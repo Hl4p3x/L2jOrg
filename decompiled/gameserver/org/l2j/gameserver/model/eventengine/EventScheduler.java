@@ -128,7 +128,7 @@ public class EventScheduler
                 notification.execute();
             }
             catch (Exception e) {
-                EventScheduler.LOGGER.warn("Failed to notify to event manager: {} method: {}", (Object)notification.getManager().getClass().getSimpleName(), (Object)notification.getMethod().getName());
+                EventScheduler.LOGGER.warn("Failed to notify to event manager: {} method: {}", (Object)notification.getManager().getClass(), (Object)notification.getMethod().getName());
                 EventScheduler.LOGGER.warn(e.getMessage(), (Throwable)e);
             }
         }

@@ -7,7 +7,7 @@ package org.l2j.gameserver.network.clientpackets;
 import org.l2j.gameserver.model.Clan;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.network.serverpackets.pledge.PledgeShowMemberListAll;
-import org.l2j.gameserver.network.serverpackets.ExPledgeCount;
+import org.l2j.gameserver.network.serverpackets.pledge.ExPledgeCount;
 import org.l2j.gameserver.network.serverpackets.pledge.PledgeShowInfoUpdate;
 import org.l2j.gameserver.network.serverpackets.PledgeShowMemberListAdd;
 import org.l2j.gameserver.instancemanager.CastleManager;

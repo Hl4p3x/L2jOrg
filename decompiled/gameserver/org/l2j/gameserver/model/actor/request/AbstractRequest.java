@@ -64,7 +64,7 @@ public abstract class AbstractRequest
         return false;
     }
     
-    public abstract boolean isUsing(final int objectId);
+    public abstract boolean isUsingItem(final int objectId);
     
     public void onTimeout() {
     }

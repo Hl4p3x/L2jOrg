@@ -43,7 +43,7 @@ public class CompoundRequest extends AbstractRequest
     }
     
     @Override
-    public boolean isUsing(final int objectId) {
+    public boolean isUsingItem(final int objectId) {
         return objectId > 0 && (objectId == this._itemOne || objectId == this._itemTwo);
     }
 }

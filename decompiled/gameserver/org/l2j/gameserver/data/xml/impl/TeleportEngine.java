@@ -54,12 +54,12 @@ public final class TeleportEngine extends GameXmlReader
     
     private void parseTeleport(final Node teleportNode) {
         final NamedNodeMap attributes = teleportNode.getAttributes();
-        final Integer id = this.parseInteger(attributes, "id");
-        final Integer price = this.parseInteger(attributes, "price");
-        final Byte castle = this.parseByte(attributes, "castle");
+        final int id = this.parseInt(attributes, "id");
+        final int price = this.parseInt(attributes, "price");
+        final byte castle = this.parseByte(attributes, "castle");
         final Node locationNode = teleportNode.getFirstChild();
         if (Objects.nonNull(locationNode)) {
-            this.teleports.put((int)id, (Object)new TeleportData(price, this.parseLocation(locationNode), castle));
+            this.teleports.put(id, (Object)new TeleportData(price, this.parseLocation(locationNode), castle));
         }
         else {
             TeleportEngine.LOGGER.warn("Can't find location node in teleports.xml id {}", (Object)id);

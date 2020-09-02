@@ -14,7 +14,7 @@ public class FriendAddRequestResult extends ServerPacket
     private final int _result;
     private final int _charId;
     private final String _charName;
-    private final int _isOnline;
+    private final boolean _isOnline;
     private final int _charObjectId;
     private final int _charLevel;
     private final int _charClassId;
@@ -23,7 +23,7 @@ public class FriendAddRequestResult extends ServerPacket
         this._result = result;
         this._charId = activeChar.getObjectId();
         this._charName = activeChar.getName();
-        this._isOnline = activeChar.isOnlineInt();
+        this._isOnline = activeChar.isOnline();
         this._charObjectId = activeChar.getObjectId();
         this._charLevel = activeChar.getLevel();
         this._charClassId = activeChar.getActiveClass();
@@ -38,6 +38,6 @@ public class FriendAddRequestResult extends ServerPacket
         this.writeInt(this._charObjectId);
         this.writeInt(this._charLevel);
         this.writeInt(this._charClassId);
-        this.writeShort((short)0);
+        this.writeShort(0);
     }
 }

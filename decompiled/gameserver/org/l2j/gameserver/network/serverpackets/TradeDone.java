@@ -11,15 +11,15 @@ public class TradeDone extends ServerPacket
 {
     public static final TradeDone CANCELLED;
     public static final TradeDone COMPLETED;
-    private final boolean completed;
+    private final boolean success;
     
-    private TradeDone(final boolean completed) {
-        this.completed = completed;
+    private TradeDone(final boolean success) {
+        this.success = success;
     }
     
     public void writeImpl(final GameClient client) {
         this.writeId(ServerPacketId.TRADE_DONE);
-        this.writeInt(this.completed);
+        this.writeInt(this.success);
     }
     
     static {

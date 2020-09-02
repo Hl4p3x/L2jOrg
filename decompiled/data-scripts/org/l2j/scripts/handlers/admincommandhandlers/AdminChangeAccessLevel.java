@@ -31,7 +31,7 @@ public final class AdminChangeAccessLevel implements IAdminCommandHandler
                     gm.sendPacket(SystemMessageId.INVALID_TARGET);
                 }
                 else {
-                    onlineChange(gm, (Player)target, lvl);
+                    this.onlineChange(gm, (Player)target, lvl);
                 }
             }
             catch (Exception e) {
@@ -43,7 +43,7 @@ public final class AdminChangeAccessLevel implements IAdminCommandHandler
             final int level = Integer.parseInt(parts[2]);
             final Player player = World.getInstance().findPlayer(name);
             if (player != null) {
-                onlineChange(gm, player, level);
+                this.onlineChange(gm, player, level);
             }
             else if (((PlayerDAO)DatabaseAccess.getDAO((Class)PlayerDAO.class)).updateAccessLevelByName(name, level)) {
                 BuilderUtil.sendSysMessage(gm, invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, level));
@@ -55,11 +55,7 @@ public final class AdminChangeAccessLevel implements IAdminCommandHandler
         return true;
     }
     
-    public String[] getAdminCommandList() {
-        return AdminChangeAccessLevel.ADMIN_COMMANDS;
-    }
-    
-    private static void onlineChange(final Player activeChar, final Player player, final int lvl) {
+    private void onlineChange(final Player activeChar, final Player player, final int lvl) {
         if (lvl >= 0) {
             final AccessLevel acccessLevel = AdminData.getInstance().getAccessLevel(lvl);
             if (acccessLevel != null) {
@@ -76,6 +72,10 @@ public final class AdminChangeAccessLevel implements IAdminCommandHandler
             player.sendMessage("Your character has been banned. Bye.");
             Disconnection.of(player).defaultSequence(false);
         }
+    }
+    
+    public String[] getAdminCommandList() {
+        return AdminChangeAccessLevel.ADMIN_COMMANDS;
     }
     
     static {

@@ -4,7 +4,8 @@
 
 package org.l2j.gameserver.network.clientpackets;
 
-import org.l2j.gameserver.Config;
+import org.l2j.commons.configuration.Configurator;
+import org.l2j.gameserver.settings.ServerSettings;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.ExIsCharNameCreatable;
 import org.l2j.gameserver.network.GameClient;
@@ -43,7 +44,7 @@ public class RequestCharacterNameCreatable extends ClientPacket
     }
     
     private boolean isValidName(final String text) {
-        return Config.CHARNAME_TEMPLATE_PATTERN.matcher(text).matches();
+        return ((ServerSettings)Configurator.getSettings((Class)ServerSettings.class)).acceptPlayerName(text);
     }
     
     static {

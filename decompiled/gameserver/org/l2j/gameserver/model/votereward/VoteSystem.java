@@ -104,32 +104,30 @@ public abstract class VoteSystem implements Runnable
             announce(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;, this.getSiteName(), currentVotes));
             announce(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;, this.getSiteName(), this.votesDiff));
             for (final Player p : pls) {
-                if (p.getClient() != null) {
-                    if (p.getClient().isDetached()) {
-                        continue;
-                    }
-                    boolean canReward = false;
-                    final String pIp = p.getClient().getHostAddress();
-                    if (this.playerIps.containsKey(pIp)) {
-                        final int count = this.playerIps.get(pIp);
-                        if (count < this.boxes) {
-                            this.playerIps.remove(pIp);
-                            this.playerIps.put(pIp, count + 1);
-                            canReward = true;
-                        }
-                    }
-                    else {
+                if (p.getClient() == null) {
+                    continue;
+                }
+                boolean canReward = false;
+                final String pIp = p.getClient().getHostAddress();
+                if (this.playerIps.containsKey(pIp)) {
+                    final int count = this.playerIps.get(pIp);
+                    if (count < this.boxes) {
+                        this.playerIps.remove(pIp);
+                        this.playerIps.put(pIp, count + 1);
                         canReward = true;
-                        this.playerIps.put(pIp, 1);
                     }
-                    if (canReward) {
-                        for (final int i : this.rewards.keySet()) {
-                            p.addItem("Vote reward.", i, this.rewards.get(i), p, true);
-                        }
+                }
+                else {
+                    canReward = true;
+                    this.playerIps.put(pIp, 1);
+                }
+                if (canReward) {
+                    for (final int i : this.rewards.keySet()) {
+                        p.addItem("Vote reward.", i, this.rewards.get(i), p, true);
                     }
-                    else {
-                        p.sendMessage(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, this.boxes));
-                    }
+                }
+                else {
+                    p.sendMessage(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, this.boxes));
                 }
             }
             this.playerIps.clear();

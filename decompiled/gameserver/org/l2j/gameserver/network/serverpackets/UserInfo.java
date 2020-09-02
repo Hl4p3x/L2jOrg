@@ -87,16 +87,23 @@ public class UserInfo extends AbstractMaskPacket<UserInfoType>
     }
     
     private void calcBlockSize(final UserInfoType type) {
+        final int initSize = this.initSize;
+        int blockLength = 0;
         switch (type) {
             case BASIC_INFO: {
-                this.initSize += type.getBlockLength() + this.player.getAppearance().getVisibleName().length() * 2;
+                blockLength = type.getBlockLength() + this.player.getAppearance().getVisibleName().length() * 2;
+                break;
             }
             case CLAN: {
-                this.initSize += type.getBlockLength() + this.title.length() * 2;
+                blockLength = type.getBlockLength() + this.title.length() * 2;
+                break;
+            }
+            default: {
+                blockLength = type.getBlockLength();
                 break;
             }
         }
-        this.initSize += type.getBlockLength();
+        this.initSize = initSize + blockLength;
     }
     
     public void writeImpl(final GameClient client) {

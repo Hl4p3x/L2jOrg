@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import org.l2j.gameserver.util.GameXmlReader;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.HashMap;
-import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.instancemanager.GlobalVariablesManager;
@@ -31,6 +31,7 @@ import org.l2j.gameserver.model.quest.QuestState;
 import org.l2j.gameserver.ai.CtrlIntention;
 import org.l2j.gameserver.model.interfaces.ILocational;
 import org.l2j.gameserver.util.MathUtil;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.engine.geo.GeoEngine;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.html.NpcHtmlMessage;
@@ -44,10 +45,12 @@ import org.l2j.gameserver.model.actor.Npc;
 import java.util.List;
 import org.l2j.gameserver.model.Location;
 import java.util.Map;
+import org.slf4j.Logger;
 import org.l2j.scripts.ai.AbstractNpcAI;
 
 public class FourSepulchers extends AbstractNpcAI
 {
+    private static final Logger LOGGER;
     private static final int CONQUEROR_MANAGER = 31921;
     private static final int EMPEROR_MANAGER = 31922;
     private static final int GREAT_SAGES_MANAGER = 31923;
@@ -161,11 +164,11 @@ public class FourSepulchers extends AbstractNpcAI
             }
             case "VICTIM_FLEE": {
                 if (npc != null && !npc.isDead()) {
-                    final Location destination = GeoEngine.getInstance().canMoveToTargetLoc(npc.getX(), npc.getY(), npc.getZ(), npc.getSpawn().getLocation().getX() + getRandom(-400, 400), npc.getSpawn().getLocation().getY() + getRandom(-400, 400), npc.getZ(), npc.getInstanceWorld());
+                    final Location destination = GeoEngine.getInstance().canMoveToTargetLoc(npc.getX(), npc.getY(), npc.getZ(), npc.getSpawn().getLocation().getX() + Rnd.get(-400, 400), npc.getSpawn().getLocation().getY() + Rnd.get(-400, 400), npc.getZ(), npc.getInstanceWorld());
                     if (MathUtil.isInsideRadius3D((ILocational)npc, (ILocational)npc.getSpawn().getLocation(), 600)) {
                         npc.getAI().setIntention(CtrlIntention.AI_INTENTION_MOVE_TO, new Object[] { destination });
                     }
-                    npc.broadcastSay(ChatType.NPC_GENERAL, FourSepulchers.VICTIM_MSG[getRandom(FourSepulchers.VICTIM_MSG.length)], new String[0]);
+                    npc.broadcastSay(ChatType.NPC_GENERAL, FourSepulchers.VICTIM_MSG[Rnd.get(FourSepulchers.VICTIM_MSG.length)], new String[0]);
                     this.startQuestTimer("VICTIM_FLEE", 3000L, npc, (Player)null, false);
                 }
                 return null;
@@ -188,7 +191,7 @@ public class FourSepulchers extends AbstractNpcAI
                 }
                 if (FourSepulchers.STORED_MONSTER_SPAWNS.get(sepulcherId2).isEmpty()) {
                     if (currentWave2 == 2) {
-                        if (getRandomBoolean()) {
+                        if (Rnd.nextBoolean()) {
                             this.spawnNextWave(player);
                         }
                         else {
@@ -294,7 +297,7 @@ public class FourSepulchers extends AbstractNpcAI
                 break;
             }
             case 18256: {
-                npc.dropItem((Creature)killer, 57, (long)getRandom(300, 1300));
+                npc.dropItem((Creature)killer, 57, (long)Rnd.get(300, 1300));
                 break;
             }
             default: {
@@ -451,6 +454,7 @@ public class FourSepulchers extends AbstractNpcAI
     }
     
     static {
+        LOGGER = LoggerFactory.getLogger((Class)FourSepulchers.class);
         FIRST_TALK_NPCS = new int[] { 31452, 31453, 31454, 31919, 31920, 31925, 31926, 31927, 31928, 31929, 31930, 31931, 31932, 31933, 31934, 31935, 31936, 31937, 31938, 31939, 31940, 31941, 31942, 31943, 31944 };
         CHEST_REWARD_MONSTERS = new int[] { 18120, 18158, 18177, 18212 };
         (START_HALL_SPAWNS = new HashMap<Integer, Location>()).put(31921, new Location(181632, -85587, -7218));
@@ -489,7 +493,7 @@ public class FourSepulchers extends AbstractNpcAI
         public void load() {
             FourSepulchers.ROOM_SPAWN_DATA.clear();
             this.parseDatapackFile("data/FourSepulchers.xml");
-            FourSepulchers.this.LOGGER.info("Loaded {} spawn zones data.", (Object)FourSepulchers.ROOM_SPAWN_DATA.size());
+            FourSepulchers.LOGGER.info("Loaded {} spawn zones data.", (Object)FourSepulchers.ROOM_SPAWN_DATA.size());
         }
         
         protected Path getSchemaFilePath() {
@@ -502,7 +506,7 @@ public class FourSepulchers extends AbstractNpcAI
                     for (Node b = n.getFirstChild(); b != null; b = b.getNextSibling()) {
                         if ("spawn".equalsIgnoreCase(b.getNodeName())) {
                             final NamedNodeMap attrs = b.getAttributes();
-                            final int[] info = { this.parseInteger(attrs, "sepulcherId"), this.parseInteger(attrs, "wave"), this.parseInteger(attrs, "npcId"), this.parseInteger(attrs, "x"), this.parseInteger(attrs, "y"), this.parseInteger(attrs, "z"), this.parseInteger(attrs, "heading") };
+                            final int[] info = { this.parseInt(attrs, "sepulcherId"), this.parseInt(attrs, "wave"), this.parseInt(attrs, "npcId"), this.parseInt(attrs, "x"), this.parseInt(attrs, "y"), this.parseInt(attrs, "z"), this.parseInt(attrs, "heading") };
                             FourSepulchers.ROOM_SPAWN_DATA.add(info);
                         }
                     }

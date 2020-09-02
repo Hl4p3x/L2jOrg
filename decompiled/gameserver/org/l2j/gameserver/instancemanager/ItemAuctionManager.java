@@ -10,7 +10,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import java.io.File;
 import org.w3c.dom.Document;
-import java.sql.PreparedStatement;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.ItemDAO;
 import org.l2j.commons.configuration.Configurator;
 import org.l2j.gameserver.settings.ServerSettings;
 import java.nio.file.Path;
@@ -107,66 +108,8 @@ public final class ItemAuctionManager extends GameXmlReader
     }
     
     public static void deleteAuction(final int auctionId) {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                PreparedStatement statement = con.prepareStatement("DELETE FROM item_auction WHERE auctionId=?");
-                try {
-                    statement.setInt(1, auctionId);
-                    statement.execute();
-                    if (statement != null) {
-                        statement.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                statement = con.prepareStatement("DELETE FROM item_auction_bid WHERE auctionId=?");
-                try {
-                    statement.setInt(1, auctionId);
-                    statement.execute();
-                    if (statement != null) {
-                        statement.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t3) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception3) {
-                        t3.addSuppressed(exception3);
-                    }
-                }
-                throw t3;
-            }
-        }
-        catch (SQLException e) {
-            ItemAuctionManager.LOGGER.error(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, auctionId), (Throwable)e);
-        }
+        ((ItemDAO)DatabaseAccess.getDAO((Class)ItemDAO.class)).deleteItemAuction(auctionId);
+        ((ItemDAO)DatabaseAccess.getDAO((Class)ItemDAO.class)).deleteItemAuctionBid(auctionId);
     }
     
     public void load() {

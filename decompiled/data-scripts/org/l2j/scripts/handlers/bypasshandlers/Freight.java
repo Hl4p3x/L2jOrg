@@ -52,7 +52,7 @@ public class Freight implements IBypassHandler
                 player.sendPacket(new ServerPacket[] { (ServerPacket)new PackageToList(player.getAccountChars()) });
             }
         }
-        return false;
+        return true;
     }
     
     public String[] getBypassList() {

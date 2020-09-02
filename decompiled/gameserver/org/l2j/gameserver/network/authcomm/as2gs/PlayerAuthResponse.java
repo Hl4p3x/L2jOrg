@@ -9,9 +9,10 @@ import org.l2j.gameserver.cache.HtmCache;
 import java.util.List;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.network.GameClient;
-import org.l2j.gameserver.network.serverpackets.CharSelectionInfo;
+import org.l2j.gameserver.network.serverpackets.PlayerSelectionInfo;
 import org.l2j.gameserver.network.authcomm.SendablePacket;
 import org.l2j.gameserver.network.authcomm.gs2as.PlayerInGame;
+import io.github.joealisson.mmocore.WritablePacket;
 import org.l2j.gameserver.network.serverpackets.ServerClose;
 import org.l2j.gameserver.network.Disconnection;
 import org.l2j.gameserver.network.SystemMessageId;
@@ -65,16 +66,14 @@ public class PlayerAuthResponse extends ReceivablePacket
                     Disconnection.of(activeChar).defaultSequence(false);
                 }
                 else {
-                    oldClient.close(ServerClose.STATIC_PACKET);
+                    oldClient.close((WritablePacket)ServerClose.STATIC_PACKET);
                 }
             }
             this.sendPacket(new PlayerInGame(new String[] { client.getAccountName() }));
-            final CharSelectionInfo charSelectionInfo = new CharSelectionInfo(client.getAccountName(), client.getSessionId().getGameServerSessionId());
-            client.sendPacket(charSelectionInfo);
-            client.setCharSelection(charSelectionInfo.getCharInfo());
+            client.sendPacket(new PlayerSelectionInfo(client));
         }
         else {
-            client.close(new LoginFail(4));
+            client.close((WritablePacket)new LoginFail(4));
         }
     }
     
@@ -85,10 +84,10 @@ public class PlayerAuthResponse extends ReceivablePacket
             if (Objects.nonNull(html)) {
                 html = html.replace("<?active_windows?>", String.valueOf(activeWindows));
                 html = html.replace("<?windows_limit?>", String.valueOf(limit));
-                client.close(new TutorialShowHtml(html));
+                client.close((WritablePacket)new TutorialShowHtml(html));
             }
             else {
-                client.close(new LoginFail(4));
+                client.close((WritablePacket)new LoginFail(4));
             }
             return true;
         }

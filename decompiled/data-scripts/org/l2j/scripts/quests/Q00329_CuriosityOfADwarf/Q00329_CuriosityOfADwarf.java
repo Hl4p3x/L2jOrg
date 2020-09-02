@@ -7,6 +7,7 @@ package org.l2j.scripts.quests.Q00329_CuriosityOfADwarf;
 import java.util.Arrays;
 import io.github.joealisson.primitive.HashIntMap;
 import java.util.Iterator;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.WorldObject;
 import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.Config;
@@ -66,7 +67,7 @@ public final class Q00329_CuriosityOfADwarf extends Quest
     public String onKill(final Npc npc, final Player killer, final boolean isSummon) {
         final QuestState st = this.getQuestState(killer, false);
         if (st != null && GameUtils.checkIfInRange(Config.ALT_PARTY_RANGE, (WorldObject)npc, (WorldObject)killer, true)) {
-            final int rnd = getRandom(100);
+            final int rnd = Rnd.get(100);
             for (final ItemHolder drop : (List)Q00329_CuriosityOfADwarf.MONSTER_DROPS.get(npc.getId())) {
                 if (rnd < drop.getCount()) {
                     giveItemRandomly(killer, npc, drop.getId(), 1L, 0L, 1.0, true);

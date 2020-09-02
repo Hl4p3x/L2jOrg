@@ -9,17 +9,12 @@ import org.l2j.gameserver.model.actor.instance.Monster;
 import org.l2j.gameserver.model.holders.MinionHolder;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.l2j.gameserver.model.quest.Quest;
 
 public abstract class AbstractNpcAI extends Quest
 {
-    protected final Logger LOGGER;
-    
     public AbstractNpcAI() {
         super(-1);
-        this.LOGGER = LoggerFactory.getLogger(this.getClass().getName());
     }
     
     public String onFirstTalk(final Npc npc, final Player player) {

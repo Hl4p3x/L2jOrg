@@ -4,7 +4,6 @@
 
 package org.l2j.gameserver;
 
-import java.util.concurrent.TimeUnit;
 import java.lang.management.ManagementFactory;
 import java.io.InputStream;
 import java.io.IOException;
@@ -12,10 +11,10 @@ import java.util.Properties;
 import org.slf4j.LoggerFactory;
 import org.l2j.commons.util.Util;
 import org.l2j.commons.cache.CacheFactory;
+import java.util.concurrent.TimeUnit;
 import org.l2j.commons.util.DeadLockDetector;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.util.Broadcast;
-import java.time.Duration;
 import org.l2j.gameserver.network.authcomm.AuthServerCommunication;
 import io.github.joealisson.mmocore.PacketHandler;
 import io.github.joealisson.mmocore.ConnectionBuilder;
@@ -28,7 +27,6 @@ import java.time.temporal.Temporal;
 import java.time.temporal.ChronoUnit;
 import org.l2j.gameserver.instancemanager.ServerRestartManager;
 import org.l2j.gameserver.settings.ServerSettings;
-import org.l2j.gameserver.data.sql.impl.OfflineTradersTable;
 import org.l2j.gameserver.idfactory.IdFactory;
 import org.l2j.gameserver.instancemanager.PunishmentManager;
 import org.l2j.gameserver.engine.mail.MailEngine;
@@ -58,7 +56,6 @@ import org.l2j.gameserver.instancemanager.ClanHallAuctionManager;
 import org.l2j.gameserver.data.xml.impl.ClanHallManager;
 import org.l2j.gameserver.data.xml.impl.ResidenceFunctionsData;
 import org.l2j.gameserver.data.sql.impl.ClanTable;
-import org.l2j.gameserver.instancemanager.MentorManager;
 import org.l2j.gameserver.data.sql.impl.PlayerSummonTable;
 import org.l2j.gameserver.data.xml.impl.CubicData;
 import org.l2j.gameserver.data.xml.impl.PetDataTable;
@@ -83,8 +80,8 @@ import org.l2j.gameserver.engine.costume.CostumeEngine;
 import org.l2j.gameserver.data.xml.impl.AttendanceRewardData;
 import org.l2j.gameserver.data.xml.impl.LuckyGameData;
 import org.l2j.gameserver.instancemanager.CommissionManager;
-import org.l2j.gameserver.data.xml.impl.LCoinShopData;
-import org.l2j.gameserver.data.xml.impl.PrimeShopData;
+import org.l2j.gameserver.engine.item.shop.LCoinShop;
+import org.l2j.gameserver.engine.item.shop.L2Store;
 import org.l2j.gameserver.data.xml.impl.TeleportEngine;
 import org.l2j.gameserver.engine.elemental.ElementalSpiritEngine;
 import org.l2j.gameserver.engine.vip.VipEngine;
@@ -168,8 +165,8 @@ public class GameServer
         VipEngine.init();
         ElementalSpiritEngine.init();
         TeleportEngine.init();
-        PrimeShopData.getInstance();
-        LCoinShopData.getInstance();
+        L2Store.init();
+        LCoinShop.init();
         CommissionManager.getInstance();
         LuckyGameData.getInstance();
         AttendanceRewardData.getInstance();
@@ -180,7 +177,7 @@ public class GameServer
         BeautyShopData.getInstance();
         ExtendDropData.getInstance();
         ItemAuctionManager.getInstance();
-        SchemeBufferTable.getInstance();
+        SchemeBufferTable.init();
         GrandBossManager.getInstance();
         printSection("Characters");
         ClassListData.getInstance();
@@ -195,17 +192,16 @@ public class GameServer
         PetDataTable.getInstance();
         CubicData.getInstance();
         PlayerSummonTable.getInstance().init();
-        MentorManager.getInstance();
         printSection("Clans");
         ClanTable.init();
         ResidenceFunctionsData.getInstance();
         ClanHallManager.init();
         ClanHallAuctionManager.getInstance();
-        ClanEntryManager.getInstance();
+        ClanEntryManager.init();
         WalkingManager.getInstance();
         StaticObjectData.getInstance();
         printSection("Instance");
-        InstanceManager.getInstance();
+        InstanceManager.init();
         printSection("Cache");
         HtmCache.getInstance();
         CrestTable.getInstance();
@@ -239,10 +235,7 @@ public class GameServer
         }
         PunishmentManager.getInstance();
         Runtime.getRuntime().addShutdownHook(Shutdown.getInstance());
-        GameServer.LOGGER.info(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, IdFactory.getInstance().size()));
-        if ((Config.OFFLINE_TRADE_ENABLE || Config.OFFLINE_CRAFT_ENABLE) && Config.RESTORE_OFFLINERS) {
-            OfflineTradersTable.getInstance().restoreOfflineTraders();
-        }
+        GameServer.LOGGER.info("IdFactory: Free ObjectID's remaining: {}", (Object)IdFactory.getInstance().size());
         final ServerSettings serverSettings = (ServerSettings)Configurator.getSettings((Class)ServerSettings.class);
         if (serverSettings.scheduleRestart()) {
             ServerRestartManager.getInstance();
@@ -275,16 +268,18 @@ public class GameServer
         ExtensionBoot.initializers();
         GameServer.INSTANCE = new GameServer();
         ThreadPool.execute((Runnable)AuthServerCommunication.getInstance());
+        scheduleDeadLockDetector(settings);
+    }
+    
+    private static void scheduleDeadLockDetector(final ServerSettings settings) {
         if (settings.useDeadLockDetector()) {
-            final DeadLockDetector deadLockDetector = new DeadLockDetector(Duration.ofSeconds(settings.deadLockDetectorInterval()), () -> {
-                if (settings.restartOnDeadLock()) {
-                    Broadcast.toAllOnlinePlayers("Server has stability issues - restarting now.");
+            ThreadPool.scheduleAtFixedDelay((Runnable)new DeadLockDetector(() -> {
+                if (((ServerSettings)Configurator.getSettings((Class)ServerSettings.class)).restartOnDeadLock()) {
+                    Broadcast.toAllOnlinePlayers("Server restarting now.");
                     GameServer.LOGGER.warn("Deadlock detected restarting the server");
                     Shutdown.getInstance().startShutdown(null, 60, true);
                 }
-                return;
-            });
-            deadLockDetector.start();
+            }), (long)settings.deadLockDetectorInterval(), (long)settings.deadLockDetectorInterval(), TimeUnit.SECONDS);
         }
     }
     
@@ -323,13 +318,14 @@ public class GameServer
                     final String updateName = versionProperties.getProperty("update");
                     GameServer.fullVersion = String.format("%s: %s-%s (%s)", updateName, version, versionProperties.getProperty("revision"), versionProperties.getProperty("buildDate"));
                     final int[] protocol = ((ServerSettings)Configurator.getSettings((Class)ServerSettings.class)).acceptedProtocols();
-                    printSection("Server Info Version");
+                    printSection("L2jOrg Server Info Version");
                     GameServer.LOGGER.info("Update: .................. {}", (Object)updateName);
                     GameServer.LOGGER.info("Protocol: ................ {}", (Object)protocol);
                     GameServer.LOGGER.info("Build Version: ........... {}", (Object)version);
                     GameServer.LOGGER.info("Build Revision: .......... {}", (Object)versionProperties.getProperty("revision"));
                     GameServer.LOGGER.info("Build date: .............. {}", (Object)versionProperties.getProperty("buildDate"));
                     GameServer.LOGGER.info("Compiler JDK version: .... {}", (Object)versionProperties.getProperty("compilerVersion"));
+                    GameServer.LOGGER.info("Report any bug at https://github.com/JoeAlisson/L2jOrg/issues");
                 }
                 if (versionFile != null) {
                     versionFile.close();

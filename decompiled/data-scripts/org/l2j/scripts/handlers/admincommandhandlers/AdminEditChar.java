@@ -466,10 +466,6 @@ public class AdminEditChar implements IAdminCommandHandler
                 BuilderUtil.sendSysMessage(activeChar, "Client is null.");
                 return false;
             }
-            if (client.isDetached()) {
-                BuilderUtil.sendSysMessage(activeChar, "Client is detached.");
-                return false;
-            }
             final int[][] trace = client.getTrace();
             for (int i = 0; i < trace.length; ++i) {
                 String ip = "";
@@ -747,9 +743,6 @@ public class AdminEditChar implements IAdminCommandHandler
         if (Objects.isNull(client)) {
             BuilderUtil.sendSysMessage(activeChar, "Client is null.");
         }
-        else if (client.isDetached()) {
-            BuilderUtil.sendSysMessage(activeChar, "Client is detached.");
-        }
         else {
             ip = client.getHostAddress();
         }
@@ -897,19 +890,12 @@ public class AdminEditChar implements IAdminCommandHandler
             if (client == null) {
                 continue;
             }
-            if (client.isDetached()) {
-                if (!findDisconnected) {
-                    continue;
-                }
+            if (findDisconnected) {
+                continue;
             }
-            else {
-                if (findDisconnected) {
-                    continue;
-                }
-                ip = client.getHostAddress();
-                if (!ip.equals(IpAdress)) {
-                    continue;
-                }
+            ip = client.getHostAddress();
+            if (!ip.equals(IpAdress)) {
+                continue;
             }
             final String name = player.getName();
             ++CharactersFound;
@@ -974,25 +960,23 @@ public class AdminEditChar implements IAdminCommandHandler
         players.sort(Comparator.comparingLong(Player::getUptime));
         for (final Player player : players) {
             final GameClient client = player.getClient();
-            if (client != null) {
-                if (client.isDetached()) {
-                    continue;
-                }
-                ip = client.getHostAddress();
-                if (ipMap.get(ip) == null) {
-                    ipMap.put(ip, new ArrayList<Player>());
-                }
-                ipMap.get(ip).add(player);
-                if (ipMap.get(ip).size() < multibox) {
-                    continue;
-                }
-                final Integer count = dualboxIPs.get(ip);
-                if (count == null) {
-                    dualboxIPs.put(ip, multibox);
-                }
-                else {
-                    dualboxIPs.put(ip, count + 1);
-                }
+            if (client == null) {
+                continue;
+            }
+            ip = client.getHostAddress();
+            if (ipMap.get(ip) == null) {
+                ipMap.put(ip, new ArrayList<Player>());
+            }
+            ipMap.get(ip).add(player);
+            if (ipMap.get(ip).size() < multibox) {
+                continue;
+            }
+            final Integer count = dualboxIPs.get(ip);
+            if (count == null) {
+                dualboxIPs.put(ip, multibox);
+            }
+            else {
+                dualboxIPs.put(ip, count + 1);
             }
         }
         final List<String> keys = new ArrayList<String>(dualboxIPs.keySet());
@@ -1016,25 +1000,23 @@ public class AdminEditChar implements IAdminCommandHandler
         players.sort(Comparator.comparingLong(Player::getUptime));
         for (final Player player : players) {
             final GameClient client = player.getClient();
-            if (client != null) {
-                if (client.isDetached()) {
-                    continue;
-                }
-                final IpPack pack = new IpPack(client.getHostAddress(), client.getTrace());
-                if (ipMap.get(pack) == null) {
-                    ipMap.put(pack, new ArrayList<Player>());
-                }
-                ipMap.get(pack).add(player);
-                if (ipMap.get(pack).size() < multibox) {
-                    continue;
-                }
-                final Integer count = dualboxIPs.get(pack);
-                if (count == null) {
-                    dualboxIPs.put(pack, multibox);
-                }
-                else {
-                    dualboxIPs.put(pack, count + 1);
-                }
+            if (client == null) {
+                continue;
+            }
+            final IpPack pack = new IpPack(client.getHostAddress(), client.getTrace());
+            if (ipMap.get(pack) == null) {
+                ipMap.put(pack, new ArrayList<Player>());
+            }
+            ipMap.get(pack).add(player);
+            if (ipMap.get(pack).size() < multibox) {
+                continue;
+            }
+            final Integer count = dualboxIPs.get(pack);
+            if (count == null) {
+                dualboxIPs.put(pack, multibox);
+            }
+            else {
+                dualboxIPs.put(pack, count + 1);
             }
         }
         final List<IpPack> keys = new ArrayList<IpPack>(dualboxIPs.keySet());

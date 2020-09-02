@@ -107,10 +107,10 @@ public final class SkillTreesData extends GameXmlReader
     private void parseSkillTree(final Node skillTreeNode) {
         final NamedNodeMap attributes = skillTreeNode.getAttributes();
         final String type = this.parseString(attributes, "type");
-        final Integer cId = this.parseInteger(attributes, "classId", Integer.valueOf(-1));
-        final Integer parentId = this.parseInteger(attributes, "parentClassId", Integer.valueOf(-1));
+        final int cId = this.parseInt(attributes, "classId", -1);
+        final int parentId = this.parseInt(attributes, "parentClassId", -1);
         final ClassId classId = ClassId.getClassId(cId);
-        if (Objects.nonNull(classId) && parentId > -1 && !cId.equals(parentId)) {
+        if (Objects.nonNull(classId) && parentId > -1 && cId != parentId) {
             SkillTreesData.parentClassMap.putIfAbsent(classId, ClassId.getClassId(parentId));
         }
         final LongMap<SkillLearn> classSkillTree = (LongMap<SkillLearn>)new HashLongMap();
@@ -134,11 +134,11 @@ public final class SkillTreesData extends GameXmlReader
             final String nodeName = b.getNodeName();
             switch (nodeName) {
                 case "item": {
-                    skillLearn.addRequiredItem(new ItemHolder(this.parseInteger(attrs, "id"), this.parseInteger(attrs, "count")));
+                    skillLearn.addRequiredItem(new ItemHolder(this.parseInt(attrs, "id"), this.parseInt(attrs, "count")));
                     break;
                 }
                 case "preRequisiteSkill": {
-                    skillLearn.addPreReqSkill(new SkillHolder(this.parseInteger(attrs, "id"), this.parseInteger(attrs, "lvl")));
+                    skillLearn.addPreReqSkill(new SkillHolder(this.parseInt(attrs, "id"), this.parseInt(attrs, "lvl")));
                     break;
                 }
                 case "race": {
@@ -154,7 +154,7 @@ public final class SkillTreesData extends GameXmlReader
                     break;
                 }
                 case "removeSkill": {
-                    final int removeSkillId = this.parseInteger(attrs, "id");
+                    final int removeSkillId = this.parseInt(attrs, "id");
                     skillLearn.addRemoveSkills(removeSkillId);
                     SkillTreesData.removeSkillCache.computeIfAbsent(classId, k -> new HashIntSet()).add(removeSkillId);
                     break;

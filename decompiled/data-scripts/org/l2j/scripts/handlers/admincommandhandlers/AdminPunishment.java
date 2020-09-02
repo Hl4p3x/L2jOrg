@@ -227,36 +227,43 @@ public class AdminPunishment implements IAdminCommandHandler
                 if (st.hasMoreTokens()) {
                     return this.useAdminCommand(String.format("admin_punishment_add %s %s %s %s %s", st.nextToken(), PunishmentAffect.CHARACTER, PunishmentType.BAN, 0, "Banned by admin"), activeChar);
                 }
+                break;
             }
             case "admin_unban_char": {
                 if (st.hasMoreTokens()) {
                     return this.useAdminCommand(String.format("admin_punishment_remove %s %s %s", st.nextToken(), PunishmentAffect.CHARACTER, PunishmentType.BAN), activeChar);
                 }
+                break;
             }
             case "admin_ban_acc": {
                 if (st.hasMoreTokens()) {
                     return this.useAdminCommand(String.format("admin_punishment_add %s %s %s %s %s", st.nextToken(), PunishmentAffect.ACCOUNT, PunishmentType.BAN, 0, "Banned by admin"), activeChar);
                 }
+                break;
             }
             case "admin_unban_acc": {
                 if (st.hasMoreTokens()) {
                     return this.useAdminCommand(String.format("admin_punishment_remove %s %s %s", st.nextToken(), PunishmentAffect.ACCOUNT, PunishmentType.BAN), activeChar);
                 }
+                break;
             }
             case "admin_ban_chat": {
                 if (st.hasMoreTokens()) {
                     return this.useAdminCommand(String.format("admin_punishment_add %s %s %s %s %s", st.nextToken(), PunishmentAffect.CHARACTER, PunishmentType.CHAT_BAN, 0, "Chat banned by admin"), activeChar);
                 }
+                break;
             }
             case "admin_unban_chat": {
                 if (st.hasMoreTokens()) {
                     return this.useAdminCommand(String.format("admin_punishment_remove %s %s %s", st.nextToken(), PunishmentAffect.CHARACTER, PunishmentType.CHAT_BAN), activeChar);
                 }
+                break;
             }
             case "admin_jail": {
                 if (st.hasMoreTokens()) {
                     return this.useAdminCommand(String.format("admin_punishment_add %s %s %s %s %s", st.nextToken(), PunishmentAffect.CHARACTER, PunishmentType.JAIL, 0, "Jailed by admin"), activeChar);
                 }
+                break;
             }
             case "admin_unjail": {
                 if (st.hasMoreTokens()) {

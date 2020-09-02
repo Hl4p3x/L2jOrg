@@ -17,6 +17,7 @@ import org.l2j.gameserver.model.actor.Summon;
 import java.util.function.Consumer;
 import java.util.Objects;
 import org.l2j.gameserver.model.actor.Playable;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.commons.util.Rnd;
@@ -26,11 +27,13 @@ import org.l2j.gameserver.model.instancezone.conditions.ConditionGroupMin;
 import org.l2j.gameserver.model.instancezone.conditions.ConditionCommandChannel;
 import java.util.Collection;
 import org.l2j.gameserver.enums.GroupType;
+import io.github.joealisson.primitive.Containers;
 import java.util.Collections;
 import org.l2j.gameserver.Config;
 import java.util.ArrayList;
-import java.util.HashMap;
+import io.github.joealisson.primitive.HashIntMap;
 import org.l2j.gameserver.model.instancezone.conditions.Condition;
+import io.github.joealisson.primitive.IntSet;
 import org.l2j.gameserver.enums.InstanceRemoveBuffType;
 import org.l2j.gameserver.model.holders.InstanceReenterTimeHolder;
 import org.l2j.gameserver.enums.InstanceReenterType;
@@ -40,21 +43,21 @@ import org.l2j.gameserver.model.StatsSet;
 import org.l2j.gameserver.model.spawns.SpawnTemplate;
 import java.util.List;
 import org.l2j.gameserver.model.actor.templates.DoorTemplate;
-import java.util.Map;
+import io.github.joealisson.primitive.IntMap;
 import org.l2j.gameserver.model.interfaces.INamable;
 import org.l2j.gameserver.model.interfaces.IIdentifiable;
 import org.l2j.gameserver.model.events.ListenersContainer;
 
 public class InstanceTemplate extends ListenersContainer implements IIdentifiable, INamable
 {
-    private final Map<Integer, DoorTemplate> _doors;
-    private final List<SpawnTemplate> _spawns;
-    private int _templateId;
-    private String _name;
+    private final IntMap<DoorTemplate> doors;
+    private final List<SpawnTemplate> spawns;
+    private final int id;
+    private final String name;
+    private final int maxWorldCount;
     private int _duration;
     private long _emptyDestroyTime;
     private int _ejectTime;
-    private int _maxWorldCount;
     private boolean _isPvP;
     private boolean _allowPlayerSummon;
     private float _expRate;
@@ -69,19 +72,16 @@ public class InstanceTemplate extends ListenersContainer implements IIdentifiabl
     private InstanceReenterType _reenterType;
     private List<InstanceReenterTimeHolder> _reenterData;
     private InstanceRemoveBuffType _removeBuffType;
-    private List<Integer> _removeBuffExceptions;
+    private IntSet _removeBuffExceptions;
     private List<Condition> _conditions;
     private int _groupMask;
     
-    public InstanceTemplate(final StatsSet set) {
-        this._doors = new HashMap<Integer, DoorTemplate>();
-        this._spawns = new ArrayList<SpawnTemplate>();
-        this._templateId = -1;
-        this._name = "UnknownInstance";
+    public InstanceTemplate() {
+        this.doors = (IntMap<DoorTemplate>)new HashIntMap();
+        this.spawns = new ArrayList<SpawnTemplate>();
         this._duration = -1;
         this._emptyDestroyTime = -1L;
         this._ejectTime = Config.EJECT_DEAD_PLAYER_TIME;
-        this._maxWorldCount = -1;
         this._isPvP = false;
         this._allowPlayerSummon = false;
         this._expRate = Config.RATE_INSTANCE_XP;
@@ -96,12 +96,40 @@ public class InstanceTemplate extends ListenersContainer implements IIdentifiabl
         this._reenterType = InstanceReenterType.NONE;
         this._reenterData = Collections.emptyList();
         this._removeBuffType = InstanceRemoveBuffType.NONE;
-        this._removeBuffExceptions = Collections.emptyList();
+        this._removeBuffExceptions = Containers.emptyIntSet();
         this._conditions = Collections.emptyList();
         this._groupMask = GroupType.NONE.getMask();
-        this._templateId = set.getInt("id", 0);
-        this._name = set.getString("name", null);
-        this._maxWorldCount = set.getInt("maxWorlds", -1);
+        this.id = 0;
+        this.name = null;
+        this.maxWorldCount = -1;
+    }
+    
+    public InstanceTemplate(final int id, final String name, final int maxWorld) {
+        this.doors = (IntMap<DoorTemplate>)new HashIntMap();
+        this.spawns = new ArrayList<SpawnTemplate>();
+        this._duration = -1;
+        this._emptyDestroyTime = -1L;
+        this._ejectTime = Config.EJECT_DEAD_PLAYER_TIME;
+        this._isPvP = false;
+        this._allowPlayerSummon = false;
+        this._expRate = Config.RATE_INSTANCE_XP;
+        this._spRate = Config.RATE_INSTANCE_SP;
+        this._expPartyRate = Config.RATE_INSTANCE_PARTY_XP;
+        this._spPartyRate = Config.RATE_INSTANCE_PARTY_SP;
+        this._parameters = StatsSet.EMPTY_STATSET;
+        this._enterLocationType = InstanceTeleportType.NONE;
+        this._enterLocations = null;
+        this._exitLocationType = InstanceTeleportType.NONE;
+        this._exitLocations = null;
+        this._reenterType = InstanceReenterType.NONE;
+        this._reenterData = Collections.emptyList();
+        this._removeBuffType = InstanceRemoveBuffType.NONE;
+        this._removeBuffExceptions = Containers.emptyIntSet();
+        this._conditions = Collections.emptyList();
+        this._groupMask = GroupType.NONE.getMask();
+        this.id = id;
+        this.name = name;
+        this.maxWorldCount = maxWorld;
     }
     
     public void allowPlayerSummon(final boolean val) {
@@ -113,11 +141,11 @@ public class InstanceTemplate extends ListenersContainer implements IIdentifiabl
     }
     
     public void addDoor(final int templateId, final DoorTemplate template) {
-        this._doors.put(templateId, template);
+        this.doors.put(templateId, (Object)template);
     }
     
     public void addSpawns(final List<SpawnTemplate> spawns) {
-        this._spawns.addAll(spawns);
+        this.spawns.addAll(spawns);
     }
     
     public void setEnterLocation(final InstanceTeleportType type, final List<Location> locations) {
@@ -135,7 +163,7 @@ public class InstanceTemplate extends ListenersContainer implements IIdentifiabl
         this._reenterData = holder;
     }
     
-    public void setRemoveBuff(final InstanceRemoveBuffType type, final List<Integer> exceptionList) {
+    public void setRemoveBuff(final InstanceRemoveBuffType type, final IntSet exceptionList) {
         this._removeBuffType = type;
         this._removeBuffExceptions = exceptionList;
     }
@@ -176,18 +204,12 @@ public class InstanceTemplate extends ListenersContainer implements IIdentifiabl
     
     @Override
     public int getId() {
-        return this._templateId;
+        return this.id;
     }
     
     @Override
     public String getName() {
-        return this._name;
-    }
-    
-    public void setName(final String name) {
-        if (name != null && !name.isEmpty()) {
-            this._name = name;
-        }
+        return this.name;
     }
     
     public List<Location> getEnterLocations() {
@@ -275,16 +297,16 @@ public class InstanceTemplate extends ListenersContainer implements IIdentifiabl
         return this._isPvP;
     }
     
-    public Map<Integer, DoorTemplate> getDoors() {
-        return this._doors;
+    public IntMap<DoorTemplate> getDoors() {
+        return this.doors;
     }
     
     public List<SpawnTemplate> getSpawns() {
-        return this._spawns;
+        return this.spawns;
     }
     
     public int getMaxWorlds() {
-        return this._maxWorldCount;
+        return this.maxWorldCount;
     }
     
     public StatsSet getParameters() {
@@ -466,6 +488,6 @@ public class InstanceTemplate extends ListenersContainer implements IIdentifiabl
     
     @Override
     public String toString() {
-        return invokedynamic(makeConcatWithConstants:(ILjava/lang/String;)Ljava/lang/String;, this._templateId, this._name);
+        return invokedynamic(makeConcatWithConstants:(ILjava/lang/String;)Ljava/lang/String;, this.id, this.name);
     }
 }

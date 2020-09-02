@@ -4,8 +4,11 @@
 
 package org.l2j.gameserver.data.database.data;
 
+import org.l2j.gameserver.enums.ItemLocation;
 import org.l2j.commons.database.annotation.Column;
+import org.l2j.commons.database.annotation.Table;
 
+@Table("items")
 public class ItemData
 {
     @Column("owner_id")
@@ -17,16 +20,12 @@ public class ItemData
     private long count;
     @Column("enchant_level")
     private int enchantLevel;
-    private String loc;
+    private ItemLocation loc;
     @Column("loc_data")
     private int locData;
     @Column("time_of_use")
     private int timeOfUse;
-    @Column("custom_type1")
-    private int customType1;
-    @Column("custom_type2")
-    private int customType2;
-    private float time;
+    private int time;
     
     public int getOwnerId() {
         return this.ownerId;
@@ -48,7 +47,7 @@ public class ItemData
         return this.enchantLevel;
     }
     
-    public String getLoc() {
+    public ItemLocation getLoc() {
         return this.loc;
     }
     
@@ -60,15 +59,7 @@ public class ItemData
         return this.timeOfUse;
     }
     
-    public int getCustomType1() {
-        return this.customType1;
-    }
-    
-    public int getCustomType2() {
-        return this.customType2;
-    }
-    
     public float getTime() {
-        return this.time;
+        return (float)this.time;
     }
 }

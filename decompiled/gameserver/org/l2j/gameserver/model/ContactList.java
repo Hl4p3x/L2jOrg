@@ -5,6 +5,8 @@
 package org.l2j.gameserver.model;
 
 import org.slf4j.LoggerFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.PlayerDAO;
 import java.util.Iterator;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.SystemMessage;
@@ -190,51 +192,10 @@ public class ContactList
             return;
         }
         this._contacts.remove(name);
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement statement = con.prepareStatement("DELETE FROM character_contacts WHERE charId = ? and contactId = ?");
-                try {
-                    statement.setInt(1, this.activeChar.getObjectId());
-                    statement.setInt(2, contactId);
-                    statement.execute();
-                    final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_WAS_SUCCESSFULLY_DELETED_FROM_YOUR_CONTACT_LIST);
-                    sm.addString(name);
-                    this.activeChar.sendPacket(sm);
-                    if (statement != null) {
-                        statement.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            ContactList.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, this.activeChar.getName(), e.getMessage()), (Throwable)e);
-        }
+        ((PlayerDAO)DatabaseAccess.getDAO((Class)PlayerDAO.class)).deleteContact(this.activeChar.getObjectId(), contactId);
+        final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.S1_WAS_SUCCESSFULLY_DELETED_FROM_YOUR_CONTACT_LIST);
+        sm.addString(name);
+        this.activeChar.sendPacket(sm);
     }
     
     public Set<String> getAllContacts() {

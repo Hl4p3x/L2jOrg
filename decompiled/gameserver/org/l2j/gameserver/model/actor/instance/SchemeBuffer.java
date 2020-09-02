@@ -4,11 +4,13 @@
 
 package org.l2j.gameserver.model.actor.instance;
 
+import java.util.List;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Map;
 import org.l2j.gameserver.engine.skill.api.Skill;
 import org.l2j.gameserver.model.actor.Summon;
+import io.github.joealisson.primitive.ArrayIntList;
 import org.l2j.commons.util.Util;
 import org.l2j.gameserver.model.actor.Creature;
 import org.l2j.gameserver.model.WorldObject;
@@ -17,9 +19,9 @@ import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.html.NpcHtmlMessage;
 import java.util.StringTokenizer;
 import org.l2j.gameserver.engine.skill.api.SkillEngine;
-import java.util.List;
+import java.util.PrimitiveIterator;
 import org.l2j.gameserver.Config;
-import java.util.ArrayList;
+import io.github.joealisson.primitive.IntList;
 import java.util.Iterator;
 import org.l2j.gameserver.datatables.SchemeBufferTable;
 import org.l2j.gameserver.model.actor.templates.NpcTemplate;
@@ -58,13 +60,14 @@ public class SchemeBuffer extends Folk
         return sb.toString();
     }
     
-    private static int getFee(final ArrayList<Integer> list) {
+    private static int getFee(final IntList list) {
         if (Config.BUFFER_STATIC_BUFF_COST > 0) {
             return list.size() * Config.BUFFER_STATIC_BUFF_COST;
         }
         int fee = 0;
-        for (final int sk : list) {
-            fee += SchemeBufferTable.getInstance().getAvailableBuff(sk).getPrice();
+        final PrimitiveIterator.OfInt it = list.iterator();
+        while (it.hasNext()) {
+            fee += SchemeBufferTable.getInstance().getAvailableBuff(it.nextInt()).getPrice();
         }
         return fee;
     }
@@ -73,7 +76,7 @@ public class SchemeBuffer extends Folk
         return objectsSize / pageSize + ((objectsSize % pageSize != 0) ? 1 : 0);
     }
     
-    private static long getCountOf(final List<Integer> skills, final boolean dances) {
+    private static long getCountOf(final IntList skills, final boolean dances) {
         return skills.stream().filter(sId -> SkillEngine.getInstance().getSkill(sId, 1).isDance() == dances).count();
     }
     
@@ -131,7 +134,9 @@ public class SchemeBuffer extends Folk
                 player.sendPacket(SystemMessageId.YOU_DO_NOT_HAVE_A_PET);
             }
             else if (cost == 0 || player.reduceAdena("NPC Buffer", cost, this, true)) {
-                for (final int skillId : SchemeBufferTable.getInstance().getScheme(player.getObjectId(), schemeName)) {
+                final PrimitiveIterator.OfInt it = SchemeBufferTable.getInstance().getScheme(player.getObjectId(), schemeName).iterator();
+                while (it.hasNext()) {
+                    final int skillId = it.nextInt();
                     SkillEngine.getInstance().getSkill(skillId, SkillEngine.getInstance().getMaxLevel(skillId)).applyEffects(this, target);
                 }
             }
@@ -144,7 +149,7 @@ public class SchemeBuffer extends Folk
             final String schemeName2 = st.nextToken();
             final int skillId2 = Integer.parseInt(st.nextToken());
             final int page = Integer.parseInt(st.nextToken());
-            final List<Integer> skills = SchemeBufferTable.getInstance().getScheme(player.getObjectId(), schemeName2);
+            final IntList skills = SchemeBufferTable.getInstance().getScheme(player.getObjectId(), schemeName2);
             if (currentCommand.startsWith("skillselect") && !schemeName2.equalsIgnoreCase("none")) {
                 final Skill skill = SkillEngine.getInstance().getSkill(skillId2, SkillEngine.getInstance().getMaxLevel(skillId2));
                 if (skill.isDance()) {
@@ -163,7 +168,7 @@ public class SchemeBuffer extends Folk
                 }
             }
             else if (currentCommand.startsWith("skillunselect")) {
-                skills.remove((Object)skillId2);
+                skills.remove(skillId2);
             }
             this.showEditSchemeWindow(player, groupType, schemeName2, page);
         }
@@ -178,7 +183,7 @@ public class SchemeBuffer extends Folk
                     player.sendMessage("Please use plain alphanumeric characters.");
                     return;
                 }
-                final Map<String, ArrayList<Integer>> schemes = SchemeBufferTable.getInstance().getPlayerSchemes(player.getObjectId());
+                final Map<String, IntList> schemes = SchemeBufferTable.getInstance().getPlayerSchemes(player.getObjectId());
                 if (schemes != null) {
                     if (schemes.size() == Config.BUFFER_MAX_SCHEMES) {
                         player.sendMessage("Maximum schemes amount is already reached.");
@@ -189,7 +194,7 @@ public class SchemeBuffer extends Folk
                         return;
                     }
                 }
-                SchemeBufferTable.getInstance().setScheme(player.getObjectId(), schemeName.trim(), new ArrayList<Integer>());
+                SchemeBufferTable.getInstance().setScheme(player.getObjectId(), schemeName.trim(), (IntList)new ArrayIntList(), false);
                 this.showGiveBuffsWindow(player);
             }
             catch (Exception e) {
@@ -199,8 +204,8 @@ public class SchemeBuffer extends Folk
         else if (currentCommand.startsWith("deletescheme")) {
             try {
                 final String schemeName = st.nextToken();
-                final Map<String, ArrayList<Integer>> schemes = SchemeBufferTable.getInstance().getPlayerSchemes(player.getObjectId());
-                if (schemes != null && schemes.containsKey(schemeName)) {
+                final Map<String, IntList> schemes = SchemeBufferTable.getInstance().getPlayerSchemes(player.getObjectId());
+                if (schemes != null) {
                     schemes.remove(schemeName);
                 }
             }
@@ -225,12 +230,12 @@ public class SchemeBuffer extends Folk
     
     private void showGiveBuffsWindow(final Player player) {
         final StringBuilder sb = new StringBuilder(200);
-        final Map<String, ArrayList<Integer>> schemes = SchemeBufferTable.getInstance().getPlayerSchemes(player.getObjectId());
+        final Map<String, IntList> schemes = SchemeBufferTable.getInstance().getPlayerSchemes(player.getObjectId());
         if (schemes == null || schemes.isEmpty()) {
             sb.append("<font color=\"LEVEL\">You haven't defined any scheme.</font>");
         }
         else {
-            for (final Map.Entry<String, ArrayList<Integer>> scheme : schemes.entrySet()) {
+            for (final Map.Entry<String, IntList> scheme : schemes.entrySet()) {
                 final int cost = getFee(scheme.getValue());
                 sb.append(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;, (String)scheme.getKey(), scheme.getValue().size(), (cost > 0) ? invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, NumberFormat.getInstance(Locale.ENGLISH).format(cost)) : ""));
                 sb.append(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;, (String)scheme.getKey(), cost));
@@ -249,7 +254,7 @@ public class SchemeBuffer extends Folk
     
     private void showEditSchemeWindow(final Player player, final String groupType, final String schemeName, final int page) {
         final NpcHtmlMessage html = new NpcHtmlMessage(this.getObjectId());
-        final List<Integer> schemeSkills = SchemeBufferTable.getInstance().getScheme(player.getObjectId(), schemeName);
+        final IntList schemeSkills = SchemeBufferTable.getInstance().getScheme(player.getObjectId(), schemeName);
         html.setFile(player, this.getHtmlPath(this.getId(), 2));
         html.replace("%schemename%", schemeName);
         html.replace("%count%", invokedynamic(makeConcatWithConstants:(JIJB)Ljava/lang/String;, getCountOf(schemeSkills, false), player.getStats().getMaxBuffCount(), getCountOf(schemeSkills, true), Config.DANCES_MAX_AMOUNT));
@@ -269,7 +274,7 @@ public class SchemeBuffer extends Folk
             page = max;
         }
         skills = skills.subList((page - 1) * 6, Math.min(page * 6, skills.size()));
-        final List<Integer> schemeSkills = SchemeBufferTable.getInstance().getScheme(player.getObjectId(), schemeName);
+        final IntList schemeSkills = SchemeBufferTable.getInstance().getScheme(player.getObjectId(), schemeName);
         final StringBuilder sb = new StringBuilder(skills.size() * 150);
         int row = 0;
         for (final int skillId : skills) {

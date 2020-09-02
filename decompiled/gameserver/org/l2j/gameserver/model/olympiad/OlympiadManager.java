@@ -7,7 +7,7 @@ package org.l2j.gameserver.model.olympiad;
 import java.util.Collections;
 import org.l2j.gameserver.enums.CategoryType;
 import org.l2j.gameserver.network.serverpackets.html.NpcHtmlMessage;
-import org.l2j.gameserver.engine.olympiad.OlympiadEngine;
+import org.l2j.gameserver.engine.olympiad.Olympiad;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.SystemMessage;
 import org.l2j.gameserver.network.SystemMessageId;
@@ -93,7 +93,7 @@ public class OlympiadManager
     }
     
     private boolean isInCompetition(final Player noble, final Player player, final boolean showMessage) {
-        if (!OlympiadEngine.getInstance().isMatchInProgress()) {
+        if (!Olympiad.getInstance().isMatchesInProgress()) {
             return false;
         }
         int i = OlympiadGameManager.getInstance().getNumberOfStadiums();
@@ -128,12 +128,12 @@ public class OlympiadManager
     }
     
     public final boolean registerNoble(final Player player, final CompetitionType type) {
-        if (!OlympiadEngine.getInstance().isMatchInProgress()) {
+        if (!Olympiad.getInstance().isMatchesInProgress()) {
             player.sendPacket(SystemMessageId.THE_OLYMPIAD_GAMES_ARE_NOT_CURRENTLY_IN_PROGRESS);
             return false;
         }
         final int charId = player.getObjectId();
-        if (OlympiadEngine.getInstance().getRemainingDailyMatches(player) < 1) {
+        if (Olympiad.getInstance().getRemainingDailyMatches(player) < 1) {
             player.sendPacket(SystemMessageId.YOU_CAN_PARTICIPATE_IN_UP_TO_30_MATCHES_PER_WEEK);
             return false;
         }
@@ -175,7 +175,7 @@ public class OlympiadManager
     }
     
     public final boolean unRegisterNoble(final Player noble) {
-        if (!OlympiadEngine.getInstance().isMatchInProgress()) {
+        if (!Olympiad.getInstance().isMatchesInProgress()) {
             noble.sendPacket(SystemMessageId.THE_OLYMPIAD_GAMES_ARE_NOT_CURRENTLY_IN_PROGRESS);
             return false;
         }

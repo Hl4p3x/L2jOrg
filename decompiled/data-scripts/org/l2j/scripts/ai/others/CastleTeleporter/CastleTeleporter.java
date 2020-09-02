@@ -5,6 +5,7 @@
 package org.l2j.scripts.ai.others.CastleTeleporter;
 
 import org.l2j.gameserver.model.PcCondOverride;
+import org.l2j.commons.util.Rnd;
 import org.l2j.commons.util.Util;
 import java.util.Iterator;
 import org.l2j.gameserver.model.StatsSet;
@@ -127,10 +128,10 @@ public final class CastleTeleporter extends AbstractNpcAI
     
     private Location getTeleportLocation(final StatsSet npcParams, final String paramName1, final String paramName2, final String paramName3) {
         Location loc;
-        if (getRandom(100) < 33) {
+        if (Rnd.get(100) < 33) {
             loc = new Location(npcParams.getInt(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, paramName1)), npcParams.getInt(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, paramName1)), npcParams.getInt(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, paramName1)));
         }
-        else if (getRandom(100) < 66) {
+        else if (Rnd.get(100) < 66) {
             loc = new Location(npcParams.getInt(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, paramName2)), npcParams.getInt(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, paramName2)), npcParams.getInt(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, paramName2)));
         }
         else {

@@ -5,6 +5,7 @@
 package org.l2j.gameserver.data.xml.impl;
 
 import org.slf4j.LoggerFactory;
+import java.util.Collections;
 import org.w3c.dom.NamedNodeMap;
 import org.l2j.gameserver.model.StatsSet;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import org.l2j.gameserver.settings.CharacterSettings;
 import org.l2j.commons.configuration.Configurator;
 import org.l2j.gameserver.settings.ServerSettings;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.EnumMap;
 import org.l2j.gameserver.model.item.PcItemTemplate;
 import java.util.List;
 import org.l2j.gameserver.model.base.ClassId;
@@ -31,7 +32,7 @@ public final class InitialEquipmentData extends GameXmlReader
     private final Map<ClassId, List<PcItemTemplate>> _initialEquipmentList;
     
     private InitialEquipmentData() {
-        this._initialEquipmentList = new HashMap<ClassId, List<PcItemTemplate>>();
+        this._initialEquipmentList = new EnumMap<ClassId, List<PcItemTemplate>>(ClassId.class);
         this.load();
     }
     
@@ -77,11 +78,11 @@ public final class InitialEquipmentData extends GameXmlReader
     }
     
     public List<PcItemTemplate> getEquipmentList(final ClassId cId) {
-        return this._initialEquipmentList.get(cId);
+        return this._initialEquipmentList.getOrDefault(cId, Collections.emptyList());
     }
     
     public List<PcItemTemplate> getEquipmentList(final int cId) {
-        return this._initialEquipmentList.get(ClassId.getClassId(cId));
+        return this.getEquipmentList(ClassId.getClassId(cId));
     }
     
     public static InitialEquipmentData getInstance() {

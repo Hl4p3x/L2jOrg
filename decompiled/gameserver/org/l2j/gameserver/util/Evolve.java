@@ -6,9 +6,8 @@ package org.l2j.gameserver.util;
 
 import org.l2j.gameserver.network.serverpackets.MagicSkillLaunched;
 import org.slf4j.LoggerFactory;
-import java.sql.PreparedStatement;
-import java.sql.Connection;
-import org.l2j.commons.database.DatabaseFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.PetDAO;
 import org.l2j.gameserver.network.serverpackets.InventoryUpdate;
 import org.l2j.gameserver.network.serverpackets.SystemMessage;
 import org.l2j.gameserver.model.actor.templates.NpcTemplate;
@@ -161,45 +160,7 @@ public final class Evolve
         else {
             petSummon.startFeed();
         }
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("DELETE FROM pets WHERE item_obj_id=?");
-                try {
-                    ps.setInt(1, removedItem.getObjectId());
-                    ps.execute();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception ex) {}
+        ((PetDAO)DatabaseAccess.getDAO((Class)PetDAO.class)).deleteByItem(removedItem.getObjectId());
         return true;
     }
     

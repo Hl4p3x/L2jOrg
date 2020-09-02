@@ -87,7 +87,7 @@ public class TeleportersData extends GameXmlReader
     }
     
     private void parseNpcs(final HashMap<String, TeleportHolder> teleportList, final Node node) {
-        this.forEach(node, "npc", npcNode -> this.registerTeleportList(this.parseInteger(npcNode.getAttributes(), "id"), teleportList));
+        this.forEach(node, "npc", npcNode -> this.registerTeleportList(this.parseInt(npcNode.getAttributes(), "id"), teleportList));
     }
     
     private void parseTeleport(final HashMap<String, TeleportHolder> teleportList, final int npcId, final Node node) {

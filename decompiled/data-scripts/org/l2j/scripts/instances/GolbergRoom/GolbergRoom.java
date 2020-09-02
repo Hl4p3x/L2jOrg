@@ -7,6 +7,7 @@ package org.l2j.scripts.instances.GolbergRoom;
 import java.util.Iterator;
 import org.l2j.gameserver.model.instancezone.Instance;
 import org.l2j.gameserver.model.Party;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.network.serverpackets.ExShowScreenMessage;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.model.interfaces.ILocational;
@@ -132,7 +133,7 @@ public class GolbergRoom extends AbstractInstance
                 case 4: {
                     if (player.isGM()) {
                         if (this._treasureCounter <= 27) {
-                            addSpawn(18357, 11708 + getRandom(-1000, 1000), -86505 + getRandom(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
+                            addSpawn(18357, 11708 + Rnd.get(-1000, 1000), -86505 + Rnd.get(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
                             this.startQuestTimer("SPAWN_TRESURE", 1000L, npc, player);
                             ++this._treasureCounter;
                             break;
@@ -146,7 +147,7 @@ public class GolbergRoom extends AbstractInstance
                         switch (player.getParty().getMemberCount()) {
                             case 2: {
                                 if (this._treasureCounter <= 1) {
-                                    addSpawn(18357, 11708 + getRandom(-1000, 1000), -86505 + getRandom(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
+                                    addSpawn(18357, 11708 + Rnd.get(-1000, 1000), -86505 + Rnd.get(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
                                     this.startQuestTimer("SPAWN_TRESURE", 1000L, npc, player);
                                     ++this._treasureCounter;
                                     break Label_1262;
@@ -155,7 +156,7 @@ public class GolbergRoom extends AbstractInstance
                             }
                             case 3: {
                                 if (this._treasureCounter <= 2) {
-                                    addSpawn(18357, 11708 + getRandom(-1000, 1000), -86505 + getRandom(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
+                                    addSpawn(18357, 11708 + Rnd.get(-1000, 1000), -86505 + Rnd.get(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
                                     this.startQuestTimer("SPAWN_TRESURE", 1000L, npc, player);
                                     ++this._treasureCounter;
                                     break Label_1262;
@@ -164,7 +165,7 @@ public class GolbergRoom extends AbstractInstance
                             }
                             case 4: {
                                 if (this._treasureCounter <= 4) {
-                                    addSpawn(18357, 11708 + getRandom(-1000, 1000), -86505 + getRandom(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
+                                    addSpawn(18357, 11708 + Rnd.get(-1000, 1000), -86505 + Rnd.get(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
                                     this.startQuestTimer("SPAWN_TRESURE", 1000L, npc, player);
                                     ++this._treasureCounter;
                                     break Label_1262;
@@ -173,7 +174,7 @@ public class GolbergRoom extends AbstractInstance
                             }
                             case 5: {
                                 if (this._treasureCounter <= 7) {
-                                    addSpawn(18357, 11708 + getRandom(-1000, 1000), -86505 + getRandom(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
+                                    addSpawn(18357, 11708 + Rnd.get(-1000, 1000), -86505 + Rnd.get(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
                                     this.startQuestTimer("SPAWN_TRESURE", 1000L, npc, player);
                                     ++this._treasureCounter;
                                     break Label_1262;
@@ -182,7 +183,7 @@ public class GolbergRoom extends AbstractInstance
                             }
                             case 6: {
                                 if (this._treasureCounter <= 10) {
-                                    addSpawn(18357, 11708 + getRandom(-1000, 1000), -86505 + getRandom(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
+                                    addSpawn(18357, 11708 + Rnd.get(-1000, 1000), -86505 + Rnd.get(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
                                     this.startQuestTimer("SPAWN_TRESURE", 1000L, npc, player);
                                     ++this._treasureCounter;
                                     break Label_1262;
@@ -191,7 +192,7 @@ public class GolbergRoom extends AbstractInstance
                             }
                             case 7: {
                                 if (this._treasureCounter <= 13) {
-                                    addSpawn(18357, 11708 + getRandom(-1000, 1000), -86505 + getRandom(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
+                                    addSpawn(18357, 11708 + Rnd.get(-1000, 1000), -86505 + Rnd.get(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
                                     this.startQuestTimer("SPAWN_TRESURE", 1000L, npc, player);
                                     ++this._treasureCounter;
                                     break Label_1262;
@@ -200,7 +201,7 @@ public class GolbergRoom extends AbstractInstance
                             }
                             case 8: {
                                 if (this._treasureCounter <= 16) {
-                                    addSpawn(18357, 11708 + getRandom(-1000, 1000), -86505 + getRandom(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
+                                    addSpawn(18357, 11708 + Rnd.get(-1000, 1000), -86505 + Rnd.get(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
                                     this.startQuestTimer("SPAWN_TRESURE", 1000L, npc, player);
                                     ++this._treasureCounter;
                                     break Label_1262;
@@ -209,7 +210,7 @@ public class GolbergRoom extends AbstractInstance
                             }
                             case 9: {
                                 if (this._treasureCounter <= 27) {
-                                    addSpawn(18357, 11708 + getRandom(-1000, 1000), -86505 + getRandom(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
+                                    addSpawn(18357, 11708 + Rnd.get(-1000, 1000), -86505 + Rnd.get(-1000, 1000), -10928, 0, true, -1L, true, player.getInstanceId());
                                     this.startQuestTimer("SPAWN_TRESURE", 1000L, npc, player);
                                     ++this._treasureCounter;
                                     break Label_1262;

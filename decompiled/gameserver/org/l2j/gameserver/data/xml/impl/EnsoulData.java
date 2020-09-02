@@ -151,7 +151,7 @@ public class EnsoulData extends GameXmlReader
     
     private void parseFee(final Node ensoulNode, final EnsoulFee fee, final int index) {
         final NamedNodeMap attrs = ensoulNode.getAttributes();
-        fee.setEnsoul(index, new ItemHolder(this.parseInt(attrs, "itemId"), this.parseInteger(attrs, "count")));
+        fee.setEnsoul(index, new ItemHolder(this.parseInt(attrs, "itemId"), this.parseInt(attrs, "count")));
         this.ensoulFees.put(fee.getCrystalType(), fee);
     }
     
@@ -179,7 +179,7 @@ public class EnsoulData extends GameXmlReader
     private void parseStones(final Node ensoulNode) {
         final NamedNodeMap attrs = ensoulNode.getAttributes();
         final EnsoulStone stone = new EnsoulStone(this.parseInt(attrs, "id"), this.parseInt(attrs, "slotType"));
-        this.forEach(ensoulNode, "option", optionNode -> stone.addOption(this.parseInteger(optionNode.getAttributes(), "id")));
+        this.forEach(ensoulNode, "option", optionNode -> stone.addOption(this.parseInt(optionNode.getAttributes(), "id")));
         this.ensoulStones.put(stone.getId(), (Object)stone);
     }
     

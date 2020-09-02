@@ -67,6 +67,7 @@ import org.l2j.gameserver.ai.CtrlEvent;
 import org.l2j.gameserver.model.events.impl.character.OnCreatureDeath;
 import org.l2j.gameserver.model.events.returns.TerminateReturn;
 import org.l2j.gameserver.model.effects.EffectFlag;
+import java.util.Iterator;
 import org.l2j.gameserver.model.item.instance.Item;
 import org.l2j.gameserver.model.Hit;
 import org.l2j.gameserver.model.stats.Stat;
@@ -81,14 +82,14 @@ import org.l2j.gameserver.model.item.BodyPart;
 import org.l2j.gameserver.model.item.type.WeaponType;
 import org.l2j.gameserver.engine.geo.GeoEngine;
 import org.l2j.gameserver.network.SystemMessageId;
-import java.util.Objects;
 import org.l2j.gameserver.world.MapRegionManager;
 import org.l2j.gameserver.model.TeleportWhereType;
 import org.l2j.commons.util.Rnd;
+import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.network.serverpackets.ExTeleportToLocationActivate;
-import org.l2j.gameserver.network.serverpackets.TeleportToLocation;
 import org.l2j.gameserver.ai.CtrlIntention;
 import org.l2j.gameserver.world.WorldRegion;
+import org.l2j.gameserver.network.serverpackets.TeleportToLocation;
 import org.l2j.gameserver.model.Location;
 import org.l2j.gameserver.network.serverpackets.ActionFailed;
 import org.l2j.gameserver.model.events.impl.character.OnCreatureTeleport;
@@ -111,9 +112,8 @@ import org.l2j.gameserver.data.xml.impl.TransformData;
 import java.util.function.Predicate;
 import org.l2j.gameserver.model.instancezone.Instance;
 import org.l2j.gameserver.model.item.container.Inventory;
-import java.util.Iterator;
-import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.enums.InstanceType;
+import java.util.Objects;
 import java.util.EnumMap;
 import java.util.concurrent.ConcurrentHashMap;
 import org.l2j.gameserver.world.zone.ZoneType;
@@ -262,23 +262,10 @@ public abstract class Creature extends WorldObject implements ISkillsHolder, IDe
         this._hitTask = null;
         this.chargedShots = new EnumMap<ShotType, Double>(ShotType.class);
         this._AIdisabled = false;
-        if (template == null) {
-            throw new NullPointerException("Template is null!");
-        }
+        this._template = Objects.requireNonNull(template);
         this.setInstanceType(InstanceType.Creature);
-        this._template = template;
         this.initCharStat();
         this.initCharStatus();
-        if (GameUtils.isNpc(this)) {
-            for (final Skill skill : template.getSkills().values()) {
-                this.addSkill(skill);
-            }
-        }
-        else if (GameUtils.isSummon(this)) {
-            for (final Skill skill : template.getSkills().values()) {
-                this.addSkill(skill);
-            }
-        }
         this.setIsInvul(true);
     }
     
@@ -515,11 +502,11 @@ public abstract class Creature extends WorldObject implements ISkillsHolder, IDe
         this.abortCast();
         this.setTarget(null);
         this.setIsTeleporting(true);
+        z += 5;
+        this.broadcastPacket(new TeleportToLocation(this, x, y, z, heading));
         World.getInstance().removeVisibleObject(this, this.getWorldRegion());
         this.setWorldRegion(null);
         this.getAI().setIntention(CtrlIntention.AI_INTENTION_ACTIVE);
-        z += 5;
-        this.broadcastPacket(new TeleportToLocation(this, x, y, z, heading));
         if (this.getInstanceWorld() != instance) {
             this.setInstance(instance);
         }
@@ -528,7 +515,7 @@ public abstract class Creature extends WorldObject implements ISkillsHolder, IDe
         }
         this.setXYZInvisible(x, y, z);
         this.sendPacket(new ExTeleportToLocationActivate(this));
-        if (!GameUtils.isPlayer(this) || (this.getActingPlayer().getClient() != null && this.getActingPlayer().getClient().isDetached())) {
+        if (!GameUtils.isPlayer(this)) {
             this.onTeleported();
         }
         this.revalidateZone(true);

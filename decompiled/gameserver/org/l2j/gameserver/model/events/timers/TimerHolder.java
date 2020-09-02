@@ -28,9 +28,9 @@ public class TimerHolder<T> implements Runnable
     private final ScheduledFuture<?> _task;
     
     public TimerHolder(final T event, final StatsSet params, final long time, final Npc npc, final Player player, final boolean isRepeating, final IEventTimerEvent<T> eventScript, final IEventTimerCancel<T> cancelScript, final TimerExecutor<T> postExecutor) {
-        Objects.requireNonNull(event, invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName()));
-        Objects.requireNonNull(eventScript, invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName()));
-        Objects.requireNonNull(postExecutor, invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName()));
+        Objects.requireNonNull(event, "\"event\" cannot be null!");
+        Objects.requireNonNull(eventScript, "\"script\" cannot be null!");
+        Objects.requireNonNull(postExecutor, "\"postExecutor\" cannot be null!");
         this._event = event;
         this._params = params;
         this._time = time;

@@ -6,6 +6,8 @@ package org.l2j.gameserver.instancemanager;
 
 import org.slf4j.LoggerFactory;
 import java.util.concurrent.ConcurrentHashMap;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.SiegeDAO;
 import java.util.Iterator;
 import org.l2j.gameserver.model.actor.templates.NpcTemplate;
 import org.l2j.gameserver.model.actor.instance.Defender;
@@ -297,94 +299,11 @@ public final class SiegeGuardManager
     }
     
     public void removeSiegeGuard(final int npcId, final IPositionable pos) {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("Delete From castle_siege_guards Where npcId = ? And x = ? AND y = ? AND z = ? AND isHired = 1");
-                try {
-                    ps.setInt(1, npcId);
-                    ps.setInt(2, pos.getX());
-                    ps.setInt(3, pos.getY());
-                    ps.setInt(4, pos.getZ());
-                    ps.execute();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            SiegeGuardManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Lorg/l2j/gameserver/model/interfaces/IPositionable;Ljava/lang/String;)Ljava/lang/String;, pos, e.getMessage()), (Throwable)e);
-        }
+        ((SiegeDAO)DatabaseAccess.getDAO((Class)SiegeDAO.class)).deleteGuard(npcId, pos.getX(), pos.getY(), pos.getZ());
     }
     
     public void removeSiegeGuards(final Castle castle) {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("Delete From castle_siege_guards Where castleId = ? And isHired = 1");
-                try {
-                    ps.setInt(1, castle.getId());
-                    ps.execute();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            SiegeGuardManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, castle.getName(), e.getMessage()), (Throwable)e);
-        }
+        ((SiegeDAO)DatabaseAccess.getDAO((Class)SiegeDAO.class)).deleteGuardsOfCastle(castle.getId());
     }
     
     public void spawnSiegeGuard(final Castle castle) {

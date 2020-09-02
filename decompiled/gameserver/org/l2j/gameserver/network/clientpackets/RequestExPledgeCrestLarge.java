@@ -6,7 +6,7 @@ package org.l2j.gameserver.network.clientpackets;
 
 import org.l2j.gameserver.data.database.data.CrestData;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
-import org.l2j.gameserver.network.serverpackets.ExPledgeEmblem;
+import org.l2j.gameserver.network.serverpackets.pledge.ExPledgeEmblem;
 import org.l2j.gameserver.network.GameClient;
 import org.l2j.gameserver.data.sql.impl.CrestTable;
 

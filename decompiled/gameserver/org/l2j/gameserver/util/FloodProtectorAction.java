@@ -100,11 +100,11 @@ public final class FloodProtectorAction
         output.append(": ");
         String address = null;
         try {
-            if (!this._client.isDetached()) {
-                address = this._client.getHostAddress();
-            }
+            address = this._client.getHostAddress();
         }
-        catch (Exception ex) {}
+        catch (Exception e) {
+            FloodProtectorAction.LOGGER.warn(e.getMessage(), (Throwable)e);
+        }
         final ConnectionState state = this._client.getConnectionState();
         switch (state) {
             case IN_GAME: {

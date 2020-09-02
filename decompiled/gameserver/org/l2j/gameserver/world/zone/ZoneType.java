@@ -32,7 +32,13 @@ public enum ZoneType
     UNDYING, 
     TAX;
     
+    private static final int ZONE_COUNT;
+    
     public static int getZoneCount() {
-        return values().length;
+        return ZoneType.ZONE_COUNT;
+    }
+    
+    static {
+        ZONE_COUNT = values().length;
     }
 }

@@ -5,50 +5,39 @@
 package org.l2j.gameserver.model.eventengine;
 
 import java.lang.reflect.Modifier;
-import java.util.function.Function;
-import java.util.List;
 import java.lang.reflect.Method;
 
 public class EventMethodNotification
 {
-    private final AbstractEventManager<?> _manager;
-    private final Method _method;
-    private final Object[] _args;
+    private final AbstractEventManager<?> manager;
+    private final Method method;
     
-    public EventMethodNotification(final AbstractEventManager<?> manager, final String methodName, final List<Object> args) throws NoSuchMethodException {
-        this._manager = manager;
-        this._method = manager.getClass().getDeclaredMethod(methodName, (Class<?>[])args.stream().map((Function<? super Object, ?>)Object::getClass).toArray(Class[]::new));
-        this._args = args.toArray();
+    public EventMethodNotification(final AbstractEventManager<?> manager, final String methodName) throws NoSuchMethodException {
+        this.manager = manager;
+        this.method = manager.getClass().getDeclaredMethod(methodName, (Class<?>[])new Class[0]);
     }
     
     public AbstractEventManager<?> getManager() {
-        return this._manager;
+        return this.manager;
     }
     
     public Method getMethod() {
-        return this._method;
+        return this.method;
     }
     
     public void execute() throws Exception {
-        if (Modifier.isStatic(this._method.getModifiers())) {
-            this.invoke(null);
-        }
-        else {
-            for (final Method method : this._manager.getClass().getMethods()) {
-                if (Modifier.isStatic(method.getModifiers()) && this._manager.getClass().isAssignableFrom(method.getReturnType()) && method.getParameterCount() == 0) {
-                    final Object instance = method.invoke(null, new Object[0]);
-                    this.invoke(instance);
-                }
+        if (this.method.trySetAccessible()) {
+            if (Modifier.isStatic(this.method.getModifiers())) {
+                this.method.invoke(null, new Object[0]);
+            }
+            else {
+                this.method.invoke(this.manager, new Object[0]);
             }
         }
     }
     
-    private void invoke(final Object instance) throws Exception {
-        final boolean wasAccessible = this._method.canAccess(instance);
-        if (!wasAccessible) {
-            this._method.setAccessible(true);
-        }
-        this._method.invoke(instance, this._args);
-        this._method.setAccessible(wasAccessible);
+    @Override
+    public String toString() {
+        return invokedynamic(makeConcatWithConstants:(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/String;, this.manager.getClass(), this.method.getName());
     }
 }

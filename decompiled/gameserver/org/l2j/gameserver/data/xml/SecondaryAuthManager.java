@@ -50,8 +50,8 @@ public class SecondaryAuthManager extends GameXmlReader
             attrs = node.getAttributes();
             this.parseBoolean(attrs, "enabled");
             if (!(!(this.enabled = (boolean)enabled))) {
-                this.maxAttempts = this.parseInteger(attrs, "max-attempts");
-                this.banTime = this.parseInteger(attrs, "ban-time");
+                this.maxAttempts = this.parseInt(attrs, "max-attempts");
+                this.banTime = this.parseInt(attrs, "ban-time");
                 this.recoveryLink = this.parseString(attrs, "recovery-link");
                 this.forEach(node, "forbidden-passwords", forbiddenList -> this.forEach(forbiddenList, "password", pwdNode -> this.forbiddenPasswords.add(Integer.parseInt(pwdNode.getTextContent()))));
             }

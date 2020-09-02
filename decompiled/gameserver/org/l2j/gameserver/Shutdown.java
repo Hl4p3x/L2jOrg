@@ -18,11 +18,10 @@ import org.l2j.gameserver.instancemanager.QuestManager;
 import org.l2j.gameserver.instancemanager.CastleManorManager;
 import org.l2j.gameserver.data.sql.impl.ClanTable;
 import org.l2j.gameserver.model.entity.Hero;
-import org.l2j.gameserver.engine.olympiad.OlympiadEngine;
+import org.l2j.gameserver.engine.olympiad.Olympiad;
 import org.l2j.gameserver.instancemanager.ItemAuctionManager;
 import org.l2j.gameserver.instancemanager.GrandBossManager;
 import org.l2j.gameserver.instancemanager.DBSpawnManager;
-import org.l2j.gameserver.data.sql.impl.OfflineTradersTable;
 import org.l2j.commons.util.Util;
 import org.l2j.gameserver.util.Broadcast;
 import org.l2j.gameserver.network.serverpackets.SystemMessage;
@@ -197,14 +196,6 @@ public class Shutdown extends Thread
     }
     
     private void saveData() {
-        try {
-            if ((Config.OFFLINE_TRADE_ENABLE || Config.OFFLINE_CRAFT_ENABLE) && Config.RESTORE_OFFLINERS && !Config.STORE_OFFLINE_TRADE_IN_REALTIME) {
-                OfflineTradersTable.getInstance().storeOffliners();
-            }
-        }
-        catch (Throwable t) {
-            Shutdown.LOGGER.warn("Error saving offline shops.", t);
-        }
         this.disconnectAllCharacters();
         Shutdown.LOGGER.info("All players disconnected and saved.");
         DBSpawnManager.getInstance().cleanUp();
@@ -213,7 +204,7 @@ public class Shutdown extends Thread
         Shutdown.LOGGER.info("GrandBossManager: All Grand Boss info saved.");
         ItemAuctionManager.getInstance().shutdown();
         Shutdown.LOGGER.info("Item Auction Manager: All tasks stopped.");
-        OlympiadEngine.getInstance().saveOlympiadStatus();
+        Olympiad.getInstance().saveOlympiadStatus();
         Shutdown.LOGGER.info("Olympiad System: Data saved.");
         Hero.getInstance().shutdown();
         Shutdown.LOGGER.info("Hero System: Data saved.");

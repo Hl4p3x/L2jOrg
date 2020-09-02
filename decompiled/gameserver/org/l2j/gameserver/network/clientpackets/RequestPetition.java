@@ -7,10 +7,9 @@ package org.l2j.gameserver.network.clientpackets;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.SystemMessage;
+import org.l2j.gameserver.network.SystemMessageId;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.instancemanager.PetitionManager;
-import org.l2j.gameserver.network.SystemMessageId;
-import org.l2j.gameserver.data.xml.impl.AdminData;
 import org.l2j.gameserver.network.GameClient;
 
 public final class RequestPetition extends ClientPacket
@@ -31,16 +30,12 @@ public final class RequestPetition extends ClientPacket
         if (this._type <= 0 || this._type >= 10) {
             return;
         }
-        if (!AdminData.getInstance().isGmOnline(false)) {
-            ((GameClient)this.client).sendPacket(SystemMessageId.THERE_ARE_NO_GMS_CURRENTLY_VISIBLE_IN_THE_PUBLIC_LIST_AS_THEY_MAY_BE_PERFORMING_OTHER_FUNCTIONS_AT_THE_MOMENT);
-            return;
-        }
         if (!PetitionManager.getInstance().isPetitioningAllowed()) {
-            ((GameClient)this.client).sendPacket(SystemMessageId.THE_GAME_CLIENT_ENCOUNTERED_AN_ERROR_AND_WAS_UNABLE_TO_CONNECT_TO_THE_PETITION_SERVER);
+            player.sendMessage("The game client encountered an error and was unable to connect to the petition server.");
             return;
         }
         if (PetitionManager.getInstance().isPlayerPetitionPending(player)) {
-            ((GameClient)this.client).sendPacket(SystemMessageId.YOU_MAY_ONLY_SUBMIT_ONE_PETITION_ACTIVE_AT_A_TIME);
+            player.sendMessage("You may only submit one petition (active) at a time.");
             return;
         }
         if (PetitionManager.getInstance().getPendingPetitionCount() == Config.MAX_PETITIONS_PENDING) {

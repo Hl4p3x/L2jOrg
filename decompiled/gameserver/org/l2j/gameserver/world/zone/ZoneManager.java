@@ -21,7 +21,6 @@ import org.l2j.gameserver.world.zone.form.ZoneCubeArea;
 import io.github.joealisson.primitive.IntList;
 import org.l2j.gameserver.world.zone.form.ZonePolygonArea;
 import io.github.joealisson.primitive.ArrayIntList;
-import org.l2j.commons.util.Util;
 import org.l2j.gameserver.world.zone.type.SpawnZone;
 import org.l2j.gameserver.world.zone.type.RespawnZone;
 import org.l2j.gameserver.world.zone.form.ZoneCylinderArea;
@@ -29,6 +28,7 @@ import org.l2j.gameserver.model.Location;
 import java.lang.reflect.InvocationTargetException;
 import org.w3c.dom.NamedNodeMap;
 import java.lang.reflect.Constructor;
+import org.l2j.commons.util.Util;
 import org.w3c.dom.Node;
 import java.io.File;
 import org.w3c.dom.Document;
@@ -130,85 +130,85 @@ public final class ZoneManager extends GameXmlReader
         //    16: aload           type
         //    18: invokestatic    java/lang/Class.forName:(Ljava/lang/String;)Ljava/lang/Class;
         //    21: astore          zoneClass
-        //    23: ldc_w           Lorg/l2j/gameserver/world/zone/type/SpawnTerritory;.class
-        //    26: aload           zoneClass
-        //    28: invokevirtual   java/lang/Class.isAssignableFrom:(Ljava/lang/Class;)Z
-        //    31: ifeq            41
-        //    34: aload_0         /* this */
-        //    35: aload_1         /* zoneNode */
-        //    36: aload_2         /* file */
-        //    37: invokevirtual   org/l2j/gameserver/world/zone/ZoneManager.addTerritory:(Lorg/w3c/dom/Node;Ljava/lang/String;)V
-        //    40: return         
-        //    41: ldc_w           Lorg/l2j/gameserver/world/zone/Zone;.class
-        //    44: aload           zoneClass
-        //    46: invokevirtual   java/lang/Class.isAssignableFrom:(Ljava/lang/Class;)Z
-        //    49: ifne            67
-        //    52: getstatic       org/l2j/gameserver/world/zone/ZoneManager.LOGGER:Lorg/slf4j/Logger;
-        //    55: ldc_w           "The zone type: {} in file: {} is not subclass of Zone Class"
-        //    58: aload           type
-        //    60: aload_2         /* file */
-        //    61: invokeinterface org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
-        //    66: return         
-        //    67: aload_0         /* this */
-        //    68: aload_1         /* zoneNode */
-        //    69: aload           zoneClass
-        //    71: aload_2         /* file */
-        //    72: invokevirtual   org/l2j/gameserver/world/zone/ZoneManager.addZone:(Lorg/w3c/dom/Node;Ljava/lang/Class;Ljava/lang/String;)V
-        //    75: goto            135
-        //    78: astore          e
-        //    80: getstatic       org/l2j/gameserver/world/zone/ZoneManager.LOGGER:Lorg/slf4j/Logger;
-        //    83: ldc_w           "No such zone type: {} in file: {}"
-        //    86: aload           type
-        //    88: aload_2         /* file */
-        //    89: invokeinterface org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
-        //    94: goto            135
-        //    97: astore          e
-        //    99: getstatic       org/l2j/gameserver/world/zone/ZoneManager.LOGGER:Lorg/slf4j/Logger;
-        //   102: ldc_w           "The type: {} in file: {} must have a public constructor with a int parameter"
-        //   105: aload           type
-        //   107: aload_2         /* file */
-        //   108: invokeinterface org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
-        //   113: goto            135
-        //   116: astore          e
-        //   118: getstatic       org/l2j/gameserver/world/zone/ZoneManager.LOGGER:Lorg/slf4j/Logger;
-        //   121: ldc_w           "There is a invalid Zone in file {}: {}"
-        //   124: aload_2         /* file */
-        //   125: aload           e
-        //   127: invokevirtual   org/l2j/gameserver/world/zone/InvalidZoneException.getMessage:()Ljava/lang/String;
-        //   130: invokeinterface org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
-        //   135: return         
+        //    23: ldc             Lorg/l2j/gameserver/world/zone/type/SpawnTerritory;.class
+        //    25: aload           zoneClass
+        //    27: invokevirtual   java/lang/Class.isAssignableFrom:(Ljava/lang/Class;)Z
+        //    30: ifeq            40
+        //    33: aload_0         /* this */
+        //    34: aload_1         /* zoneNode */
+        //    35: aload_2         /* file */
+        //    36: invokevirtual   org/l2j/gameserver/world/zone/ZoneManager.addTerritory:(Lorg/w3c/dom/Node;Ljava/lang/String;)V
+        //    39: return         
+        //    40: ldc_w           Lorg/l2j/gameserver/world/zone/Zone;.class
+        //    43: aload           zoneClass
+        //    45: invokevirtual   java/lang/Class.isAssignableFrom:(Ljava/lang/Class;)Z
+        //    48: ifne            66
+        //    51: getstatic       org/l2j/gameserver/world/zone/ZoneManager.LOGGER:Lorg/slf4j/Logger;
+        //    54: ldc_w           "The zone type: {} in file: {} is not subclass of Zone Class"
+        //    57: aload           type
+        //    59: aload_2         /* file */
+        //    60: invokeinterface org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
+        //    65: return         
+        //    66: aload_0         /* this */
+        //    67: aload_1         /* zoneNode */
+        //    68: aload           zoneClass
+        //    70: aload_2         /* file */
+        //    71: invokevirtual   org/l2j/gameserver/world/zone/ZoneManager.addZone:(Lorg/w3c/dom/Node;Ljava/lang/Class;Ljava/lang/String;)V
+        //    74: goto            134
+        //    77: astore          e
+        //    79: getstatic       org/l2j/gameserver/world/zone/ZoneManager.LOGGER:Lorg/slf4j/Logger;
+        //    82: ldc_w           "No such zone type: {} in file: {}"
+        //    85: aload           type
+        //    87: aload_2         /* file */
+        //    88: invokeinterface org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
+        //    93: goto            134
+        //    96: astore          e
+        //    98: getstatic       org/l2j/gameserver/world/zone/ZoneManager.LOGGER:Lorg/slf4j/Logger;
+        //   101: ldc_w           "The type: {} in file: {} must have a public constructor with a int parameter"
+        //   104: aload           type
+        //   106: aload_2         /* file */
+        //   107: invokeinterface org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
+        //   112: goto            134
+        //   115: astore          e
+        //   117: getstatic       org/l2j/gameserver/world/zone/ZoneManager.LOGGER:Lorg/slf4j/Logger;
+        //   120: ldc_w           "There is a invalid Zone in file {}: {}"
+        //   123: aload_2         /* file */
+        //   124: aload           e
+        //   126: invokevirtual   org/l2j/gameserver/world/zone/InvalidZoneException.getMessage:()Ljava/lang/String;
+        //   129: invokeinterface org/slf4j/Logger.warn:(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;)V
+        //   134: return         
         //    MethodParameters:
         //  Name      Flags  
         //  --------  -----
         //  zoneNode  
         //  file      
-        //    StackMapTable: 00 06 FE 00 29 07 03 2B 07 00 D4 07 00 FB 19 FF 00 0A 00 05 07 00 0B 07 00 CE 07 00 D4 07 03 2B 07 00 D4 00 01 07 01 15 52 07 03 2D 52 07 01 23 12
+        //    StackMapTable: 00 06 FE 00 28 07 01 33 07 00 D4 07 00 F5 19 FF 00 0A 00 05 07 00 0B 07 00 CE 07 00 D4 07 01 33 07 00 D4 00 01 07 01 0F 52 07 03 32 52 07 01 1D 12
         //    Exceptions:
         //  Try           Handler
         //  Start  End    Start  End    Type                                                
         //  -----  -----  -----  -----  ----------------------------------------------------
-        //  16     40     78     97     Ljava/lang/ClassNotFoundException;
-        //  41     66     78     97     Ljava/lang/ClassNotFoundException;
-        //  67     75     78     97     Ljava/lang/ClassNotFoundException;
-        //  16     40     97     116    Ljava/lang/NoSuchMethodException;
-        //  16     40     97     116    Ljava/lang/IllegalAccessException;
-        //  16     40     97     116    Ljava/lang/InstantiationException;
-        //  16     40     97     116    Ljava/lang/reflect/InvocationTargetException;
-        //  41     66     97     116    Ljava/lang/NoSuchMethodException;
-        //  41     66     97     116    Ljava/lang/IllegalAccessException;
-        //  41     66     97     116    Ljava/lang/InstantiationException;
-        //  41     66     97     116    Ljava/lang/reflect/InvocationTargetException;
-        //  67     75     97     116    Ljava/lang/NoSuchMethodException;
-        //  67     75     97     116    Ljava/lang/IllegalAccessException;
-        //  67     75     97     116    Ljava/lang/InstantiationException;
-        //  67     75     97     116    Ljava/lang/reflect/InvocationTargetException;
-        //  16     40     116    135    Lorg/l2j/gameserver/world/zone/InvalidZoneException;
-        //  41     66     116    135    Lorg/l2j/gameserver/world/zone/InvalidZoneException;
-        //  67     75     116    135    Lorg/l2j/gameserver/world/zone/InvalidZoneException;
+        //  16     39     77     96     Ljava/lang/ClassNotFoundException;
+        //  40     65     77     96     Ljava/lang/ClassNotFoundException;
+        //  66     74     77     96     Ljava/lang/ClassNotFoundException;
+        //  16     39     96     115    Ljava/lang/NoSuchMethodException;
+        //  16     39     96     115    Ljava/lang/IllegalAccessException;
+        //  16     39     96     115    Ljava/lang/InstantiationException;
+        //  16     39     96     115    Ljava/lang/reflect/InvocationTargetException;
+        //  40     65     96     115    Ljava/lang/NoSuchMethodException;
+        //  40     65     96     115    Ljava/lang/IllegalAccessException;
+        //  40     65     96     115    Ljava/lang/InstantiationException;
+        //  40     65     96     115    Ljava/lang/reflect/InvocationTargetException;
+        //  66     74     96     115    Ljava/lang/NoSuchMethodException;
+        //  66     74     96     115    Ljava/lang/IllegalAccessException;
+        //  66     74     96     115    Ljava/lang/InstantiationException;
+        //  66     74     96     115    Ljava/lang/reflect/InvocationTargetException;
+        //  16     39     115    134    Lorg/l2j/gameserver/world/zone/InvalidZoneException;
+        //  40     65     115    134    Lorg/l2j/gameserver/world/zone/InvalidZoneException;
+        //  66     74     115    134    Lorg/l2j/gameserver/world/zone/InvalidZoneException;
         // 
         // The error that occurred was:
         // 
-        // java.lang.IllegalStateException: Expression is linked from several locations: Label_0041:
+        // java.lang.IllegalStateException: Expression is linked from several locations: Label_0040:
         //     at com.strobel.decompiler.ast.Error.expressionLinkedFromMultipleLocations(Error.java:27)
         //     at com.strobel.decompiler.ast.AstOptimizer.mergeDisparateObjectInitializations(AstOptimizer.java:2596)
         //     at com.strobel.decompiler.ast.AstOptimizer.optimize(AstOptimizer.java:235)
@@ -234,7 +234,7 @@ public final class ZoneManager extends GameXmlReader
     private void addZone(final Node zoneNode, final Class<?> zoneClass, final String file) throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, InvalidZoneException {
         final Constructor<? extends Zone> constructor = zoneClass.asSubclass(Zone.class).getConstructor(Integer.TYPE);
         final NamedNodeMap attributes = zoneNode.getAttributes();
-        Integer zoneId = this.parseInteger(attributes, "id");
+        Integer zoneId = (Integer)Util.computeIfNonNull((Object)attributes.getNamedItem("id"), (Function)this::parseInt);
         if (Objects.isNull(zoneId)) {
             zoneId = this.lastDynamicId++;
         }
@@ -324,9 +324,9 @@ public final class ZoneManager extends GameXmlReader
     
     private void parseSpawn(final Zone zone, final NamedNodeMap attr) {
         if (zone instanceof SpawnZone) {
-            final Integer x = this.parseInteger(attr, "x");
-            final Integer y = this.parseInteger(attr, "y");
-            final Integer z = this.parseInteger(attr, "z");
+            final int x = this.parseInt(attr, "x");
+            final int y = this.parseInt(attr, "y");
+            final int z = this.parseInt(attr, "z");
             final String type = this.parseString(attr, "type");
             ((SpawnZone)zone).parseLoc(x, y, z, type);
         }
@@ -381,32 +381,32 @@ public final class ZoneManager extends GameXmlReader
         for (Node node = polygonNode.getFirstChild(); node != null; node = node.getNextSibling()) {
             if ("point".equalsIgnoreCase(node.getNodeName())) {
                 final NamedNodeMap attr = node.getAttributes();
-                xPoints.add((int)this.parseInteger(attr, "x"));
-                yPoints.add((int)this.parseInteger(attr, "y"));
+                xPoints.add(this.parseInt(attr, "x"));
+                yPoints.add(this.parseInt(attr, "y"));
             }
         }
         if (xPoints.size() < 3) {
             throw new InvalidZoneException("The Zone with Polygon form must have at least 3 points");
         }
         final NamedNodeMap attributes = polygonNode.getAttributes();
-        final Integer minZ = this.parseInteger(attributes, "min-z");
-        final Integer maxZ = this.parseInteger(attributes, "max-z");
+        final int minZ = this.parseInt(attributes, "min-z");
+        final int maxZ = this.parseInt(attributes, "max-z");
         return new ZonePolygonArea(xPoints.toArray(int[]::new), yPoints.toArray(int[]::new), minZ, maxZ);
     }
     
     private ZoneArea parseCylinder(final Node zoneNode) throws InvalidZoneException {
         final NamedNodeMap attributes = zoneNode.getAttributes();
-        final int radius = this.parseInteger(attributes, "radius");
+        final int radius = this.parseInt(attributes, "radius");
         if (radius <= 0) {
             throw new InvalidZoneException("The Zone with Cylinder form must have a radius");
         }
         for (Node node = zoneNode.getFirstChild(); node != null; node = node.getNextSibling()) {
             if ("point".equalsIgnoreCase(node.getNodeName())) {
                 final NamedNodeMap attr = node.getAttributes();
-                final int x = this.parseInteger(attr, "x");
-                final int y = this.parseInteger(attr, "y");
-                final Integer minZ = this.parseInteger(attributes, "min-z");
-                final Integer maxZ = this.parseInteger(attributes, "max-z");
+                final int x = this.parseInt(attr, "x");
+                final int y = this.parseInt(attr, "y");
+                final int minZ = this.parseInt(attributes, "min-z");
+                final int maxZ = this.parseInt(attributes, "max-z");
                 return new ZoneCylinderArea(x, y, minZ, maxZ, radius);
             }
         }
@@ -420,13 +420,13 @@ public final class ZoneManager extends GameXmlReader
         for (Node node = cubeNode.getFirstChild(); node != null; node = node.getNextSibling()) {
             if ("point".equalsIgnoreCase(node.getNodeName())) {
                 final NamedNodeMap attr = node.getAttributes();
-                final int x = this.parseInteger(attr, "x");
-                final int y = this.parseInteger(attr, "y");
+                final int x = this.parseInt(attr, "x");
+                final int y = this.parseInt(attr, "y");
                 points[point++] = x;
                 points[point++] = y;
                 if (point > 3) {
-                    final Integer minZ = this.parseInteger(attributes, "min-z");
-                    final Integer maxZ = this.parseInteger(attributes, "max-z");
+                    final int minZ = this.parseInt(attributes, "min-z");
+                    final int maxZ = this.parseInt(attributes, "max-z");
                     return new ZoneCubeArea(points[0], points[2], points[1], points[3], minZ, maxZ);
                 }
             }

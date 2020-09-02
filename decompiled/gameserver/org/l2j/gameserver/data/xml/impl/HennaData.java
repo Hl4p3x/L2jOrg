@@ -99,7 +99,7 @@ public final class HennaData extends GameXmlReader
                     break;
                 }
                 case "skill": {
-                    skills.add(SkillEngine.getInstance().getSkill(this.parseInteger(attrs, "id"), this.parseInteger(attrs, "level")));
+                    skills.add(SkillEngine.getInstance().getSkill(this.parseInt(attrs, "id"), this.parseInt(attrs, "level")));
                     break;
                 }
                 case "classId": {

@@ -55,51 +55,51 @@ public final class ElementalSpiritEngine extends GameXmlReader
     
     private void parseSpirit(final Node spiritNode) {
         final NamedNodeMap attributes = spiritNode.getAttributes();
-        final Byte type = this.parseByte(attributes, "type");
-        final Byte stage = this.parseByte(attributes, "stage");
-        final Integer npcId = this.parseInteger(attributes, "npc");
-        final Integer extractItem = this.parseInteger(attributes, "extract-item");
-        final Integer maxCharacteristics = this.parseInteger(attributes, "max-characteristics");
+        final byte type = this.parseByte(attributes, "type");
+        final byte stage = this.parseByte(attributes, "stage");
+        final int npcId = this.parseInt(attributes, "npc");
+        final int extractItem = this.parseInt(attributes, "extract-item");
+        final int maxCharacteristics = this.parseInt(attributes, "max-characteristics");
         final ElementalSpiritTemplate template = new ElementalSpiritTemplate(type, stage, npcId, extractItem, maxCharacteristics);
         this.spiritData.computeIfAbsent(type, (Function<? super Byte, ? extends Map<Byte, ElementalSpiritTemplate>>)HashMap::new).put(stage, template);
         final NamedNodeMap levelInfo;
-        final Integer level;
-        final Integer attack;
-        final Integer defense;
-        final Integer criticalRate;
-        final Integer criticalDamage;
-        final Long maxExperience;
+        final int level;
+        final int attack;
+        final int defense;
+        final int criticalRate;
+        final int criticalDamage;
+        final long maxExperience;
         final ElementalSpiritTemplate elementalSpiritTemplate;
         this.forEach(spiritNode, "level", levelNode -> {
             levelInfo = levelNode.getAttributes();
-            level = this.parseInteger(levelInfo, "id");
-            attack = this.parseInteger(levelInfo, "atk");
-            defense = this.parseInteger(levelInfo, "def");
-            criticalRate = this.parseInteger(levelInfo, "crit-rate");
-            criticalDamage = this.parseInteger(levelInfo, "crit-dam");
+            level = this.parseInt(levelInfo, "id");
+            attack = this.parseInt(levelInfo, "atk");
+            defense = this.parseInt(levelInfo, "def");
+            criticalRate = this.parseInt(levelInfo, "crit-rate");
+            criticalDamage = this.parseInt(levelInfo, "crit-dam");
             maxExperience = this.parseLong(levelInfo, "max-exp");
             elementalSpiritTemplate.addLevelInfo(level, attack, defense, criticalRate, criticalDamage, maxExperience);
             return;
         });
         final NamedNodeMap itemInfo;
-        final Integer itemId;
-        final Integer count;
+        final int itemId;
+        final int count;
         final ElementalSpiritTemplate elementalSpiritTemplate2;
         this.forEach(spiritNode, "evolve-item", itemNode -> {
             itemInfo = itemNode.getAttributes();
-            itemId = this.parseInteger(itemInfo, "id");
-            count = this.parseInteger(itemInfo, "count");
+            itemId = this.parseInt(itemInfo, "id");
+            count = this.parseInt(itemInfo, "count");
             elementalSpiritTemplate2.addItemToEvolve(itemId, count);
             return;
         });
         final NamedNodeMap absorbInfo;
-        final Integer itemId2;
-        final Integer experience;
+        final int itemId2;
+        final int experience;
         final ElementalSpiritTemplate elementalSpiritTemplate3;
         this.forEach(spiritNode, "absorb-item", absorbItemNode -> {
             absorbInfo = absorbItemNode.getAttributes();
-            itemId2 = this.parseInteger(absorbInfo, "id");
-            experience = this.parseInteger(absorbInfo, "experience");
+            itemId2 = this.parseInt(absorbInfo, "id");
+            experience = this.parseInt(absorbInfo, "experience");
             elementalSpiritTemplate3.addAbsorbItem(itemId2, experience);
         });
     }

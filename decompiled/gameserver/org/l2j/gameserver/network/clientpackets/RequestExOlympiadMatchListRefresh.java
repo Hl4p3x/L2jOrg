@@ -4,9 +4,8 @@
 
 package org.l2j.gameserver.network.clientpackets;
 
-import org.l2j.gameserver.model.actor.instance.Player;
-import org.l2j.gameserver.network.serverpackets.olympiad.ExOlympiadMatchList;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
+import org.l2j.gameserver.network.serverpackets.olympiad.ExOlympiadMatchList;
 import org.l2j.gameserver.network.GameClient;
 
 public class RequestExOlympiadMatchListRefresh extends ClientPacket
@@ -15,10 +14,6 @@ public class RequestExOlympiadMatchListRefresh extends ClientPacket
     }
     
     public void runImpl() {
-        final Player activeChar = ((GameClient)this.client).getPlayer();
-        if (activeChar == null) {
-            return;
-        }
-        activeChar.sendPacket(new ExOlympiadMatchList());
+        ((GameClient)this.client).sendPacket(new ExOlympiadMatchList());
     }
 }

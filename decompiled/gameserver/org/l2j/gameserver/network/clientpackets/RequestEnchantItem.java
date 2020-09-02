@@ -34,7 +34,7 @@ public final class RequestEnchantItem extends ClientPacket
         }
         request.setEnchantingItem(this.objectId);
         request.setProcessing(true);
-        if (!player.isOnline() || ((GameClient)this.client).isDetached()) {
+        if (!player.isOnline()) {
             player.removeRequest(EnchantItemRequest.class);
             return;
         }

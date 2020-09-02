@@ -57,31 +57,31 @@ public final class HitConditionBonusData extends GameXmlReader
             final String nodeName = d.getNodeName();
             switch (nodeName) {
                 case "front": {
-                    this.frontBonus = this.parseInteger(attrs, "val");
+                    this.frontBonus = this.parseInt(attrs, "val");
                     break;
                 }
                 case "side": {
-                    this.sideBonus = this.parseInteger(attrs, "val");
+                    this.sideBonus = this.parseInt(attrs, "val");
                     break;
                 }
                 case "back": {
-                    this.backBonus = this.parseInteger(attrs, "val");
+                    this.backBonus = this.parseInt(attrs, "val");
                     break;
                 }
                 case "high": {
-                    this.highBonus = this.parseInteger(attrs, "val");
+                    this.highBonus = this.parseInt(attrs, "val");
                     break;
                 }
                 case "low": {
-                    this.lowBonus = this.parseInteger(attrs, "val");
+                    this.lowBonus = this.parseInt(attrs, "val");
                     break;
                 }
                 case "dark": {
-                    this.darkBonus = this.parseInteger(attrs, "val");
+                    this.darkBonus = this.parseInt(attrs, "val");
                     break;
                 }
                 case "rain": {
-                    this.rainBonus = this.parseInteger(attrs, "val");
+                    this.rainBonus = this.parseInt(attrs, "val");
                     break;
                 }
             }

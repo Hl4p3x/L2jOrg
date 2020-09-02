@@ -37,7 +37,7 @@ public final class RequestJoinParty extends ClientPacket
             requestor.sendPacket(SystemMessageId.YOU_MUST_FIRST_SELECT_A_USER_TO_INVITE_TO_YOUR_PARTY);
             return;
         }
-        if (Objects.isNull(target.getClient()) || target.getClient().isDetached()) {
+        if (Objects.isNull(target.getClient())) {
             requestor.sendPacket(((AbstractMessagePacket<ServerPacket>)SystemMessage.getSystemMessage(SystemMessageId.S1_CURRENTLY_OFFLINE)).addString(this.name));
             return;
         }

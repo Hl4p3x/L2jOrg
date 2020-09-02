@@ -5,6 +5,8 @@
 package org.l2j.gameserver.instancemanager;
 
 import org.slf4j.LoggerFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.GlobalVariableDAO;
 import java.util.Iterator;
 import java.sql.PreparedStatement;
 import java.util.Map;
@@ -174,91 +176,11 @@ public final class GlobalVariablesManager extends AbstractVariables
     
     @Override
     public boolean deleteMe() {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final Statement del = con.createStatement();
-                try {
-                    del.execute("DELETE FROM global_variables");
-                    if (del != null) {
-                        del.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (del != null) {
-                        try {
-                            del.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            GlobalVariablesManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName()), (Throwable)e);
-            return false;
-        }
-        return true;
+        return ((GlobalVariableDAO)DatabaseAccess.getDAO((Class)GlobalVariableDAO.class)).deleteAll();
     }
     
     public void resetRaidBonus() {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final Statement st = con.createStatement();
-                try {
-                    st.execute("DELETE FROM global_variables WHERE var like 'MA_C%'");
-                    if (st != null) {
-                        st.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (st != null) {
-                        try {
-                            st.close();
-                        }
-                        catch (Throwable exception) {
-                            t2.addSuppressed(exception);
-                        }
-                    }
-                    throw t2;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t3) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t3.addSuppressed(exception2);
-                    }
-                }
-                throw t3;
-            }
-        }
-        catch (SQLException t) {
-            GlobalVariablesManager.LOGGER.warn(t.getMessage(), (Throwable)t);
-        }
+        ((GlobalVariableDAO)DatabaseAccess.getDAO((Class)GlobalVariableDAO.class)).deleteRaidBonus();
     }
     
     public static void init() {

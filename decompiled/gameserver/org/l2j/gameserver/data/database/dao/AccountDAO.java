@@ -10,7 +10,7 @@ import org.l2j.commons.database.DAO;
 
 public interface AccountDAO extends DAO<AccountData>
 {
-    @Query("DELETE a1, a FROM account_gsdata a1 JOIN account_data a ON a.account = a1.account_name WHERE a.account NOT IN (SELECT account_name FROM characters);")
+    @Query("DELETE FROM account_data a WHERE a.account NOT IN (SELECT account_name FROM characters)")
     int deleteWithoutAccount();
     
     @Query("SELECT * FROM account_data WHERE account = :account:")

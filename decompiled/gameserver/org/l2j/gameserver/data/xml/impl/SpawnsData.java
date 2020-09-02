@@ -260,10 +260,10 @@ public class SpawnsData extends GameXmlReader
     private void parseLocations(final Node n, final NpcSpawnTemplate npcTemplate) {
         for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
             if ("location".equalsIgnoreCase(d.getNodeName())) {
-                final int x = this.parseInteger(d.getAttributes(), "x");
-                final int y = this.parseInteger(d.getAttributes(), "y");
-                final int z = this.parseInteger(d.getAttributes(), "z");
-                final int heading = this.parseInteger(d.getAttributes(), "heading", Integer.valueOf(0));
+                final int x = this.parseInt(d.getAttributes(), "x");
+                final int y = this.parseInt(d.getAttributes(), "y");
+                final int z = this.parseInt(d.getAttributes(), "z");
+                final int heading = this.parseInt(d.getAttributes(), "heading", 0);
                 final double chance = this.parseDouble(d.getAttributes(), "chance");
                 npcTemplate.addSpawnLocation(new ChanceLocation(x, y, z, heading, chance));
             }

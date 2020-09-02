@@ -43,9 +43,6 @@ public final class AntiFeedManager
         if (targetPlayer == null) {
             return false;
         }
-        if (targetPlayer.getClient().isDetached()) {
-            return false;
-        }
         if (Config.ANTIFEED_INTERVAL > 0 && this._lastDeathTimes.containsKey(targetPlayer.getObjectId()) && System.currentTimeMillis() - this._lastDeathTimes.get(targetPlayer.getObjectId()) < Config.ANTIFEED_INTERVAL) {
             return false;
         }
@@ -58,7 +55,7 @@ public final class AntiFeedManager
         }
         final GameClient targetClient = targetPlayer.getClient();
         final GameClient attackerClient = attackerPlayer.getClient();
-        if (targetClient == null || attackerClient == null || targetClient.isDetached() || attackerClient.isDetached()) {
+        if (targetClient == null || attackerClient == null) {
             return !Config.ANTIFEED_DISCONNECTED_AS_DUALBOX;
         }
         return !targetClient.getHostAddress().equals(attackerClient.getHostAddress());
@@ -89,7 +86,7 @@ public final class AntiFeedManager
         if (!Config.DUALBOX_COUNT_OFFLINE_TRADERS) {
             final String address = client.getHostAddress();
             for (final Player player : World.getInstance().getPlayers()) {
-                if ((player.getClient() == null || player.getClient().isDetached()) && player.getIPAddress().equals(address)) {
+                if (player.getClient() == null && player.getIPAddress().equals(address)) {
                     connectionCount.decrementAndGet();
                 }
             }

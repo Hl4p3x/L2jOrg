@@ -45,6 +45,8 @@ import java.util.Iterator;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import org.l2j.commons.database.DatabaseFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.ItemDAO;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerAugment;
 import org.l2j.gameserver.model.actor.Summon;
 import org.l2j.gameserver.model.item.type.EtcItemType;
@@ -241,10 +243,10 @@ public final class Item extends WorldObject
         final GeneralSettings generalSettings = (GeneralSettings)Configurator.getSettings((Class)GeneralSettings.class);
         if (generalSettings.logItems() && (!generalSettings.smallLogItems() || this.template.isEquipable() || this.template.getId() == 57)) {
             if (this.enchantLevel > 0) {
-                Item.LOG_ITEMS.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;IILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;, String.valueOf(process), this.getObjectId(), this.enchantLevel, this.template.getName(), this._count, String.valueOf(creator), String.valueOf(reference)));
+                Item.LOG_ITEMS.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;IILjava/lang/String;JLorg/l2j/gameserver/model/actor/instance/Player;Ljava/lang/Object;)Ljava/lang/String;, process, this.getObjectId(), this.enchantLevel, this.template.getName(), this._count, creator, reference));
             }
             else {
-                Item.LOG_ITEMS.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;ILjava/lang/String;JLjava/lang/String;Ljava/lang/String;)Ljava/lang/String;, String.valueOf(process), this.getObjectId(), this.template.getName(), this._count, String.valueOf(creator), String.valueOf(reference)));
+                Item.LOG_ITEMS.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;ILjava/lang/String;JLorg/l2j/gameserver/model/actor/instance/Player;Ljava/lang/Object;)Ljava/lang/String;, String.valueOf(process), this.getObjectId(), this.template.getName(), this._count, creator, reference));
             }
         }
         if (creator != null && creator.isGM()) {
@@ -579,47 +581,7 @@ public final class Item extends WorldObject
         }
         final VariationInstance augment = this._augmentation;
         this._augmentation = null;
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("DELETE FROM item_variations WHERE itemId = ?");
-                try {
-                    ps.setInt(1, this.getObjectId());
-                    ps.executeUpdate();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            Item.LOGGER.error(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.toString()), (Throwable)e);
-        }
+        ((ItemDAO)DatabaseAccess.getDAO((Class)ItemDAO.class)).deleteVariations(this.objectId);
         EventDispatcher.getInstance().notifyEventAsync(new OnPlayerAugment(this.getActingPlayer(), this, augment, false), this.getTemplate());
     }
     
@@ -816,30 +778,7 @@ public final class Item extends WorldObject
     }
     
     private void updateItemElements(final Connection con) {
-        try {
-            final PreparedStatement ps = con.prepareStatement("DELETE FROM item_elementals WHERE itemId = ?");
-            try {
-                ps.setInt(1, this.getObjectId());
-                ps.executeUpdate();
-                if (ps != null) {
-                    ps.close();
-                }
-            }
-            catch (Throwable t) {
-                if (ps != null) {
-                    try {
-                        ps.close();
-                    }
-                    catch (Throwable exception) {
-                        t.addSuppressed(exception);
-                    }
-                }
-                throw t;
-            }
-        }
-        catch (SQLException e) {
-            Item.LOGGER.error(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.toString()), (Throwable)e);
-        }
+        ((ItemDAO)DatabaseAccess.getDAO((Class)ItemDAO.class)).deleteElementals(this.objectId);
         if (this._elementals == null) {
             return;
         }
@@ -857,16 +796,16 @@ public final class Item extends WorldObject
                     ps.close();
                 }
             }
-            catch (Throwable t2) {
+            catch (Throwable t) {
                 if (ps != null) {
                     try {
                         ps.close();
                     }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
+                    catch (Throwable exception) {
+                        t.addSuppressed(exception);
                     }
                 }
-                throw t2;
+                throw t;
             }
         }
         catch (SQLException e) {
@@ -1003,50 +942,8 @@ public final class Item extends WorldObject
         if (this._elementals == null) {
             return;
         }
-        synchronized (this._elementals) {
-            this._elementals.clear();
-        }
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("DELETE FROM item_elementals WHERE itemId = ?");
-                try {
-                    ps.setInt(1, this.getObjectId());
-                    ps.executeUpdate();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            Item.LOGGER.error(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.toString()), (Throwable)e);
-        }
+        this._elementals.clear();
+        ((ItemDAO)DatabaseAccess.getDAO((Class)ItemDAO.class)).deleteElementals(this.objectId);
     }
     
     @Override
@@ -1221,108 +1118,9 @@ public final class Item extends WorldObject
         if (!this._existsInDb || this._wear) {
             return;
         }
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                PreparedStatement ps = con.prepareStatement("DELETE FROM items WHERE object_id = ?");
-                try {
-                    ps.setInt(1, this.getObjectId());
-                    ps.executeUpdate();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                ps = con.prepareStatement("DELETE FROM item_variations WHERE itemId = ?");
-                try {
-                    ps.setInt(1, this.getObjectId());
-                    ps.executeUpdate();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-                ps = con.prepareStatement("DELETE FROM item_elementals WHERE itemId = ?");
-                try {
-                    ps.setInt(1, this.getObjectId());
-                    ps.executeUpdate();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t3) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception3) {
-                            t3.addSuppressed(exception3);
-                        }
-                    }
-                    throw t3;
-                }
-                ps = con.prepareStatement("DELETE FROM item_special_abilities WHERE objectId = ?");
-                try {
-                    ps.setInt(1, this.getObjectId());
-                    ps.executeUpdate();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t4) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception4) {
-                            t4.addSuppressed(exception4);
-                        }
-                    }
-                    throw t4;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t5) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception5) {
-                        t5.addSuppressed(exception5);
-                    }
-                }
-                throw t5;
-            }
-        }
-        catch (Exception e) {
-            Item.LOGGER.error(invokedynamic(makeConcatWithConstants:(Lorg/l2j/gameserver/model/item/instance/Item;)Ljava/lang/String;, this), (Throwable)e);
-        }
-        finally {
-            this._existsInDb = false;
-            this._storedInDb = false;
-        }
+        ((ItemDAO)DatabaseAccess.getDAO((Class)ItemDAO.class)).deleteItem(this.objectId);
+        this._existsInDb = false;
+        this._storedInDb = false;
     }
     
     @Override

@@ -33,7 +33,7 @@ public final class ChatWhisper implements IChatHandler
                 player.sendPacket(SystemMessageId.THAT_PERSON_IS_IN_MESSAGE_REFUSAL_MODE);
                 return;
             }
-            if (Objects.isNull(receiver.getClient()) || receiver.getClient().isDetached()) {
+            if (Objects.isNull(receiver.getClient())) {
                 player.sendMessage("Player is in offline mode.");
                 return;
             }

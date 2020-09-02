@@ -5,8 +5,8 @@
 package org.l2j.gameserver.network.clientpackets;
 
 import org.slf4j.LoggerFactory;
-import org.l2j.gameserver.model.CharSelectInfoPackage;
-import org.l2j.gameserver.network.serverpackets.CharSelectionInfo;
+import org.l2j.gameserver.model.PlayerSelectInfo;
+import org.l2j.gameserver.network.serverpackets.PlayerSelectionInfo;
 import org.l2j.gameserver.network.serverpackets.CharDeleteFail;
 import org.l2j.gameserver.model.events.impl.IBaseEvent;
 import org.l2j.gameserver.model.events.Listeners;
@@ -32,7 +32,7 @@ public final class CharacterDelete extends ClientPacket
             final CharacterDeleteFailType failType = ((GameClient)this.client).markToDeleteChar(this._charSlot);
             if (failType == CharacterDeleteFailType.NONE) {
                 ((GameClient)this.client).sendPacket(new CharDeleteSuccess());
-                final CharSelectInfoPackage charInfo = ((GameClient)this.client).getCharSelection(this._charSlot);
+                final PlayerSelectInfo charInfo = ((GameClient)this.client).getPlayerSelection(this._charSlot);
                 EventDispatcher.getInstance().notifyEvent(new OnPlayerDelete(charInfo.getObjectId(), charInfo.getName(), (GameClient)this.client), Listeners.players());
             }
             else {
@@ -42,9 +42,7 @@ public final class CharacterDelete extends ClientPacket
         catch (Exception e) {
             CharacterDelete.LOGGER.error(e.getLocalizedMessage(), (Throwable)e);
         }
-        final CharSelectionInfo cl = new CharSelectionInfo(((GameClient)this.client).getAccountName(), ((GameClient)this.client).getSessionId().getGameServerSessionId(), 0);
-        ((GameClient)this.client).sendPacket(cl);
-        ((GameClient)this.client).setCharSelection(cl.getCharInfo());
+        ((GameClient)this.client).sendPacket(new PlayerSelectionInfo((GameClient)this.client, 0));
     }
     
     static {

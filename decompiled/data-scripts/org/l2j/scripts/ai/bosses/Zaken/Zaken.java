@@ -4,6 +4,7 @@
 
 package org.l2j.scripts.ai.bosses.Zaken;
 
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.PlaySound;
@@ -58,7 +59,7 @@ public class Zaken extends AbstractNpcAI
     public String onKill(final Npc npc, final Player killer, final boolean isSummon) {
         npc.broadcastPacket((ServerPacket)new PlaySound(1, "BS02_D", 1, npc.getObjectId(), npc.getX(), npc.getY(), npc.getZ()));
         GrandBossManager.getInstance().setBossStatus(29022, 1);
-        final long respawnTime = (Config.ZAKEN_SPAWN_INTERVAL + getRandom(-Config.ZAKEN_SPAWN_RANDOM, Config.ZAKEN_SPAWN_RANDOM)) * 3600000;
+        final long respawnTime = (Config.ZAKEN_SPAWN_INTERVAL + Rnd.get(-Config.ZAKEN_SPAWN_RANDOM, Config.ZAKEN_SPAWN_RANDOM)) * 3600000;
         this.startQuestTimer("zaken_unlock", respawnTime, (Npc)null, (Player)null);
         final StatsSet info = GrandBossManager.getInstance().getStatsSet(29022);
         info.set("respawn_time", System.currentTimeMillis() + respawnTime);

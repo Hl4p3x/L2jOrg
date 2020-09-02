@@ -4,6 +4,7 @@
 
 package org.l2j.gameserver.network.clientpackets;
 
+import org.l2j.gameserver.network.serverpackets.AbstractMessagePacket;
 import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.model.quest.QuestState;
 import java.util.List;
@@ -282,9 +283,7 @@ public final class RequestAcquireSkill extends ClientPacket
     }
     
     private void giveSkill(final Player player, final Npc trainer, final Skill skill, final boolean store) {
-        final SystemMessage sm = SystemMessage.getSystemMessage(SystemMessageId.LEARNED_S1_LV_S2);
-        sm.addSkillName(skill);
-        player.sendPacket(sm);
+        player.sendPacket(((AbstractMessagePacket<ServerPacket>)SystemMessage.getSystemMessage(SystemMessageId.LEARNED_S1_LV_S2).addSkillName(skill)).addInt(skill.getLevel()));
         player.addSkill(skill, store);
         player.sendItemList();
         player.sendPacket(new ShortCutInit());

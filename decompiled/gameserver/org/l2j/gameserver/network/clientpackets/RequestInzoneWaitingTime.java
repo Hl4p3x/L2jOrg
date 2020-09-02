@@ -11,7 +11,10 @@ import org.l2j.gameserver.network.GameClient;
 
 public class RequestInzoneWaitingTime extends ClientPacket
 {
+    private boolean _hide;
+    
     public void readImpl() {
+        this._hide = (this.readChar() == '\0');
     }
     
     public void runImpl() {
@@ -19,6 +22,6 @@ public class RequestInzoneWaitingTime extends ClientPacket
         if (activeChar == null) {
             return;
         }
-        ((GameClient)this.client).sendPacket(new ExInzoneWaiting(activeChar, true));
+        ((GameClient)this.client).sendPacket(new ExInzoneWaiting(activeChar, this._hide));
     }
 }

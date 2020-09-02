@@ -19,6 +19,7 @@ import org.l2j.gameserver.ai.CtrlIntention;
 import org.l2j.gameserver.model.skills.SkillCaster;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.PlaySound;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.StatsSet;
 import org.l2j.gameserver.model.actor.instance.GrandBoss;
 import org.l2j.gameserver.model.actor.instance.Player;
@@ -98,10 +99,10 @@ public final class QueenAnt extends AbstractNpcAI
     
     private void spawnBoss(final GrandBoss npc) {
         GrandBossManager.getInstance().addBoss(npc);
-        if (getRandom(100) < 33) {
+        if (Rnd.get(100) < 33) {
             QueenAnt._zone.movePlayersTo(QueenAnt.OUST_LOC_1);
         }
-        else if (getRandom(100) < 50) {
+        else if (Rnd.get(100) < 50) {
             QueenAnt._zone.movePlayersTo(QueenAnt.OUST_LOC_2);
         }
         else {
@@ -112,7 +113,7 @@ public final class QueenAnt extends AbstractNpcAI
         this.startQuestTimer("heal", 1000L, (Npc)null, (Player)null, true);
         npc.broadcastPacket((ServerPacket)new PlaySound(1, "BS01_A", 1, npc.getObjectId(), npc.getX(), npc.getY(), npc.getZ()));
         this._queen = (Monster)npc;
-        this._larva = (Monster)addSpawn(29002, -21600, 179482, -5846, getRandom(360), false, 0L);
+        this._larva = (Monster)addSpawn(29002, -21600, 179482, -5846, Rnd.get(360), false, 0L);
     }
     
     public String onAdvEvent(final String event, final Npc npc, final Player player) {
@@ -131,7 +132,7 @@ public final class QueenAnt extends AbstractNpcAI
                                 continue;
                             }
                             nurse.setTarget((WorldObject)this._larva);
-                            nurse.useMagic(getRandomBoolean() ? QueenAnt.HEAL1.getSkill() : QueenAnt.HEAL2.getSkill());
+                            nurse.useMagic(Rnd.nextBoolean() ? QueenAnt.HEAL1.getSkill() : QueenAnt.HEAL2.getSkill());
                         }
                         else if (queenNeedHeal) {
                             if (nurse.getLeader() == this._larva) {
@@ -154,10 +155,10 @@ public final class QueenAnt extends AbstractNpcAI
                 break;
             }
             case "action": {
-                if (npc == null || getRandom(3) != 0) {
+                if (npc == null || Rnd.get(3) != 0) {
                     break;
                 }
-                if (getRandom(2) == 0) {
+                if (Rnd.get(2) == 0) {
                     npc.broadcastSocialAction(3);
                     break;
                 }
@@ -249,11 +250,11 @@ public final class QueenAnt extends AbstractNpcAI
         if (!Config.RAID_DISABLE_CURSE && character.getLevel() - npc.getLevel() > 8) {
             Skill curse = null;
             if (isMage) {
-                if (!character.hasAbnormalType(CommonSkill.RAID_CURSE.getSkill().getAbnormalType()) && getRandom(4) == 0) {
+                if (!character.hasAbnormalType(CommonSkill.RAID_CURSE.getSkill().getAbnormalType()) && Rnd.get(4) == 0) {
                     curse = CommonSkill.RAID_CURSE.getSkill();
                 }
             }
-            else if (!character.hasAbnormalType(CommonSkill.RAID_CURSE2.getSkill().getAbnormalType()) && getRandom(4) == 0) {
+            else if (!character.hasAbnormalType(CommonSkill.RAID_CURSE2.getSkill().getAbnormalType()) && Rnd.get(4) == 0) {
                 curse = CommonSkill.RAID_CURSE2.getSkill();
             }
             if (curse != null) {
@@ -271,7 +272,7 @@ public final class QueenAnt extends AbstractNpcAI
         if (npcId == 29001) {
             npc.broadcastPacket((ServerPacket)new PlaySound(1, "BS02_D", 1, npc.getObjectId(), npc.getX(), npc.getY(), npc.getZ()));
             GrandBossManager.getInstance().setBossStatus(29001, 1);
-            final long respawnTime = (Config.QUEEN_ANT_SPAWN_INTERVAL + getRandom(-Config.QUEEN_ANT_SPAWN_RANDOM, Config.QUEEN_ANT_SPAWN_RANDOM)) * 3600000;
+            final long respawnTime = (Config.QUEEN_ANT_SPAWN_INTERVAL + Rnd.get(-Config.QUEEN_ANT_SPAWN_RANDOM, Config.QUEEN_ANT_SPAWN_RANDOM)) * 3600000;
             this.startQuestTimer("queen_unlock", respawnTime, (Npc)null, (Player)null);
             this.cancelQuestTimer("action", npc, (Player)null);
             this.cancelQuestTimer("heal", (Npc)null, (Player)null);
@@ -288,7 +289,7 @@ public final class QueenAnt extends AbstractNpcAI
             if (npcId == 29005) {
                 final Monster mob = (Monster)npc;
                 if (mob.getLeader() != null) {
-                    mob.getLeader().getMinionList().onMinionDie(mob, (280 + getRandom(40)) * 1000);
+                    mob.getLeader().getMinionList().onMinionDie(mob, (280 + Rnd.get(40)) * 1000);
                 }
             }
             else if (npcId == 29003) {

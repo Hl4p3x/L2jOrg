@@ -24,7 +24,7 @@ public interface PlayerDAO extends DAO<PlayerData>
     void setAllCharactersOffline();
     
     @Query("SELECT * FROM characters WHERE account_name = :account: ORDER BY createDate")
-    List<PlayerData> findAllCharactersByAccount(final String account);
+    List<PlayerData> findPlayersByAccount(final String account);
     
     @Query("SELECT * FROM characters WHERE charId = :objectId:")
     PlayerData findById(final int objectId);
@@ -151,4 +151,64 @@ public interface PlayerDAO extends DAO<PlayerData>
     
     @Query("UPDATE characters SET deletetime=:deleteTime: WHERE charId=:playerId:")
     void updateDeleteTime(final int playerId, final long deleteTime);
+    
+    @Query("DELETE FROM character_skills_save WHERE skill_id=:skillId:")
+    void deleteSkillSave(final int skillId);
+    
+    @Query("UPDATE character_reco_bonus SET rec_left = 20, rec_have = GREATEST(CAST(rec_have AS SIGNED)  -20 , 0)")
+    void resetRecommends();
+    
+    @Query("UPDATE characters SET vitality_points = :points:")
+    void resetVitality(final int points);
+    
+    @Query("DELETE FROM character_recipebook WHERE charId=:playerId: AND id=:recipeId: AND classIndex=:classIndex:")
+    void deleteRecipe(final int playerId, final int recipeId, final int classIndex);
+    
+    @Query("UPDATE characters SET online=:online:, lastAccess=:lastAccess: WHERE charId=:playerId:")
+    void updateOnlineStatus(final int playerId, final boolean online, final long lastAccess);
+    
+    @Query("DELETE FROM character_skills WHERE skill_id=:skillId: AND charId=:playerId: AND class_index=:classIndex:")
+    void deleteSkill(final int playerId, final int skillId, final int classIndex);
+    
+    @Query("DELETE FROM character_hennas WHERE charId=:playerId: AND slot=:slot: AND class_index=:classIndex:")
+    void deleteHenna(final int playerId, final int slot, final int classIndex);
+    
+    @Query("DELETE FROM character_hennas WHERE charId=:playerId: AND class_index=:classIndex:")
+    void deleteHennas(final int playerId, final int classIndex);
+    
+    @Query("DELETE FROM character_skills_save WHERE charId=:playerId: AND class_index=:classIndex:")
+    void deleteSkillsSave(final int playerId, final int classIndex);
+    
+    @Query("DELETE FROM character_skills WHERE charId=? AND class_index=?")
+    void deleteSkills(final int playerId, final int classIndex);
+    
+    @Query("DELETE FROM character_subclasses WHERE charId=:playerId: AND class_index=:classIndex:")
+    void deleteSubClass(final int playerId, final int classIndex);
+    
+    @Query("UPDATE character_tpbookmark SET icon=:icon:,tag=:tag:,name=:name: where charId=:playerId: AND Id=:id:")
+    void updateTeleportBookMark(final int playerId, final int id, final int icon, final String tag, final String name);
+    
+    @Query("DELETE FROM character_tpbookmark WHERE charId=:playerId: AND Id=:id:")
+    void deleteTeleportBookMark(final int playerId, final int id);
+    
+    @Query("DELETE FROM character_recipeshoplist WHERE charId=:playerId:")
+    void deleteRecipeShop(final int playerId);
+    
+    @Query("UPDATE characters SET subpledge=:pledgeType: WHERE charId=:playerId:")
+    void updateSubpledge(final int playerId, final int pledgeType);
+    
+    @Query("UPDATE characters SET power_grade=:powerGrade: WHERE charId=:playerId:")
+    void updatePowerGrade(final int playerId, final int powerGrade);
+    
+    @Query("UPDATE characters SET apprentice=:apprentice:,sponsor=:sponsor: WHERE charId= :playerId:")
+    void updateApprenticeAndSponsor(final int playerId, final int apprentice, final int sponsor);
+    
+    @Query("DELETE FROM character_contacts WHERE charId =:playeId: and contactId = :contactId:")
+    void deleteContact(final int playerId, final int contactId);
+    
+    @Query("DELETE FROM character_macroses WHERE charId=:playerId: AND id=:id:")
+    void deleteMacro(final int playerId, final int id);
+    
+    @Query("DELETE FROM character_instance_time WHERE charId=:playerId: AND instanceId=:id:")
+    void deleteInstanceTime(final int playerId, final int id);
 }

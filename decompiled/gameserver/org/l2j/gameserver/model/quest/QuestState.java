@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 
 public final class QuestState
 {
-    protected static final Logger LOGGER;
+    private static final Logger LOGGER;
     private final String _questName;
     private final Player _player;
     private byte _state;
@@ -73,9 +73,6 @@ public final class QuestState
     }
     
     public boolean setState(final byte state, final boolean saveInDb) {
-        if (this._simulated) {
-            return false;
-        }
         if (this._state == state) {
             return false;
         }
@@ -94,9 +91,6 @@ public final class QuestState
     }
     
     public String setInternal(final String var, String val) {
-        if (this._simulated) {
-            return null;
-        }
         if (this._vars == null) {
             this._vars = new HashMap<String, String>();
         }
@@ -108,16 +102,10 @@ public final class QuestState
     }
     
     public String set(final String var, final int val) {
-        if (this._simulated) {
-            return null;
-        }
         return this.set(var, Integer.toString(val));
     }
     
     public String set(final String var, String val) {
-        if (this._simulated) {
-            return null;
-        }
         if (this._vars == null) {
             this._vars = new HashMap<String, String>();
         }
@@ -149,9 +137,6 @@ public final class QuestState
     }
     
     private void setCond(final int cond, final int old) {
-        if (this._simulated) {
-            return;
-        }
         if (cond == old) {
             return;
         }
@@ -192,9 +177,6 @@ public final class QuestState
     }
     
     public String unset(final String var) {
-        if (this._simulated) {
-            return null;
-        }
         if (this._vars == null) {
             return null;
         }
@@ -253,9 +235,6 @@ public final class QuestState
     }
     
     public QuestState setCond(final int value) {
-        if (this._simulated) {
-            return null;
-        }
         if (this.isStarted()) {
             this.set("cond", Integer.toString(value));
         }
@@ -267,9 +246,6 @@ public final class QuestState
     }
     
     public QuestState setCond(final int value, final boolean playQuestMiddle) {
-        if (this._simulated) {
-            return null;
-        }
         if (!this.isStarted()) {
             return this;
         }
@@ -288,9 +264,6 @@ public final class QuestState
     }
     
     public QuestState setMemoState(final int value) {
-        if (this._simulated) {
-            return null;
-        }
         this.set("memoState", String.valueOf(value));
         return this;
     }
@@ -307,9 +280,6 @@ public final class QuestState
     }
     
     public QuestState setMemoStateEx(final int slot, final int value) {
-        if (this._simulated) {
-            return null;
-        }
         this.set(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, slot), String.valueOf(value));
         return this;
     }
@@ -323,16 +293,10 @@ public final class QuestState
     }
     
     public void setIsExitQuestOnCleanUp(final boolean isExitQuestOnCleanUp) {
-        if (this._simulated) {
-            return;
-        }
         this._isExitQuestOnCleanUp = isExitQuestOnCleanUp;
     }
     
     public QuestState startQuest() {
-        if (this._simulated) {
-            return null;
-        }
         if (this.isCreated() && !this.getQuest().isCustomQuest()) {
             this.set("cond", "1");
             this.setState((byte)1);
@@ -343,9 +307,6 @@ public final class QuestState
     }
     
     public QuestState exitQuest(final QuestType type) {
-        if (this._simulated) {
-            return null;
-        }
         switch (type) {
             case DAILY: {
                 this.exitQuest(false);
@@ -362,9 +323,6 @@ public final class QuestState
     }
     
     public QuestState exitQuest(final QuestType type, final boolean playExitQuest) {
-        if (this._simulated) {
-            return null;
-        }
         this.exitQuest(type);
         if (playExitQuest) {
             this._player.sendPacket(QuestSound.ITEMSOUND_QUEST_FINISH.getPacket());
@@ -373,9 +331,6 @@ public final class QuestState
     }
     
     private QuestState exitQuest(final boolean repeatable) {
-        if (this._simulated) {
-            return null;
-        }
         this._player.removeNotifyQuestOfDeath(this);
         if (!this.isStarted()) {
             return this;
@@ -394,9 +349,6 @@ public final class QuestState
     }
     
     public QuestState exitQuest(final boolean repeatable, final boolean playExitQuest) {
-        if (this._simulated) {
-            return null;
-        }
         this.exitQuest(repeatable);
         if (playExitQuest) {
             this._player.sendPacket(QuestSound.ITEMSOUND_QUEST_FINISH.getPacket());
@@ -406,9 +358,6 @@ public final class QuestState
     }
     
     public void setRestartTime() {
-        if (this._simulated) {
-            return;
-        }
         final Calendar reDo = Calendar.getInstance();
         if (reDo.get(11) >= this.getQuest().getResetHour()) {
             reDo.add(5, 1);
@@ -421,10 +370,6 @@ public final class QuestState
     public boolean isNowAvailable() {
         final String val = this.get("restartTime");
         return val != null && Long.parseLong(val) <= System.currentTimeMillis();
-    }
-    
-    public void setSimulated(final boolean simulated) {
-        this._simulated = simulated;
     }
     
     static {

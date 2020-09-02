@@ -12,6 +12,8 @@ import java.util.Comparator;
 import java.util.Optional;
 import org.l2j.gameserver.model.entity.ClanHall;
 import org.l2j.gameserver.data.xml.impl.ClanHallManager;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.ClanHallDAO;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Collections;
 import org.l2j.gameserver.model.Clan;
@@ -28,9 +30,7 @@ public class ClanHallAuction
 {
     private static final Logger LOGGER;
     private static final String LOAD_CLANHALL_BIDDERS = "SELECT * FROM clanhall_auctions_bidders WHERE clanHallId=?";
-    private static final String DELETE_CLANHALL_BIDDERS = "DELETE FROM clanhall_auctions_bidders WHERE clanHallId=?";
     private static final String INSERT_CLANHALL_BIDDER = "REPLACE INTO clanhall_auctions_bidders (clanHallId, clanId, bid, bidTime) VALUES (?,?,?,?)";
-    private static final String DELETE_CLANHALL_BIDDER = "DELETE FROM clanhall_auctions_bidders WHERE clanId=?";
     private final int _clanHallId;
     private volatile Map<Integer, Bidder> _bidders;
     
@@ -168,47 +168,7 @@ public class ClanHallAuction
     
     public void removeBid(final Clan clan) {
         this.getBids().remove(clan.getId());
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("DELETE FROM clanhall_auctions_bidders WHERE clanId=?");
-                try {
-                    ps.setInt(1, clan.getId());
-                    ps.execute();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            ClanHallAuction.LOGGER.error(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;, clan.getName(), this._clanHallId), (Throwable)e);
-        }
+        ((ClanHallDAO)DatabaseAccess.getDAO((Class)ClanHallDAO.class)).deleteBidder(clan.getId());
     }
     
     public long getHighestBid() {
@@ -239,47 +199,7 @@ public class ClanHallAuction
             final ClanHall clanHall = ClanHallManager.getInstance().getClanHallById(this._clanHallId);
             clanHall.setOwner(highestBidder.getClan());
             this.getBids().clear();
-            try {
-                final Connection con = DatabaseFactory.getInstance().getConnection();
-                try {
-                    final PreparedStatement ps = con.prepareStatement("DELETE FROM clanhall_auctions_bidders WHERE clanHallId=?");
-                    try {
-                        ps.setInt(1, this._clanHallId);
-                        ps.execute();
-                        if (ps != null) {
-                            ps.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (ps != null) {
-                            try {
-                                ps.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (con != null) {
-                        con.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (con != null) {
-                        try {
-                            con.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-            }
-            catch (Exception e) {
-                ClanHallAuction.LOGGER.error(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, this._clanHallId), (Throwable)e);
-            }
+            ((ClanHallDAO)DatabaseAccess.getDAO((Class)ClanHallDAO.class)).deleteBidders(this._clanHallId);
         }
     }
     

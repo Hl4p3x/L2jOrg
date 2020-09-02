@@ -691,7 +691,7 @@ public class Party extends AbstractPlayerGroup
     }
     
     static {
-        BONUS_EXP_SP = new double[] { 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 2.0 };
+        BONUS_EXP_SP = new double[] { 1.0, 1.6, 1.65, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2 };
         PARTY_POSITION_BROADCAST_INTERVAL = Duration.ofSeconds(12L);
         PARTY_DISTRIBUTION_TYPE_REQUEST_TIMEOUT = Duration.ofSeconds(15L);
         TACTICAL_SYS_STRINGS = new int[] { 0, 2664, 2665, 2666, 2667 };

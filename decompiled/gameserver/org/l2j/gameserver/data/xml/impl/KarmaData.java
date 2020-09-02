@@ -44,7 +44,7 @@ public class KarmaData extends GameXmlReader
                 for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
                     if ("increase".equalsIgnoreCase(d.getNodeName())) {
                         final NamedNodeMap attrs = d.getAttributes();
-                        final int level = this.parseInteger(attrs, "lvl");
+                        final int level = this.parseInt(attrs, "lvl");
                         this._karmaTable.put(level, this.parseDouble(attrs, "val"));
                     }
                 }

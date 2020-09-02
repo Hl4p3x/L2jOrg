@@ -5,7 +5,7 @@
 package org.l2j.scripts.handlers.admincommandhandlers;
 
 import org.l2j.gameserver.model.olympiad.OlympiadManager;
-import org.l2j.gameserver.engine.olympiad.OlympiadEngine;
+import org.l2j.gameserver.engine.olympiad.Olympiad;
 import org.l2j.commons.util.Util;
 import org.l2j.gameserver.model.olympiad.OlympiadGameTask;
 import org.l2j.gameserver.model.olympiad.AbstractOlympiadGame;
@@ -80,7 +80,7 @@ public class AdminOlympiad implements IAdminCommandHandler
             BuilderUtil.sendSysMessage(activeChar, invokedynamic(makeConcatWithConstants:(Lorg/l2j/gameserver/model/actor/instance/Player;)Ljava/lang/String;, player));
             return false;
         }
-        if (OlympiadEngine.getInstance().getOlympiadPoints(player) <= 0) {
+        if (Olympiad.getInstance().getOlympiadPoints(player) <= 0) {
             BuilderUtil.sendSysMessage(activeChar, invokedynamic(makeConcatWithConstants:(Lorg/l2j/gameserver/model/actor/instance/Player;)Ljava/lang/String;, player));
             return false;
         }

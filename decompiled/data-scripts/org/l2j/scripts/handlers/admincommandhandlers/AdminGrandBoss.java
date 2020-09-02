@@ -4,6 +4,7 @@
 
 package org.l2j.scripts.handlers.admincommandhandlers;
 
+import org.l2j.gameserver.instancemanager.QuestManager;
 import org.l2j.gameserver.model.quest.Quest;
 import org.l2j.gameserver.model.StatsSet;
 import java.util.Objects;
@@ -240,11 +241,11 @@ public class AdminGrandBoss implements IAdminCommandHandler
     }
     
     private Quest antharasAi() {
-        return null;
+        return QuestManager.getInstance().getQuest("Antharas");
     }
     
     private Quest baiumAi() {
-        return null;
+        return QuestManager.getInstance().getQuest("Baium");
     }
     
     public String[] getAdminCommandList() {

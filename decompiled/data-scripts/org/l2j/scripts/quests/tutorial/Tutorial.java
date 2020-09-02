@@ -19,6 +19,7 @@ import org.l2j.gameserver.network.serverpackets.PlaySound;
 import org.l2j.gameserver.network.serverpackets.html.TutorialShowHtml;
 import org.l2j.gameserver.network.serverpackets.html.TutorialWindowType;
 import org.l2j.gameserver.model.WorldObject;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.quest.QuestState;
 import org.l2j.gameserver.enums.Race;
 import org.l2j.gameserver.enums.HtmlActionScope;
@@ -226,7 +227,7 @@ public abstract class Tutorial extends Quest
     
     public String onKill(final Npc npc, final Player killer, final boolean isSummon) {
         final QuestState questState = this.getQuestState(killer, false);
-        if (Objects.nonNull(questState) && questState.getCond() < 2 && !hasQuestItems(killer, 6353) && getRandom(100) < 50) {
+        if (Objects.nonNull(questState) && questState.getCond() < 2 && questState.getMemoState() > 0 && !hasQuestItems(killer, 6353) && Rnd.chance(25)) {
             killer.addItem("Quest", 6353, 1L, (WorldObject)killer, true);
             questState.setMemoState(3);
             questState.setCond(2);

@@ -138,7 +138,7 @@ public final class PunishmentManager
         return (p != null) ? p.getExpirationTime() : 0L;
     }
     
-    private PunishmentTask getPunishment(final Object key, final PunishmentAffect affect, final PunishmentType type) {
+    public PunishmentTask getPunishment(final Object key, final PunishmentAffect affect, final PunishmentType type) {
         return this._tasks.get(affect).getPunishment(String.valueOf(key), type);
     }
     

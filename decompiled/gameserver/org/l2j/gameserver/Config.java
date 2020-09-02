@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import org.l2j.gameserver.util.GameXmlReader;
 import org.slf4j.LoggerFactory;
 import org.l2j.commons.util.Util;
+import java.util.stream.Stream;
 import java.net.UnknownHostException;
 import java.net.InetAddress;
 import java.util.stream.Collector;
@@ -38,12 +39,10 @@ import org.l2j.gameserver.settings.RateSettings;
 import java.util.Arrays;
 import org.l2j.commons.util.StringUtil;
 import java.util.HashMap;
-import java.util.regex.PatternSyntaxException;
 import java.io.IOException;
 import org.l2j.commons.util.PropertiesParser;
 import org.l2j.gameserver.model.Location;
 import java.io.File;
-import java.util.regex.Pattern;
 import org.l2j.gameserver.util.FloodProtectorConfig;
 import org.l2j.gameserver.model.holders.ItemHolder;
 import java.util.List;
@@ -66,7 +65,6 @@ public final class Config
     private static final String RATES_CONFIG_FILE = "config/rates.properties";
     private static final String ALTHARS_CONFIG_FILE = "config/althars.ini";
     private static final String SERVER_CONFIG_FILE = "config/server.properties";
-    private static final String TRAINING_CAMP_CONFIG_FILE = "./config/TrainingCamp.ini";
     private static final String CHAT_FILTER_FILE = "./config/chatfilter.txt";
     private static final String IPCONFIG_FILE = "./config/ipconfig.xml";
     private static final String CUSTOM_BANKING_CONFIG_FILE = "./config/Custom/Banking.ini";
@@ -75,7 +73,6 @@ public final class Config
     private static final String CUSTOM_DUALBOX_CHECK_CONFIG_FILE = "./config/Custom/DualboxCheck.ini";
     private static final String CUSTOM_MULTILANGUAL_SUPPORT_CONFIG_FILE = "./config/Custom/MultilingualSupport.ini";
     private static final String CUSTOM_NPC_STAT_MULTIPIERS_CONFIG_FILE = "./config/Custom/NpcStatMultipliers.ini";
-    private static final String CUSTOM_OFFLINE_TRADE_CONFIG_FILE = "./config/Custom/OfflineTrade.ini";
     private static final String CUSTOM_PC_CAFE_CONFIG_FILE = "./config/Custom/PcCafe.ini";
     private static final String CUSTOM_PVP_ANNOUNCE_CONFIG_FILE = "./config/Custom/PvpAnnounce.ini";
     private static final String CUSTOM_PVP_REWARD_ITEM_CONFIG_FILE = "./config/Custom/PvpRewardItem.ini";
@@ -148,7 +145,6 @@ public final class Config
     public static int WAREHOUSE_SLOTS_CLAN;
     public static int ALT_FREIGHT_SLOTS;
     public static int ALT_FREIGHT_PRICE;
-    public static long MENTOR_PENALTY_FOR_MENTEE_LEAVE;
     public static boolean ALT_GAME_KARMA_PLAYER_CAN_BE_KILLED_IN_PEACEZONE;
     public static boolean ALT_GAME_KARMA_PLAYER_CAN_SHOP;
     public static boolean ALT_GAME_KARMA_PLAYER_CAN_TELEPORT;
@@ -288,7 +284,6 @@ public final class Config
     public static boolean ALT_DEV_SHOW_QUESTS_LOAD_IN_LOGS;
     public static boolean ALT_DEV_SHOW_SCRIPTS_LOAD_IN_LOGS;
     public static boolean ALLOW_DISCARDITEM;
-    public static int CLAN_VARIABLES_STORE_INTERVAL;
     public static boolean LAZY_ITEMS_UPDATE;
     public static boolean UPDATE_ITEMS_ON_CHAR_STORE;
     public static boolean DESTROY_ALL_ITEMS;
@@ -490,7 +485,6 @@ public final class Config
     public static int KARMA_RATE_DROP_EQUIP_WEAPON;
     public static boolean HARDWARE_INFO_ENABLED;
     public static int MAX_PLAYERS_PER_HWID;
-    public static Pattern CHARNAME_TEMPLATE_PATTERN;
     public static String PET_NAME_TEMPLATE;
     public static String CLAN_NAME_TEMPLATE;
     public static int MAX_CHARACTERS_NUMBER_PER_ACCOUNT;
@@ -522,10 +516,6 @@ public final class Config
     public static boolean DISABLE_OVER_ENCHANTING;
     public static int[] AUGMENTATION_BLACKLIST;
     public static boolean ALT_ALLOW_AUGMENT_PVP_ITEMS;
-    public static boolean TRAINING_CAMP_ENABLE;
-    public static int TRAINING_CAMP_MAX_DURATION;
-    public static double TRAINING_CAMP_EXP_MULTIPLIER;
-    public static double TRAINING_CAMP_SP_MULTIPLIER;
     public static int ANTHARAS_WAIT_TIME;
     public static int ANTHARAS_SPAWN_INTERVAL;
     public static int ANTHARAS_SPAWN_RANDOM;
@@ -599,16 +589,6 @@ public final class Config
     public static double DEFENDER_MDEF_MULTIPLIER;
     public static double DEFENDER_AGRRO_RANGE_MULTIPLIER;
     public static double DEFENDER_CLAN_HELP_RANGE_MULTIPLIER;
-    public static boolean OFFLINE_TRADE_ENABLE;
-    public static boolean OFFLINE_CRAFT_ENABLE;
-    public static boolean OFFLINE_MODE_IN_PEACE_ZONE;
-    public static boolean RESTORE_OFFLINERS;
-    public static int OFFLINE_MAX_DAYS;
-    public static boolean OFFLINE_DISCONNECT_FINISHED;
-    public static boolean OFFLINE_SET_NAME_COLOR;
-    public static int OFFLINE_NAME_COLOR;
-    public static boolean OFFLINE_FAME;
-    public static boolean STORE_OFFLINE_TRADE_IN_REALTIME;
     public static boolean DISPLAY_SERVER_TIME;
     public static int BUFFER_MAX_SCHEMES;
     public static int BUFFER_STATIC_BUFF_COST;
@@ -748,15 +728,6 @@ public final class Config
             Config.LOGGER.warn("Error setting datapack root!", (Throwable)e);
             Config.DATAPACK_ROOT = new File(".");
         }
-        Pattern charNamePattern;
-        try {
-            charNamePattern = Pattern.compile(serverSettings.getString("CnameTemplate", ".*"));
-        }
-        catch (PatternSyntaxException e2) {
-            Config.LOGGER.warn("Character name pattern is invalid!", (Throwable)e2);
-            charNamePattern = Pattern.compile(".*");
-        }
-        Config.CHARNAME_TEMPLATE_PATTERN = charNamePattern;
         Config.PET_NAME_TEMPLATE = serverSettings.getString("PetNameTemplate", ".*");
         Config.CLAN_NAME_TEMPLATE = serverSettings.getString("ClanNameTemplate", ".*");
         Config.MAX_CHARACTERS_NUMBER_PER_ACCOUNT = serverSettings.getInt("CharMaxNumber", 7);
@@ -920,7 +891,6 @@ public final class Config
         Config.WAREHOUSE_SLOTS_CLAN = Character.getInt("MaximumWarehouseSlotsForClan", 150);
         Config.ALT_FREIGHT_SLOTS = Character.getInt("MaximumFreightSlots", 200);
         Config.ALT_FREIGHT_PRICE = Character.getInt("FreightPrice", 1000);
-        Config.MENTOR_PENALTY_FOR_MENTEE_LEAVE = Character.getInt("MentorPenaltyForMenteeLeave", 2) * 24 * 60 * 60 * 1000;
         Config.ENCHANT_CHANCE_ELEMENT_STONE = Character.getDouble("EnchantChanceElementStone", 50.0);
         Config.ENCHANT_CHANCE_ELEMENT_CRYSTAL = Character.getDouble("EnchantChanceElementCrystal", 30.0);
         Config.ENCHANT_CHANCE_ELEMENT_JEWEL = Character.getDouble("EnchantChanceElementJewel", 20.0);
@@ -998,7 +968,7 @@ public final class Config
         Config.MAX_FREE_TELEPORT_LEVEL = Character.getInt("MaxFreeTeleportLevel", 0);
         Config.MAX_NEWBIE_BUFF_LEVEL = Character.getInt("MaxNewbieBuffLevel", 0);
         Config.DELETE_DAYS = Character.getInt("DeleteCharAfterDays", 1);
-        Config.PARTY_XP_CUTOFF_METHOD = Character.getString("PartyXpCutoffMethod", "level").toLowerCase();
+        Config.PARTY_XP_CUTOFF_METHOD = Character.getString("PartyXpCutoffMethod", "highfive").toLowerCase();
         Config.PARTY_XP_CUTOFF_PERCENT = Character.getDouble("PartyXpCutoffPercent", 3.0);
         Config.PARTY_XP_CUTOFF_LEVEL = Character.getInt("PartyXpCutoffLevel", 20);
         final String[] gaps = Character.getString("PartyXpCutoffGaps", "0,9;10,14;15,99").split(";");
@@ -1015,11 +985,6 @@ public final class Config
         Config.STORE_RECIPE_SHOPLIST = Character.getBoolean("StoreRecipeShopList", false);
         Config.STORE_UI_SETTINGS = Character.getBoolean("StoreCharUiSettings", true);
         Config.PLAYER_MOVEMENT_BLOCK_TIME = Character.getInt("NpcTalkBlockingTime", 0) * 1000;
-        final PropertiesParser trainingCampSettings = new PropertiesParser("./config/TrainingCamp.ini");
-        Config.TRAINING_CAMP_ENABLE = trainingCampSettings.getBoolean("TrainingCampEnable", false);
-        Config.TRAINING_CAMP_MAX_DURATION = trainingCampSettings.getInt("TrainingCampDuration", 18000);
-        Config.TRAINING_CAMP_EXP_MULTIPLIER = trainingCampSettings.getDouble("TrainingCampExpMultiplier", 1.0);
-        Config.TRAINING_CAMP_SP_MULTIPLIER = trainingCampSettings.getDouble("TrainingCampSpMultiplier", 1.0);
         final PropertiesParser General = new PropertiesParser("config/general.properties");
         Config.SERVER_GMONLY = General.getBoolean("ServerGMOnly", false);
         Config.GM_HERO_AURA = General.getBoolean("GMHeroAura", false);
@@ -1050,7 +1015,6 @@ public final class Config
         Config.ALT_DEV_SHOW_QUESTS_LOAD_IN_LOGS = General.getBoolean("AltDevShowQuestsLoadInLogs", false);
         Config.ALT_DEV_SHOW_SCRIPTS_LOAD_IN_LOGS = General.getBoolean("AltDevShowScriptsLoadInLogs", false);
         Config.ALLOW_DISCARDITEM = General.getBoolean("AllowDiscardItem", true);
-        Config.CLAN_VARIABLES_STORE_INTERVAL = General.getInt("ClanVariablesStoreInterval", 15) * 60 * 1000;
         Config.LAZY_ITEMS_UPDATE = General.getBoolean("LazyItemsUpdate", false);
         Config.UPDATE_ITEMS_ON_CHAR_STORE = General.getBoolean("UpdateItemsOnCharStore", false);
         Config.DESTROY_ALL_ITEMS = General.getBoolean("DestroyAllItems", false);
@@ -1348,11 +1312,28 @@ public final class Config
         Config.SOD_TIAT_KILL_COUNT = GraciaSeedsSettings.getInt("TiatKillCountForNextState", 10);
         Config.SOD_STAGE_2_LENGTH = GraciaSeedsSettings.getLong("Stage2Length", 720L) * 60000L;
         try {
-            Config.FILTER_LIST = Files.lines(Paths.get("./config/chatfilter.txt", new String[0]), StandardCharsets.UTF_8).map((Function<? super String, ?>)String::trim).filter(line -> !line.isEmpty() && line.charAt(0) != '#').collect((Collector<? super Object, ?, List<String>>)Collectors.toList());
-            Config.LOGGER.info(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, Config.FILTER_LIST.size()));
+            final Stream<String> lines = Files.lines(Paths.get("./config/chatfilter.txt", new String[0]), StandardCharsets.UTF_8);
+            try {
+                Config.FILTER_LIST = lines.map((Function<? super String, ?>)String::trim).filter(line -> !line.isEmpty() && line.charAt(0) != '#').collect((Collector<? super Object, ?, List<String>>)Collectors.toList());
+                Config.LOGGER.info(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, Config.FILTER_LIST.size()));
+                if (lines != null) {
+                    lines.close();
+                }
+            }
+            catch (Throwable t) {
+                if (lines != null) {
+                    try {
+                        lines.close();
+                    }
+                    catch (Throwable exception) {
+                        t.addSuppressed(exception);
+                    }
+                }
+                throw t;
+            }
         }
-        catch (IOException e3) {
-            Config.LOGGER.warn("Error while loading chat filter words!", (Throwable)e3);
+        catch (IOException e2) {
+            Config.LOGGER.warn("Error while loading chat filter words!", (Throwable)e2);
         }
         final PropertiesParser Banking = new PropertiesParser("./config/Custom/Banking.ini");
         Config.BANKING_SYSTEM_GOLDBARS = Banking.getInt("BankingGoldbarCount", 1);
@@ -1457,10 +1438,10 @@ public final class Config
                     num = ((num == 0) ? -1 : num);
                     Config.DUALBOX_CHECK_WHITELIST.put(InetAddress.getByName(entrySplit[0]).hashCode(), num);
                 }
-                catch (UnknownHostException e4) {
+                catch (UnknownHostException e3) {
                     Config.LOGGER.warn(StringUtil.concat(new String[] { "DualboxCheck[Config.load()]: invalid address -> DualboxCheckWhitelist \"", entrySplit[0], "\"" }));
                 }
-                catch (NumberFormatException e5) {
+                catch (NumberFormatException e4) {
                     Config.LOGGER.warn(StringUtil.concat(new String[] { "DualboxCheck[Config.load()]: invalid number -> DualboxCheckWhitelist \"", entrySplit[1], "\"" }));
                 }
             }
@@ -1477,17 +1458,6 @@ public final class Config
             Config.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, Config.MULTILANG_DEFAULT));
         }
         Config.MULTILANG_VOICED_ALLOW = MultilingualSupport.getBoolean("MultiLangVoiceCommand", true);
-        final PropertiesParser OfflineTrade = new PropertiesParser("./config/Custom/OfflineTrade.ini");
-        Config.OFFLINE_TRADE_ENABLE = OfflineTrade.getBoolean("OfflineTradeEnable", false);
-        Config.OFFLINE_CRAFT_ENABLE = OfflineTrade.getBoolean("OfflineCraftEnable", false);
-        Config.OFFLINE_MODE_IN_PEACE_ZONE = OfflineTrade.getBoolean("OfflineModeInPeaceZone", false);
-        Config.OFFLINE_SET_NAME_COLOR = OfflineTrade.getBoolean("OfflineSetNameColor", false);
-        Config.OFFLINE_NAME_COLOR = Integer.decode(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, OfflineTrade.getString("OfflineNameColor", "808080")));
-        Config.OFFLINE_FAME = OfflineTrade.getBoolean("OfflineFame", true);
-        Config.RESTORE_OFFLINERS = OfflineTrade.getBoolean("RestoreOffliners", false);
-        Config.OFFLINE_MAX_DAYS = OfflineTrade.getInt("OfflineMaxDays", 10);
-        Config.OFFLINE_DISCONNECT_FINISHED = OfflineTrade.getBoolean("OfflineDisconnectFinished", true);
-        Config.STORE_OFFLINE_TRADE_IN_REALTIME = OfflineTrade.getBoolean("StoreOfflineTradeInRealtime", true);
         final PropertiesParser PcCafe = new PropertiesParser("./config/Custom/PcCafe.ini");
         Config.PC_CAFE_ENABLED = PcCafe.getBoolean("PcCafeEnabled", false);
         Config.PC_CAFE_ONLY_VIP = PcCafe.getBoolean("PcCafeOnlyVip", false);

@@ -86,6 +86,8 @@ public final class ReportTable
                     throw new FileNotFoundException(punishments.getName());
                 }
                 final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+                parser.setProperty("http://javax.xml.XMLConstants/property/accessExternalDTD", "");
+                parser.setProperty("http://javax.xml.XMLConstants/property/accessExternalSchema", "");
                 parser.parse(punishments, new PunishmentsLoader());
             }
             catch (Exception e) {

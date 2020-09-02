@@ -301,16 +301,19 @@ public final class EffectList
                     if (this.triggerBuffCount.get() > Config.TRIGGERED_BUFFS_MAX_AMOUNT) {
                         return true;
                     }
+                    break;
                 }
                 case DANCE: {
                     if (this.danceCount.get() > Config.DANCES_MAX_AMOUNT) {
                         return true;
                     }
+                    break;
                 }
                 case DEBUFF: {
                     if (this.debuffCount.get() > 24) {
                         return true;
                     }
+                    break;
                 }
                 case BUFF: {
                     if (this.getBuffCount() > this.owner.getStats().getMaxBuffCount()) {

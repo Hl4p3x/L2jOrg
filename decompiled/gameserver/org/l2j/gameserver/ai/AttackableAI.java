@@ -57,7 +57,7 @@ import org.slf4j.Logger;
 public class AttackableAI extends CreatureAI
 {
     private static final Logger LOGGER;
-    private static final int RANDOM_WALK_RATE = 30;
+    private static final int RANDOM_WALK_RATE = 1;
     private static final int MAX_ATTACK_TIMEOUT = 1200;
     int lastBuffTick;
     private int _attackTimeout;
@@ -301,7 +301,7 @@ public class AttackableAI extends CreatureAI
                 this.moveTo(x1, y1, leader.getZ());
                 return;
             }
-            if (Rnd.get(30) == 0) {
+            if (Rnd.chance(1)) {
                 for (final Skill sk : npc.getTemplate().getAISkills(AISkillScope.BUFF)) {
                     target = this.skillTargetReconsider(sk, true);
                     if (target != null) {
@@ -311,7 +311,7 @@ public class AttackableAI extends CreatureAI
                 }
             }
         }
-        else if (npc.getSpawn() != null && Rnd.get(30) == 0 && npc.isRandomWalkingEnabled()) {
+        else if (npc.getSpawn() != null && Rnd.chance(1) && npc.isRandomWalkingEnabled()) {
             int x2 = 0;
             int y2 = 0;
             int z1 = 0;

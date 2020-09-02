@@ -5,28 +5,39 @@
 package org.l2j.gameserver.instancemanager;
 
 import org.slf4j.LoggerFactory;
-import org.l2j.gameserver.model.Location;
-import org.l2j.gameserver.enums.InstanceTeleportType;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import org.l2j.gameserver.data.database.dao.PlayerDAO;
 import io.github.joealisson.primitive.maps.impl.CHashIntLongMap;
-import java.sql.PreparedStatement;
 import java.util.Iterator;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.Objects;
 import io.github.joealisson.primitive.pair.IntLong;
-import java.util.ArrayList;
 import io.github.joealisson.primitive.Containers;
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.Connection;
-import org.l2j.commons.database.DatabaseFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.InstanceDAO;
 import java.util.Collection;
 import org.l2j.gameserver.model.actor.instance.Player;
+import org.l2j.gameserver.model.Location;
+import org.l2j.gameserver.enums.InstanceTeleportType;
+import org.l2j.gameserver.model.actor.templates.DoorTemplate;
+import org.l2j.gameserver.data.xml.DoorDataManager;
+import org.l2j.gameserver.Config;
+import org.l2j.gameserver.data.xml.impl.SpawnsData;
+import org.l2j.gameserver.model.spawns.SpawnTemplate;
+import io.github.joealisson.primitive.IntSet;
+import io.github.joealisson.primitive.HashIntSet;
+import org.l2j.gameserver.enums.InstanceRemoveBuffType;
+import java.time.DayOfWeek;
+import org.l2j.gameserver.model.holders.InstanceReenterTimeHolder;
+import org.l2j.gameserver.enums.InstanceReenterType;
+import java.lang.reflect.Constructor;
+import java.util.List;
 import org.l2j.gameserver.model.StatsSet;
+import org.l2j.gameserver.model.instancezone.conditions.Condition;
+import java.util.ArrayList;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.l2j.commons.xml.XmlReader;
+import java.util.Objects;
 import java.io.File;
 import org.w3c.dom.Document;
 import org.l2j.commons.configuration.Configurator;
@@ -36,15 +47,15 @@ import io.github.joealisson.primitive.CHashIntMap;
 import io.github.joealisson.primitive.HashIntMap;
 import io.github.joealisson.primitive.maps.IntLongMap;
 import org.l2j.gameserver.model.instancezone.Instance;
-import org.l2j.gameserver.model.instancezone.InstanceTemplate;
 import io.github.joealisson.primitive.IntMap;
+import org.l2j.gameserver.model.instancezone.InstanceTemplate;
 import org.slf4j.Logger;
 import org.l2j.gameserver.util.GameXmlReader;
 
 public final class InstanceManager extends GameXmlReader
 {
     private static final Logger LOGGER;
-    private static final String DELETE_INSTANCE_TIME = "DELETE FROM character_instance_time WHERE charId=? AND instanceId=?";
+    private static final InstanceTemplate DEFAULT_TEMPLATE;
     private final IntMap<InstanceTemplate> instanceTemplates;
     private final IntMap<Instance> instanceWorlds;
     private final IntMap<IntLongMap> playerInstanceTimes;
@@ -55,7 +66,6 @@ public final class InstanceManager extends GameXmlReader
         this.instanceWorlds = (IntMap<Instance>)new CHashIntMap();
         this.playerInstanceTimes = (IntMap<IntLongMap>)new CHashIntMap();
         this.currentInstanceId = 0;
-        this.load();
     }
     
     protected Path getSchemaFilePath() {
@@ -73,93 +83,221 @@ public final class InstanceManager extends GameXmlReader
     }
     
     public void parseDocument(final Document doc, final File f) {
-        this.forEach((Node)doc, x$0 -> XmlReader.isNode(x$0), listNode -> {
-            if ("instance".equals(listNode.getNodeName())) {
-                this.parseInstanceTemplate(listNode, f);
+        for (Node node = doc.getFirstChild(); Objects.nonNull(node); node = node.getNextSibling()) {
+            if ("instance".equals(node.getNodeName())) {
+                this.parseInstanceTemplate(node, f);
             }
-        });
+        }
     }
     
     private void parseInstanceTemplate(final Node instanceNode, final File file) {
-        // 
-        // This method could not be decompiled.
-        // 
-        // Original Bytecode:
-        // 
-        //     1: aload_1         /* instanceNode */
-        //     2: invokeinterface org/w3c/dom/Node.getAttributes:()Lorg/w3c/dom/NamedNodeMap;
-        //     7: ldc             "id"
-        //     9: invokevirtual   org/l2j/gameserver/instancemanager/InstanceManager.parseInteger:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)Ljava/lang/Integer;
-        //    12: invokevirtual   java/lang/Integer.intValue:()I
-        //    15: istore_3        /* id */
-        //    16: aload_0         /* this */
-        //    17: getfield        org/l2j/gameserver/instancemanager/InstanceManager.instanceTemplates:Lio/github/joealisson/primitive/IntMap;
-        //    20: iload_3         /* id */
-        //    21: invokeinterface io/github/joealisson/primitive/IntMap.containsKey:(I)Z
-        //    26: ifeq            44
-        //    29: getstatic       org/l2j/gameserver/instancemanager/InstanceManager.LOGGER:Lorg/slf4j/Logger;
-        //    32: iload_3         /* id */
-        //    33: invokedynamic   BootstrapMethod #2, makeConcatWithConstants:(I)Ljava/lang/String;
-        //    38: invokeinterface org/slf4j/Logger.warn:(Ljava/lang/String;)V
-        //    43: return         
-        //    44: new             Lorg/l2j/gameserver/model/instancezone/InstanceTemplate;
-        //    47: dup            
-        //    48: new             Lorg/l2j/gameserver/model/StatsSet;
-        //    51: dup            
-        //    52: aload_0         /* this */
-        //    53: aload_1         /* instanceNode */
-        //    54: invokevirtual   org/l2j/gameserver/instancemanager/InstanceManager.parseAttributes:(Lorg/w3c/dom/Node;)Ljava/util/Map;
-        //    57: invokespecial   org/l2j/gameserver/model/StatsSet.<init>:(Ljava/util/Map;)V
-        //    60: invokespecial   org/l2j/gameserver/model/instancezone/InstanceTemplate.<init>:(Lorg/l2j/gameserver/model/StatsSet;)V
-        //    63: astore          template
-        //    65: aload_0         /* this */
-        //    66: aload_1         /* instanceNode */
-        //    67: invokedynamic   BootstrapMethod #3, test:()Ljava/util/function/Predicate;
-        //    72: aload_0         /* this */
-        //    73: aload           template
-        //    75: aload_2         /* file */
-        //    76: iload_3         /* id */
-        //    77: invokedynamic   BootstrapMethod #4, accept:(Lorg/l2j/gameserver/instancemanager/InstanceManager;Lorg/l2j/gameserver/model/instancezone/InstanceTemplate;Ljava/io/File;I)Ljava/util/function/Consumer;
-        //    82: invokevirtual   org/l2j/gameserver/instancemanager/InstanceManager.forEach:(Lorg/w3c/dom/Node;Ljava/util/function/Predicate;Ljava/util/function/Consumer;)V
-        //    85: aload_0         /* this */
-        //    86: getfield        org/l2j/gameserver/instancemanager/InstanceManager.instanceTemplates:Lio/github/joealisson/primitive/IntMap;
-        //    89: iload_3         /* id */
-        //    90: aload           template
-        //    92: invokeinterface io/github/joealisson/primitive/IntMap.put:(ILjava/lang/Object;)Ljava/lang/Object;
-        //    97: pop            
-        //    98: return         
-        //    MethodParameters:
-        //  Name          Flags  
-        //  ------------  -----
-        //  instanceNode  
-        //  file          
-        //    StackMapTable: 00 01 FC 00 2C 01
-        // 
-        // The error that occurred was:
-        // 
-        // java.lang.NullPointerException
-        //     at com.strobel.decompiler.languages.java.ast.NameVariables.generateNameForVariable(NameVariables.java:264)
-        //     at com.strobel.decompiler.languages.java.ast.NameVariables.assignNamesToVariables(NameVariables.java:198)
-        //     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:276)
-        //     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:99)
-        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethodBody(AstBuilder.java:782)
-        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethod(AstBuilder.java:675)
-        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.addTypeMembers(AstBuilder.java:552)
-        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeCore(AstBuilder.java:519)
-        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeNoCache(AstBuilder.java:161)
-        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createType(AstBuilder.java:150)
-        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.addType(AstBuilder.java:125)
-        //     at com.strobel.decompiler.languages.java.JavaLanguage.buildAst(JavaLanguage.java:71)
-        //     at com.strobel.decompiler.languages.java.JavaLanguage.decompileType(JavaLanguage.java:59)
-        //     at com.strobel.decompiler.DecompilerDriver.decompileType(DecompilerDriver.java:330)
-        //     at com.strobel.decompiler.DecompilerDriver.decompileJar(DecompilerDriver.java:251)
-        //     at com.strobel.decompiler.DecompilerDriver.main(DecompilerDriver.java:126)
-        // 
-        throw new IllegalStateException("An error occurred while decompiling this method.");
+        final NamedNodeMap attrs = instanceNode.getAttributes();
+        final int id = this.parseInt(attrs, "id");
+        if (this.instanceTemplates.containsKey(id)) {
+            InstanceManager.LOGGER.warn("Instance template with ID {} already exists", (Object)id);
+            return;
+        }
+        final InstanceTemplate template = new InstanceTemplate(id, this.parseString(attrs, "name"), this.parseInt(attrs, "maxWorlds", -1));
+        for (Node innerNode = instanceNode.getFirstChild(); Objects.nonNull(innerNode); innerNode = innerNode.getNextSibling()) {
+            final String nodeName = innerNode.getNodeName();
+            switch (nodeName) {
+                case "time": {
+                    this.parseTimes(template, innerNode);
+                    break;
+                }
+                case "misc": {
+                    this.parseMisc(template, innerNode);
+                    break;
+                }
+                case "rates": {
+                    this.parseRates(template, innerNode);
+                    break;
+                }
+                case "locations": {
+                    this.parseLocations(template, innerNode);
+                    break;
+                }
+                case "spawnlist": {
+                    this.parseSpawns(file, template, innerNode);
+                    break;
+                }
+                case "doorlist": {
+                    this.parseDoors(template, innerNode);
+                    break;
+                }
+                case "removeBuffs": {
+                    this.parseRemoveBuffs(template, innerNode);
+                    break;
+                }
+                case "reenter": {
+                    this.parseReenter(template, innerNode);
+                    break;
+                }
+                case "parameters": {
+                    template.setParameters(this.parseParameters(innerNode));
+                    break;
+                }
+                case "conditions": {
+                    this.parseConditions(id, template, innerNode);
+                    break;
+                }
+            }
+        }
+        this.instanceTemplates.put(id, (Object)template);
+    }
+    
+    private void parseConditions(final int id, final InstanceTemplate template, final Node innerNode) {
+        final List<Condition> conditions = new ArrayList<Condition>();
+        for (Node conditionNode = innerNode.getFirstChild(); conditionNode != null; conditionNode = conditionNode.getNextSibling()) {
+            if (conditionNode.getNodeName().equals("condition")) {
+                final NamedNodeMap attrs = conditionNode.getAttributes();
+                final String type = this.parseString(attrs, "type");
+                final boolean onlyLeader = this.parseBoolean(attrs, "onlyLeader", false);
+                final boolean showMessageAndHtml = this.parseBoolean(attrs, "showMessageAndHtml", false);
+                StatsSet params = null;
+                for (Node f = conditionNode.getFirstChild(); f != null; f = f.getNextSibling()) {
+                    if (f.getNodeName().equals("param")) {
+                        if (params == null) {
+                            params = new StatsSet();
+                        }
+                        params.set(this.parseString(f.getAttributes(), "name"), this.parseString(f.getAttributes(), "value"));
+                    }
+                }
+                if (params == null) {
+                    params = StatsSet.EMPTY_STATSET;
+                }
+                try {
+                    final Class<?> clazz = Class.forName(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, type));
+                    final Constructor<?> constructor = clazz.getConstructor(InstanceTemplate.class, StatsSet.class, Boolean.TYPE, Boolean.TYPE);
+                    conditions.add((Condition)constructor.newInstance(template, params, onlyLeader, showMessageAndHtml));
+                }
+                catch (Exception ex) {
+                    InstanceManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;, type, template.getName(), id));
+                }
+            }
+        }
+        template.setConditions(conditions);
+    }
+    
+    private void parseReenter(final InstanceTemplate template, final Node innerNode) {
+        final InstanceReenterType type = (InstanceReenterType)this.parseEnum(innerNode.getAttributes(), (Class)InstanceReenterType.class, "apply", (Enum)InstanceReenterType.NONE);
+        final List<InstanceReenterTimeHolder> data = new ArrayList<InstanceReenterTimeHolder>();
+        for (Node e = innerNode.getFirstChild(); e != null; e = e.getNextSibling()) {
+            if (e.getNodeName().equals("reset")) {
+                final NamedNodeMap attrs = e.getAttributes();
+                final int time = this.parseInt(attrs, "time", -1);
+                if (time > 0) {
+                    data.add(new InstanceReenterTimeHolder(time));
+                }
+                else {
+                    final DayOfWeek day = (DayOfWeek)this.parseEnum(attrs, (Class)DayOfWeek.class, "day");
+                    final int hour = this.parseInt(attrs, "hour", -1);
+                    final int minute = this.parseInt(attrs, "minute", -1);
+                    data.add(new InstanceReenterTimeHolder(day, hour, minute));
+                }
+            }
+        }
+        template.setReenterData(type, data);
+    }
+    
+    private void parseRemoveBuffs(final InstanceTemplate template, final Node innerNode) {
+        final InstanceRemoveBuffType removeBuffType = (InstanceRemoveBuffType)this.parseEnum(innerNode.getAttributes(), (Class)InstanceRemoveBuffType.class, "type");
+        final IntSet exceptionBuffList = (IntSet)new HashIntSet();
+        for (Node e = innerNode.getFirstChild(); e != null; e = e.getNextSibling()) {
+            if (e.getNodeName().equals("skill")) {
+                exceptionBuffList.add(this.parseInt(e.getAttributes(), "id"));
+            }
+        }
+        template.setRemoveBuff(removeBuffType, exceptionBuffList);
+    }
+    
+    private void parseSpawns(final File file, final InstanceTemplate template, final Node innerNode) {
+        final List<SpawnTemplate> spawns = new ArrayList<SpawnTemplate>();
+        SpawnsData.getInstance().parseSpawn(innerNode, file, spawns);
+        template.addSpawns(spawns);
+    }
+    
+    private void parseRates(final InstanceTemplate template, final Node innerNode) {
+        final NamedNodeMap attrs = innerNode.getAttributes();
+        template.setExpRate(this.parseFloat(attrs, "exp", Float.valueOf(Config.RATE_INSTANCE_XP)));
+        template.setSPRate(this.parseFloat(attrs, "sp", Float.valueOf(Config.RATE_INSTANCE_SP)));
+        template.setExpPartyRate(this.parseFloat(attrs, "partyExp", Float.valueOf(Config.RATE_INSTANCE_PARTY_XP)));
+        template.setSPPartyRate(this.parseFloat(attrs, "partySp", Float.valueOf(Config.RATE_INSTANCE_PARTY_SP)));
+    }
+    
+    private void parseMisc(final InstanceTemplate template, final Node innerNode) {
+        final NamedNodeMap attrs = innerNode.getAttributes();
+        template.allowPlayerSummon(this.parseBoolean(attrs, "allowPlayerSummon"));
+        template.setIsPvP(this.parseBoolean(attrs, "isPvP"));
+    }
+    
+    private void parseTimes(final InstanceTemplate template, final Node innerNode) {
+        final NamedNodeMap attrs = innerNode.getAttributes();
+        template.setDuration(this.parseInt(attrs, "duration", -1));
+        template.setEmptyDestroyTime(this.parseInt(attrs, "empty", -1));
+        template.setEjectTime(this.parseInt(attrs, "eject", -1));
+    }
+    
+    private void parseDoors(final InstanceTemplate template, final Node innerNode) {
+        for (Node doorNode = innerNode.getFirstChild(); doorNode != null; doorNode = doorNode.getNextSibling()) {
+            if (doorNode.getNodeName().equals("door")) {
+                final StatsSet parsedSet = DoorDataManager.getInstance().parseDoor(doorNode);
+                final StatsSet mergedSet = new StatsSet();
+                final int doorId = parsedSet.getInt("id");
+                final StatsSet templateSet = DoorDataManager.getInstance().getDoorTemplate(doorId);
+                if (templateSet != null) {
+                    mergedSet.merge(templateSet);
+                }
+                else {
+                    InstanceManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(ILjava/lang/String;I)Ljava/lang/String;, doorId, template.getName(), template.getId()));
+                }
+                mergedSet.merge(parsedSet);
+                try {
+                    template.addDoor(doorId, new DoorTemplate(mergedSet));
+                }
+                catch (Exception e) {
+                    InstanceManager.LOGGER.warn("Cannot initialize template for door: {}, instance: {}", new Object[] { doorId, template, e });
+                }
+            }
+        }
+    }
+    
+    private void parseLocations(final InstanceTemplate template, final Node innerNode) {
+        for (Node locationsNode = innerNode.getFirstChild(); Objects.nonNull(locationsNode); locationsNode = locationsNode.getNextSibling()) {
+            final InstanceTeleportType type = (InstanceTeleportType)this.parseEnum(locationsNode.getAttributes(), (Class)InstanceTeleportType.class, "type");
+            final String nodeName = locationsNode.getNodeName();
+            switch (nodeName) {
+                case "enter": {
+                    template.setEnterLocation(type, this.parseLocations(locationsNode));
+                    break;
+                }
+                case "exit": {
+                    if (type.equals(InstanceTeleportType.ORIGIN)) {
+                        template.setExitLocation(type, null);
+                        break;
+                    }
+                    final List<Location> locations = this.parseLocations(locationsNode);
+                    if (locations.isEmpty()) {
+                        InstanceManager.LOGGER.warn("Missing exit location data for instance {}!", (Object)template);
+                        break;
+                    }
+                    template.setExitLocation(type, locations);
+                    break;
+                }
+            }
+        }
+    }
+    
+    private List<Location> parseLocations(final Node locationsNode) {
+        final List<Location> locations = new ArrayList<Location>();
+        for (Node locationNode = locationsNode.getFirstChild(); Objects.nonNull(locationNode); locationNode = locationNode.getNextSibling()) {
+            locations.add(this.parseLocation(locationNode));
+        }
+        return locations;
     }
     
     public Instance createInstance() {
-        return new Instance(this.getNewInstanceId(), new InstanceTemplate(StatsSet.EMPTY_STATSET), null);
+        return new Instance(this.getNewInstanceId(), InstanceManager.DEFAULT_TEMPLATE, null);
     }
     
     public Instance createInstance(final InstanceTemplate template, final Player player) {
@@ -214,69 +352,23 @@ public final class InstanceManager extends GameXmlReader
     }
     
     private void restoreInstanceTimes() {
+        ((InstanceDAO)DatabaseAccess.getDAO((Class)InstanceDAO.class)).findAllInstancesTime(this::addInstancesTime);
+    }
+    
+    private void addInstancesTime(final ResultSet rs) {
         try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final Statement ps = con.createStatement();
-                try {
-                    final ResultSet rs = ps.executeQuery("SELECT * FROM character_instance_time ORDER BY charId");
-                    try {
-                        while (rs.next()) {
-                            final long time = rs.getLong("time");
-                            if (time > System.currentTimeMillis()) {
-                                final int charId = rs.getInt("charId");
-                                final int instanceId = rs.getInt("instanceId");
-                                this.setReenterPenalty(charId, instanceId, time);
-                            }
-                        }
-                        if (rs != null) {
-                            rs.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (rs != null) {
-                            try {
-                                rs.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (ps != null) {
-                        ps.close();
-                    }
+            final long currentTime = System.currentTimeMillis();
+            while (rs.next()) {
+                final long time = rs.getLong("time");
+                if (time > currentTime) {
+                    final int charId = rs.getInt("charId");
+                    final int instanceId = rs.getInt("instanceId");
+                    this.setReenterPenalty(charId, instanceId, time);
                 }
-                catch (Throwable t2) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t3) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception3) {
-                        t3.addSuppressed(exception3);
-                    }
-                }
-                throw t3;
             }
         }
         catch (Exception e) {
-            InstanceManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName()), (Throwable)e);
+            InstanceManager.LOGGER.warn(e.getMessage(), (Throwable)e);
         }
     }
     
@@ -285,62 +377,14 @@ public final class InstanceManager extends GameXmlReader
         if (instanceTimes == null || instanceTimes.isEmpty()) {
             return Containers.EMPTY_INT_LONG_MAP;
         }
-        final List<Integer> invalidPenalty = new ArrayList<Integer>(instanceTimes.size());
+        final IntSet invalidPenalty = (IntSet)new HashIntSet(instanceTimes.size());
         for (final IntLong entry : instanceTimes.entrySet()) {
             if (entry.getValue() <= System.currentTimeMillis()) {
                 invalidPenalty.add(entry.getKey());
             }
         }
         if (!invalidPenalty.isEmpty()) {
-            try {
-                final Connection con = DatabaseFactory.getInstance().getConnection();
-                try {
-                    final PreparedStatement ps = con.prepareStatement("DELETE FROM character_instance_time WHERE charId=? AND instanceId=?");
-                    try {
-                        for (final Integer id : invalidPenalty) {
-                            ps.setInt(1, player.getObjectId());
-                            ps.setInt(2, id);
-                            ps.addBatch();
-                        }
-                        ps.executeBatch();
-                        final List<Integer> list = invalidPenalty;
-                        final IntLongMap obj = instanceTimes;
-                        Objects.requireNonNull(obj);
-                        list.forEach(obj::remove);
-                        if (ps != null) {
-                            ps.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (ps != null) {
-                            try {
-                                ps.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (con != null) {
-                        con.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (con != null) {
-                        try {
-                            con.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-            }
-            catch (Exception e) {
-                InstanceManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName()), (Throwable)e);
-            }
+            ((InstanceDAO)DatabaseAccess.getDAO((Class)InstanceDAO.class)).deleteInstanceTime(player.getObjectId(), invalidPenalty);
         }
         return instanceTimes;
     }
@@ -363,51 +407,8 @@ public final class InstanceManager extends GameXmlReader
     }
     
     public void deleteInstanceTime(final Player player, final int id) {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("DELETE FROM character_instance_time WHERE charId=? AND instanceId=?");
-                try {
-                    ps.setInt(1, player.getObjectId());
-                    ps.setInt(2, id);
-                    ps.execute();
-                    if (this.playerInstanceTimes.get(player.getObjectId()) != null) {
-                        ((IntLongMap)this.playerInstanceTimes.get(player.getObjectId())).remove(id);
-                    }
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            InstanceManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName()), (Throwable)e);
-        }
+        ((PlayerDAO)DatabaseAccess.getDAO((Class)PlayerDAO.class)).deleteInstanceTime(player.getObjectId(), id);
+        ((IntLongMap)this.playerInstanceTimes.get(player.getObjectId())).remove(id);
     }
     
     public InstanceTemplate getInstanceTemplate(final int id) {
@@ -426,12 +427,17 @@ public final class InstanceManager extends GameXmlReader
         return this.instanceWorlds.values().stream().filter(i -> i.getTemplateId() == templateId).collect((Collector<? super Object, ?, List<Instance>>)Collectors.toList());
     }
     
+    public static void init() {
+        getInstance().load();
+    }
+    
     public static InstanceManager getInstance() {
         return Singleton.INSTANCE;
     }
     
     static {
         LOGGER = LoggerFactory.getLogger((Class)InstanceManager.class);
+        DEFAULT_TEMPLATE = new InstanceTemplate();
     }
     
     private static class Singleton

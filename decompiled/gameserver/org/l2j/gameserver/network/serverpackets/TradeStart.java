@@ -35,9 +35,6 @@ public final class TradeStart extends AbstractItemPacket
             if (player.isInSameClan(partner)) {
                 this.mask |= 0x2;
             }
-            if (player.hasMentorRelationship(partner)) {
-                this.mask |= 0x4;
-            }
             if (player.isInSameAlly(partner)) {
                 this.mask |= 0x8;
             }

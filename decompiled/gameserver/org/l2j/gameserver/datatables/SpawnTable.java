@@ -79,21 +79,43 @@ public final class SpawnTable
                 final File tempFile = new File(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, spawnFile.getAbsolutePath().substring(Config.DATAPACK_ROOT.getAbsolutePath().length() + 1).replace('\\', '/')));
                 try {
                     final BufferedReader reader = new BufferedReader(new FileReader(spawnFile));
-                    final BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-                    String currentLine;
-                    while ((currentLine = reader.readLine()) != null) {
-                        if (currentLine.contains("</group>")) {
-                            writer.write(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, spawnId, (spawn.getAmount() > 1) ? invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, spawnCount) : "", spawnX, spawnY, spawnZ, (spawn.getHeading() > 0) ? invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, spawnHeading) : "", spawnDelay, NpcData.getInstance().getTemplate(spawn.getId()).getName(), System.lineSeparator()));
-                            writer.write(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, currentLine, System.lineSeparator()));
+                    try {
+                        final BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+                        try {
+                            String currentLine;
+                            while ((currentLine = reader.readLine()) != null) {
+                                if (currentLine.contains("</group>")) {
+                                    writer.write(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, spawnId, (spawn.getAmount() > 1) ? invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, spawnCount) : "", spawnX, spawnY, spawnZ, (spawn.getHeading() > 0) ? invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, spawnHeading) : "", spawnDelay, NpcData.getInstance().getTemplate(spawn.getId()).getName(), System.lineSeparator()));
+                                    writer.write(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, currentLine, System.lineSeparator()));
+                                }
+                                else {
+                                    writer.write(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, currentLine, System.lineSeparator()));
+                                }
+                            }
+                            spawnFile.delete();
+                            tempFile.renameTo(spawnFile);
+                            writer.close();
                         }
-                        else {
-                            writer.write(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, currentLine, System.lineSeparator()));
+                        catch (Throwable t) {
+                            try {
+                                writer.close();
+                            }
+                            catch (Throwable exception) {
+                                t.addSuppressed(exception);
+                            }
+                            throw t;
                         }
+                        reader.close();
                     }
-                    writer.close();
-                    reader.close();
-                    spawnFile.delete();
-                    tempFile.renameTo(spawnFile);
+                    catch (Throwable t2) {
+                        try {
+                            reader.close();
+                        }
+                        catch (Throwable exception2) {
+                            t2.addSuppressed(exception2);
+                        }
+                        throw t2;
+                    }
                 }
                 catch (Exception e) {
                     SpawnTable.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/Exception;)Ljava/lang/String;, e));
@@ -131,49 +153,71 @@ public final class SpawnTable
             final File tempFile = new File(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, spawnFile.getAbsolutePath().substring(Config.DATAPACK_ROOT.getAbsolutePath().length() + 1).replace('\\', '/')));
             try {
                 final BufferedReader reader = new BufferedReader(new FileReader(spawnFile));
-                final BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
-                final String spawnId = String.valueOf(spawn.getId());
-                final String spawnX = String.valueOf(spawn.getX());
-                final String spawnY = String.valueOf(spawn.getY());
-                final String spawnZ = String.valueOf(spawn.getZ());
-                boolean found = false;
-                boolean isMultiLine = false;
-                boolean lastLineFound = false;
-                int lineCount = 0;
-                String currentLine;
-                while ((currentLine = reader.readLine()) != null) {
-                    if (!found) {
-                        if (isMultiLine) {
-                            if (currentLine.contains("</npc>")) {
-                                found = true;
-                                continue;
+                try {
+                    final BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile));
+                    try {
+                        final String spawnId = String.valueOf(spawn.getId());
+                        final String spawnX = String.valueOf(spawn.getX());
+                        final String spawnY = String.valueOf(spawn.getY());
+                        final String spawnZ = String.valueOf(spawn.getZ());
+                        boolean found = false;
+                        boolean isMultiLine = false;
+                        boolean lastLineFound = false;
+                        int lineCount = 0;
+                        String currentLine;
+                        while ((currentLine = reader.readLine()) != null) {
+                            if (!found) {
+                                if (isMultiLine) {
+                                    if (currentLine.contains("</npc>")) {
+                                        found = true;
+                                        continue;
+                                    }
+                                    continue;
+                                }
+                                else if (currentLine.contains(spawnId) && currentLine.contains(spawnX) && currentLine.contains(spawnY) && currentLine.contains(spawnZ)) {
+                                    if (!currentLine.contains("/>") && !currentLine.contains("</npc>")) {
+                                        isMultiLine = true;
+                                        continue;
+                                    }
+                                    found = true;
+                                    continue;
+                                }
                             }
-                            continue;
-                        }
-                        else if (currentLine.contains(spawnId) && currentLine.contains(spawnX) && currentLine.contains(spawnY) && currentLine.contains(spawnZ)) {
-                            if (!currentLine.contains("/>") && !currentLine.contains("</npc>")) {
-                                isMultiLine = true;
-                                continue;
+                            writer.write(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, currentLine, System.lineSeparator()));
+                            if (currentLine.contains("</list>")) {
+                                lastLineFound = true;
                             }
-                            found = true;
-                            continue;
+                            if (!lastLineFound) {
+                                ++lineCount;
+                            }
                         }
+                        spawnFile.delete();
+                        tempFile.renameTo(spawnFile);
+                        if (lineCount < 7) {
+                            SpawnTable.LOGGER.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName(), spawnFile.getAbsolutePath().substring(Config.DATAPACK_ROOT.getAbsolutePath().length() + 1).replace('\\', '/')));
+                            spawnFile.delete();
+                        }
+                        writer.close();
                     }
-                    writer.write(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, currentLine, System.lineSeparator()));
-                    if (currentLine.contains("</list>")) {
-                        lastLineFound = true;
+                    catch (Throwable t) {
+                        try {
+                            writer.close();
+                        }
+                        catch (Throwable exception) {
+                            t.addSuppressed(exception);
+                        }
+                        throw t;
                     }
-                    if (!lastLineFound) {
-                        ++lineCount;
-                    }
+                    reader.close();
                 }
-                writer.close();
-                reader.close();
-                spawnFile.delete();
-                tempFile.renameTo(spawnFile);
-                if (lineCount < 7) {
-                    SpawnTable.LOGGER.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName(), spawnFile.getAbsolutePath().substring(Config.DATAPACK_ROOT.getAbsolutePath().length() + 1).replace('\\', '/')));
-                    spawnFile.delete();
+                catch (Throwable t2) {
+                    try {
+                        reader.close();
+                    }
+                    catch (Throwable exception2) {
+                        t2.addSuppressed(exception2);
+                    }
+                    throw t2;
                 }
             }
             catch (Exception e) {

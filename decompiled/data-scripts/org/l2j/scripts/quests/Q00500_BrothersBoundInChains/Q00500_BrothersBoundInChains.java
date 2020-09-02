@@ -14,6 +14,7 @@ import org.l2j.gameserver.model.events.impl.character.player.OnPlayerSummonAgath
 import org.l2j.gameserver.engine.skill.api.Skill;
 import org.l2j.gameserver.model.quest.QuestState;
 import org.l2j.gameserver.enums.QuestType;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.Creature;
 import org.l2j.gameserver.model.WorldObject;
 import org.l2j.gameserver.engine.skill.api.SkillEngine;
@@ -80,7 +81,7 @@ public class Q00500_BrothersBoundInChains extends Quest
                 if (getQuestItemsCount(player, 70807) >= 35L) {
                     takeItems(player, 70807, -1L);
                     takeItems(player, 70806, -1L);
-                    player.setPkKills(Math.max(0, player.getPkKills() - getRandom(1, 3)));
+                    player.setPkKills(Math.max(0, player.getPkKills() - Rnd.get(1, 3)));
                     qs.unset("killCount");
                     qs.exitQuest(QuestType.DAILY, true);
                     break;

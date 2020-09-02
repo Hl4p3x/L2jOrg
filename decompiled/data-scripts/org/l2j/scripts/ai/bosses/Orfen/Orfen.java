@@ -21,6 +21,7 @@ import org.l2j.gameserver.ai.CtrlIntention;
 import org.l2j.gameserver.model.StatsSet;
 import org.l2j.gameserver.model.interfaces.IPositionable;
 import org.l2j.gameserver.model.actor.instance.GrandBoss;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.instancemanager.GrandBossManager;
@@ -62,7 +63,7 @@ public final class Orfen extends AbstractNpcAI
                 this.startQuestTimer("orfen_unlock", temp, (Npc)null, (Player)null);
             }
             else {
-                final int i = getRandom(10);
+                final int i = Rnd.get(10);
                 Location loc;
                 if (i < 4) {
                     loc = Orfen.POS[1];
@@ -122,7 +123,7 @@ public final class Orfen extends AbstractNpcAI
     
     public String onAdvEvent(final String event, final Npc npc, final Player player) {
         if (event.equalsIgnoreCase("orfen_unlock")) {
-            final int i = getRandom(10);
+            final int i = Rnd.get(10);
             Location loc;
             if (i < 4) {
                 loc = Orfen.POS[1];
@@ -139,7 +140,7 @@ public final class Orfen extends AbstractNpcAI
         }
         else if (event.equalsIgnoreCase("check_orfen_pos")) {
             if ((Orfen._IsTeleported && npc.getCurrentHp() > npc.getMaxHp() * 0.95) || (!Orfen.ZONE.isInsideZone((WorldObject)npc) && !Orfen._IsTeleported)) {
-                this.setSpawnPoint(npc, getRandom(3) + 1);
+                this.setSpawnPoint(npc, Rnd.get(3) + 1);
                 Orfen._IsTeleported = false;
             }
             else if (Orfen._IsTeleported && !Orfen.ZONE.isInsideZone((WorldObject)npc)) {
@@ -172,8 +173,8 @@ public final class Orfen extends AbstractNpcAI
     public String onSkillSee(final Npc npc, final Player caster, final Skill skill, final WorldObject[] targets, final boolean isSummon) {
         if (npc.getId() == 29014) {
             final Creature originalCaster = (Creature)(isSummon ? ((Creature)caster.getServitors().values().stream().findFirst().orElse((Creature)caster.getPet())) : caster);
-            if (skill.getEffectPoint() > 0 && getRandom(5) == 0 && MathUtil.isInsideRadius2D((ILocational)npc, (ILocational)originalCaster, 1000)) {
-                npc.broadcastSay(ChatType.NPC_GENERAL, Orfen.TEXT[getRandom(4)], new String[] { caster.getName() });
+            if (skill.getEffectPoint() > 0 && Rnd.get(5) == 0 && MathUtil.isInsideRadius2D((ILocational)npc, (ILocational)originalCaster, 1000)) {
+                npc.broadcastSay(ChatType.NPC_GENERAL, Orfen.TEXT[Rnd.get(4)], new String[] { caster.getName() });
                 originalCaster.teleToLocation((ILocational)npc.getLocation());
                 npc.setTarget((WorldObject)originalCaster);
                 npc.doCast(Orfen.PARALYSIS.getSkill());
@@ -188,7 +189,7 @@ public final class Orfen extends AbstractNpcAI
         }
         final int npcId = npc.getId();
         final int callerId = caller.getId();
-        if (npcId == 29016 && getRandom(20) == 0) {
+        if (npcId == 29016 && Rnd.get(20) == 0) {
             npc.setTarget((WorldObject)attacker);
             npc.doCast(Orfen.BLOW.getSkill());
         }
@@ -197,7 +198,7 @@ public final class Orfen extends AbstractNpcAI
             if (callerId == 29014) {
                 chance = 9;
             }
-            if (callerId != 29018 && caller.getCurrentHp() < caller.getMaxHp() / 2.0 && getRandom(10) < chance) {
+            if (callerId != 29018 && caller.getCurrentHp() < caller.getMaxHp() / 2.0 && Rnd.get(10) < chance) {
                 npc.getAI().setIntention(CtrlIntention.AI_INTENTION_IDLE, new Object[] { null, null });
                 npc.setTarget((WorldObject)caller);
                 npc.doCast(Orfen.ORFEN_HEAL.getSkill());
@@ -213,8 +214,8 @@ public final class Orfen extends AbstractNpcAI
                 Orfen._IsTeleported = true;
                 this.setSpawnPoint(npc, 0);
             }
-            else if (MathUtil.isInsideRadius2D((ILocational)npc, (ILocational)attacker, 1000) && !MathUtil.isInsideRadius2D((ILocational)npc, (ILocational)attacker, 300) && getRandom(10) == 0) {
-                npc.broadcastSay(ChatType.NPC_GENERAL, Orfen.TEXT[getRandom(3)], new String[] { attacker.getName() });
+            else if (MathUtil.isInsideRadius2D((ILocational)npc, (ILocational)attacker, 1000) && !MathUtil.isInsideRadius2D((ILocational)npc, (ILocational)attacker, 300) && Rnd.get(10) == 0) {
+                npc.broadcastSay(ChatType.NPC_GENERAL, Orfen.TEXT[Rnd.get(3)], new String[] { attacker.getName() });
                 attacker.teleToLocation((ILocational)npc.getLocation());
                 npc.setTarget((WorldObject)attacker);
                 npc.doCast(Orfen.PARALYSIS.getSkill());
@@ -231,7 +232,7 @@ public final class Orfen extends AbstractNpcAI
         if (npc.getId() == 29014) {
             npc.broadcastPacket((ServerPacket)new PlaySound(1, "BS02_D", 1, npc.getObjectId(), npc.getX(), npc.getY(), npc.getZ()));
             GrandBossManager.getInstance().setBossStatus(29014, 1);
-            long respawnTime = Config.ORFEN_SPAWN_INTERVAL + getRandom(-Config.ORFEN_SPAWN_RANDOM, Config.ORFEN_SPAWN_RANDOM);
+            long respawnTime = Config.ORFEN_SPAWN_INTERVAL + Rnd.get(-Config.ORFEN_SPAWN_RANDOM, Config.ORFEN_SPAWN_RANDOM);
             respawnTime *= 3600000L;
             this.startQuestTimer("orfen_unlock", respawnTime, (Npc)null, (Player)null);
             final StatsSet info = GrandBossManager.getInstance().getStatsSet(29014);

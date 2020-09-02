@@ -10,7 +10,7 @@ import org.l2j.gameserver.model.quest.Event;
 import org.l2j.gameserver.model.eventengine.AbstractEvent;
 import org.l2j.gameserver.model.eventengine.AbstractEventManager;
 
-public class TeamVsTeamManager extends AbstractEventManager<AbstractEvent<?>>
+public class TeamVsTeamManager extends AbstractEventManager<AbstractEvent>
 {
     private TeamVsTeamManager() {
     }

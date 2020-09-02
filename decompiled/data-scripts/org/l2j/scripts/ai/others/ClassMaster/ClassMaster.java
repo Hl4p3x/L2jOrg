@@ -44,17 +44,17 @@ import org.l2j.gameserver.model.spawns.SpawnTemplate;
 import io.github.joealisson.primitive.IntCollection;
 import java.util.LinkedList;
 import java.util.List;
-import org.slf4j.Logger;
 import io.github.joealisson.primitive.IntSet;
+import org.slf4j.Logger;
 import org.l2j.scripts.ai.AbstractNpcAI;
 
 public final class ClassMaster extends AbstractNpcAI
 {
+    private static final Logger LOGGER;
     private static final IntSet CLASS_MASTERS;
     private boolean _isEnabled;
     private boolean _spawnClassMasters;
     private boolean _showPopupWindow;
-    private static final Logger LOGGER;
     private final List<ClassChangeData> _classChangeData;
     
     public ClassMaster() {
@@ -610,8 +610,8 @@ public final class ClassMaster extends AbstractNpcAI
     }
     
     static {
-        CLASS_MASTERS = IntSet.of(31756, 31757);
         LOGGER = LoggerFactory.getLogger((Class)ClassMaster.class);
+        CLASS_MASTERS = IntSet.of(31756, 31757);
     }
     
     private static class ClassChangeData
@@ -699,11 +699,11 @@ public final class ClassMaster extends AbstractNpcAI
                     for (Node cm = n.getFirstChild(); cm != null; cm = cm.getNextSibling()) {
                         NamedNodeMap attrs = cm.getAttributes();
                         if ("classMaster".equals(cm.getNodeName())) {
-                            if (!(ClassMaster.this._isEnabled = this.parseBoolean(attrs, "classChangeEnabled", Boolean.valueOf(false)))) {
+                            if (!(ClassMaster.this._isEnabled = this.parseBoolean(attrs, "classChangeEnabled", false))) {
                                 return;
                             }
-                            ClassMaster.this._spawnClassMasters = this.parseBoolean(attrs, "spawnClassMasters", Boolean.valueOf(true));
-                            ClassMaster.this._showPopupWindow = this.parseBoolean(attrs, "showPopupWindow", Boolean.valueOf(false));
+                            ClassMaster.this._spawnClassMasters = this.parseBoolean(attrs, "spawnClassMasters", true);
+                            ClassMaster.this._showPopupWindow = this.parseBoolean(attrs, "showPopupWindow", false);
                             for (Node c = cm.getFirstChild(); c != null; c = c.getNextSibling()) {
                                 attrs = c.getAttributes();
                                 if ("classChangeOption".equals(c.getNodeName())) {
@@ -733,8 +733,8 @@ public final class ClassMaster extends AbstractNpcAI
                                             for (Node r = b.getFirstChild(); r != null; r = r.getNextSibling()) {
                                                 attrs = r.getAttributes();
                                                 if ("item".equals(r.getNodeName())) {
-                                                    final int itemId = this.parseInteger(attrs, "id");
-                                                    final int count = this.parseInteger(attrs, "count", Integer.valueOf(1));
+                                                    final int itemId = this.parseInt(attrs, "id");
+                                                    final int count = this.parseInt(attrs, "count", 1);
                                                     rewardedItems.add(new ItemHolder(itemId, (long)count));
                                                 }
                                                 else if ("setNoble".equals(r.getNodeName())) {
@@ -749,8 +749,8 @@ public final class ClassMaster extends AbstractNpcAI
                                             for (Node r = b.getFirstChild(); r != null; r = r.getNextSibling()) {
                                                 attrs = r.getAttributes();
                                                 if ("item".equals(r.getNodeName())) {
-                                                    final int itemId = this.parseInteger(attrs, "id");
-                                                    final int count = this.parseInteger(attrs, "count", Integer.valueOf(1));
+                                                    final int itemId = this.parseInt(attrs, "id");
+                                                    final int count = this.parseInt(attrs, "count", 1);
                                                     requiredItems.add(new ItemHolder(itemId, (long)count));
                                                 }
                                             }

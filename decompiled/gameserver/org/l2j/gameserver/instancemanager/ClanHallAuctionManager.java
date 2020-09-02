@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.l2j.gameserver.model.eventengine.AbstractEvent;
 import org.l2j.gameserver.model.eventengine.AbstractEventManager;
 
-public class ClanHallAuctionManager extends AbstractEventManager<AbstractEvent<?>>
+public class ClanHallAuctionManager extends AbstractEventManager<AbstractEvent>
 {
     private static final Logger LOGGER;
     private static final Map<Integer, ClanHallAuction> AUCTIONS;

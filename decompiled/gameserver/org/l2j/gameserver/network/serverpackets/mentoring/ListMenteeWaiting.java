@@ -4,10 +4,9 @@
 
 package org.l2j.gameserver.network.serverpackets.mentoring;
 
+import java.util.Iterator;
 import org.l2j.gameserver.network.ServerExPacketId;
 import org.l2j.gameserver.network.GameClient;
-import java.util.Iterator;
-import org.l2j.gameserver.world.World;
 import java.util.ArrayList;
 import org.l2j.gameserver.model.actor.instance.Player;
 import java.util.List;
@@ -22,11 +21,6 @@ public class ListMenteeWaiting extends ServerPacket
     public ListMenteeWaiting(final int page, final int minLevel, final int maxLevel) {
         this._possibleCandiates = new ArrayList<Player>();
         this._page = page;
-        for (final Player player : World.getInstance().getPlayers()) {
-            if (player.getLevel() >= minLevel && player.getLevel() <= maxLevel && !player.isMentee() && !player.isMentor()) {
-                this._possibleCandiates.add(player);
-            }
-        }
     }
     
     public void writeImpl(final GameClient client) {

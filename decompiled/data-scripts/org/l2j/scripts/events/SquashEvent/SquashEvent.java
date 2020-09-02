@@ -269,14 +269,14 @@ public class SquashEvent extends LongTimeEvent
         final int npcId = mob.getId();
         for (final int[] drop : SquashEvent.DROPLIST) {
             if (npcId == drop[0]) {
-                if (!getRandomBoolean()) {
+                if (!Rnd.nextBoolean()) {
                     if (Rnd.get(100) < drop[2]) {
                         if (ItemEngine.getInstance().getTemplate(drop[1]).getCrystalType() != CrystalType.NONE) {
                             ((Monster)mob).dropItem((Creature)player, drop[1], 1L);
                             break;
                         }
-                        ((Monster)mob).dropItem((Creature)player, drop[1], (long)getRandom(1, 3));
-                        if (getRandomBoolean()) {
+                        ((Monster)mob).dropItem((Creature)player, drop[1], (long)Rnd.get(1, 3));
+                        if (Rnd.nextBoolean()) {
                             break;
                         }
                     }

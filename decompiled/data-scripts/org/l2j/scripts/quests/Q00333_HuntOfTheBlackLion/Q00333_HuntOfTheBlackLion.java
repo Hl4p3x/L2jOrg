@@ -11,6 +11,7 @@ import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.model.quest.QuestState;
 import org.l2j.gameserver.enums.CategoryType;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.model.quest.Quest;
@@ -99,8 +100,8 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
     
     public String onAdvEvent(final String event, final Npc npc, final Player player) {
         final QuestState qs = this.getQuestState(player, false);
-        final int chance = getRandom(100);
-        final int chance2 = getRandom(100);
+        final int chance = Rnd.get(100);
+        final int chance2 = Rnd.get(100);
         if (qs == null) {
             return null;
         }
@@ -269,7 +270,7 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     htmltext = event;
                     break;
                 }
-                if (getRandom(100) < 50) {
+                if (Rnd.get(100) < 50) {
                     giveItems(player, 3461, 1L);
                     takeItems(player, 3457, 1L);
                     takeItems(player, 3458, 1L);
@@ -290,7 +291,7 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     htmltext = event;
                     break;
                 }
-                if (getRandom(100) < 50) {
+                if (Rnd.get(100) < 50) {
                     giveItems(player, 3466, 1L);
                     takeItems(player, 3462, 1L);
                     takeItems(player, 3463, 1L);
@@ -400,7 +401,7 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                             htmltext = "30736-04m.html";
                             break;
                         }
-                        if (getRandom(100) < 50) {
+                        if (Rnd.get(100) < 50) {
                             if (chance2 < 25) {
                                 giveItems(player, 3457, 1L);
                             }
@@ -563,13 +564,13 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3674)) {
                         break;
                     }
-                    if (getRandom(100) < 55) {
+                    if (Rnd.get(100) < 55) {
                         giveItems(killer, 3851, 1L);
                     }
-                    if (getRandom(100) < 12) {
+                    if (Rnd.get(100) < 12) {
                         giveItems(killer, 3443, 1L);
                     }
-                    if (getRandom(100) < 2 && hasQuestItems(killer, 3674)) {
+                    if (Rnd.get(100) < 2 && hasQuestItems(killer, 3674)) {
                         addSpawn(27152, (IPositionable)npc, true, 0L, false);
                         break;
                     }
@@ -579,10 +580,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3671)) {
                         break;
                     }
-                    if (getRandom(2) == 0) {
+                    if (Rnd.get(2) == 0) {
                         giveItems(killer, 3848, 1L);
                     }
-                    if (getRandom(100) < 11) {
+                    if (Rnd.get(100) < 11) {
                         giveItems(killer, 3440, 1L);
                         break;
                     }
@@ -592,10 +593,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3671)) {
                         break;
                     }
-                    if (getRandom(100) < 60) {
+                    if (Rnd.get(100) < 60) {
                         giveItems(killer, 3848, 1L);
                     }
-                    if (getRandom(100) < 8) {
+                    if (Rnd.get(100) < 8) {
                         giveItems(killer, 3440, 1L);
                         break;
                     }
@@ -605,10 +606,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3671)) {
                         break;
                     }
-                    if (getRandom(100) < 60) {
+                    if (Rnd.get(100) < 60) {
                         giveItems(killer, 3848, 1L);
                     }
-                    if (getRandom(100) < 9) {
+                    if (Rnd.get(100) < 9) {
                         giveItems(killer, 3440, 1L);
                         break;
                     }
@@ -618,10 +619,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3671)) {
                         break;
                     }
-                    if (getRandom(2) == 0) {
+                    if (Rnd.get(2) == 0) {
                         giveItems(killer, 3848, 1L);
                     }
-                    if (getRandom(100) < 12) {
+                    if (Rnd.get(100) < 12) {
                         giveItems(killer, 3440, 1L);
                         break;
                     }
@@ -631,10 +632,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3671)) {
                         break;
                     }
-                    if (getRandom(2) == 0) {
+                    if (Rnd.get(2) == 0) {
                         giveItems(killer, 3848, 1L);
                     }
-                    if (getRandom(100) < 13) {
+                    if (Rnd.get(100) < 13) {
                         giveItems(killer, 3440, 1L);
                         break;
                     }
@@ -644,10 +645,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3671)) {
                         break;
                     }
-                    if (getRandom(2) == 0) {
+                    if (Rnd.get(2) == 0) {
                         giveItems(killer, 3848, 1L);
                     }
-                    if (getRandom(100) < 15) {
+                    if (Rnd.get(100) < 15) {
                         giveItems(killer, 3440, 1L);
                         break;
                     }
@@ -657,10 +658,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3672)) {
                         break;
                     }
-                    if (getRandom(2) == 0) {
+                    if (Rnd.get(2) == 0) {
                         giveItems(killer, 3849, 1L);
                     }
-                    if (getRandom(100) < 9) {
+                    if (Rnd.get(100) < 9) {
                         giveItems(killer, 3441, 1L);
                         break;
                     }
@@ -670,10 +671,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3672)) {
                         break;
                     }
-                    if (getRandom(2) == 0) {
+                    if (Rnd.get(2) == 0) {
                         giveItems(killer, 3849, 1L);
                     }
-                    if (getRandom(100) < 10) {
+                    if (Rnd.get(100) < 10) {
                         giveItems(killer, 3441, 1L);
                         break;
                     }
@@ -683,10 +684,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3672)) {
                         break;
                     }
-                    if (getRandom(2) == 0) {
+                    if (Rnd.get(2) == 0) {
                         giveItems(killer, 3849, 1L);
                     }
-                    if (getRandom(100) < 11) {
+                    if (Rnd.get(100) < 11) {
                         giveItems(killer, 3441, 1L);
                         break;
                     }
@@ -696,10 +697,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3672)) {
                         break;
                     }
-                    if (getRandom(2) == 0) {
+                    if (Rnd.get(2) == 0) {
                         giveItems(killer, 3849, 1L);
                     }
-                    if (getRandom(100) < 12) {
+                    if (Rnd.get(100) < 12) {
                         giveItems(killer, 3441, 1L);
                         break;
                     }
@@ -709,10 +710,10 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3672)) {
                         break;
                     }
-                    if (getRandom(2) == 0) {
+                    if (Rnd.get(2) == 0) {
                         giveItems(killer, 3849, 1L);
                     }
-                    if (getRandom(100) < 13) {
+                    if (Rnd.get(100) < 13) {
                         giveItems(killer, 3441, 1L);
                         break;
                     }
@@ -722,13 +723,13 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3674)) {
                         break;
                     }
-                    if (getRandom(100) < 60) {
+                    if (Rnd.get(100) < 60) {
                         giveItems(killer, 3851, 1L);
                     }
-                    if (getRandom(100) < 13) {
+                    if (Rnd.get(100) < 13) {
                         giveItems(killer, 3443, 1L);
                     }
-                    if (getRandom(100) < 2 && hasQuestItems(killer, 3674)) {
+                    if (Rnd.get(100) < 2 && hasQuestItems(killer, 3674)) {
                         addSpawn(27152, (IPositionable)npc, true, 0L, false);
                         break;
                     }
@@ -738,13 +739,13 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3674)) {
                         break;
                     }
-                    if (getRandom(100) < 56) {
+                    if (Rnd.get(100) < 56) {
                         giveItems(killer, 3851, 1L);
                     }
-                    if (getRandom(100) < 14) {
+                    if (Rnd.get(100) < 14) {
                         giveItems(killer, 3443, 1L);
                     }
-                    if (getRandom(100) < 2 && hasQuestItems(killer, 3674)) {
+                    if (Rnd.get(100) < 2 && hasQuestItems(killer, 3674)) {
                         addSpawn(27152, (IPositionable)npc, true, 0L, false);
                         break;
                     }
@@ -754,13 +755,13 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                     if (!hasQuestItems(killer, 3674)) {
                         break;
                     }
-                    if (getRandom(100) < 60) {
+                    if (Rnd.get(100) < 60) {
                         giveItems(killer, 3851, 1L);
                     }
-                    if (getRandom(100) < 15) {
+                    if (Rnd.get(100) < 15) {
                         giveItems(killer, 3443, 1L);
                     }
-                    if (getRandom(100) < 2 && hasQuestItems(killer, 3674)) {
+                    if (Rnd.get(100) < 2 && hasQuestItems(killer, 3674)) {
                         addSpawn(27152, (IPositionable)npc, true, 0L, false);
                         break;
                     }
@@ -769,14 +770,14 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                 case 20251:
                 case 20252: {
                     if (hasQuestItems(killer, 3673)) {
-                        if (getRandom(2) == 0) {
+                        if (Rnd.get(2) == 0) {
                             giveItems(killer, 3850, 1L);
                         }
-                        if (getRandom(100) < 14) {
+                        if (Rnd.get(100) < 14) {
                             giveItems(killer, 3442, 1L);
                         }
                     }
-                    if (getRandom(100) < 3 && hasQuestItems(killer, 3673)) {
+                    if (Rnd.get(100) < 3 && hasQuestItems(killer, 3673)) {
                         addSpawn(27151, (IPositionable)npc, true, 0L, false);
                         addSpawn(27151, (IPositionable)npc, true, 0L, false);
                         break;
@@ -785,14 +786,14 @@ public final class Q00333_HuntOfTheBlackLion extends Quest
                 }
                 case 20253: {
                     if (hasQuestItems(killer, 3673)) {
-                        if (getRandom(2) == 0) {
+                        if (Rnd.get(2) == 0) {
                             giveItems(killer, 3850, 1L);
                         }
-                        if (getRandom(100) < 15) {
+                        if (Rnd.get(100) < 15) {
                             giveItems(killer, 3442, 1L);
                         }
                     }
-                    if (getRandom(100) < 3 && hasQuestItems(killer, 3673)) {
+                    if (Rnd.get(100) < 3 && hasQuestItems(killer, 3673)) {
                         addSpawn(27151, (IPositionable)npc, true, 0L, false);
                         addSpawn(27151, (IPositionable)npc, true, 0L, false);
                         break;

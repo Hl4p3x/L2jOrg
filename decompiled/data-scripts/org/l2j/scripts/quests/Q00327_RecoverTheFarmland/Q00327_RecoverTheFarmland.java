@@ -6,6 +6,7 @@ package org.l2j.scripts.quests.Q00327_RecoverTheFarmland;
 
 import java.util.HashMap;
 import org.l2j.gameserver.model.quest.QuestState;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.enums.QuestSound;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
@@ -128,7 +129,7 @@ public final class Q00327_RecoverTheFarmland extends Quest
                     break;
                 }
                 takeItems(player, 1848, 5L);
-                if (getRandom(6) < 5) {
+                if (Rnd.get(6) < 5) {
                     giveItems(player, 1852, 1L);
                     html = event;
                     break;
@@ -142,7 +143,7 @@ public final class Q00327_RecoverTheFarmland extends Quest
                     break;
                 }
                 takeItems(player, 1849, 5L);
-                if (getRandom(7) < 6) {
+                if (Rnd.get(7) < 6) {
                     giveItems(player, 1853, 1L);
                     html = event;
                     break;
@@ -156,7 +157,7 @@ public final class Q00327_RecoverTheFarmland extends Quest
                     break;
                 }
                 takeItems(player, 1850, 5L);
-                if (getRandom(7) < 6) {
+                if (Rnd.get(7) < 6) {
                     giveItems(player, 1854, 1L);
                     html = event;
                     break;
@@ -170,7 +171,7 @@ public final class Q00327_RecoverTheFarmland extends Quest
                     break;
                 }
                 takeItems(player, 1851, 5L);
-                if (getRandom(8) < 7) {
+                if (Rnd.get(8) < 7) {
                     giveItems(player, 1855, 1L);
                     html = event;
                     break;
@@ -183,7 +184,7 @@ public final class Q00327_RecoverTheFarmland extends Quest
                     html = "30314-07.html";
                     break;
                 }
-                rewardItems(player, 1463, (long)getRandom(70, 110));
+                rewardItems(player, 1463, (long)Rnd.get(70, 110));
                 takeItems(player, 1852, 1L);
                 html = event;
                 break;
@@ -193,7 +194,7 @@ public final class Q00327_RecoverTheFarmland extends Quest
                     html = "30314-07.html";
                     break;
                 }
-                final int rnd = getRandom(100);
+                final int rnd = Rnd.get(100);
                 if (rnd < 40) {
                     rewardItems(player, 1061, 1L);
                 }
@@ -212,7 +213,7 @@ public final class Q00327_RecoverTheFarmland extends Quest
                     html = "30314-07.html";
                     break;
                 }
-                rewardItems(player, (getRandom(100) < 59) ? 736 : 737, 1L);
+                rewardItems(player, (Rnd.get(100) < 59) ? 736 : 737, 1L);
                 takeItems(player, 1854, 1L);
                 html = event;
                 break;
@@ -222,7 +223,7 @@ public final class Q00327_RecoverTheFarmland extends Quest
                     html = "30314-07.html";
                     break;
                 }
-                rewardItems(player, 2510, (long)getRandom(50, 90));
+                rewardItems(player, 2510, (long)Rnd.get(50, 90));
                 takeItems(player, 1855, 1L);
                 html = event;
                 break;
@@ -240,8 +241,8 @@ public final class Q00327_RecoverTheFarmland extends Quest
             else {
                 giveItems(killer, 1846, 1L);
             }
-            if (getRandom(100) < Q00327_RecoverTheFarmland.FRAGMENTS_DROP_PROB.get(npc.getId())) {
-                giveItems(killer, getRandom(1848, 1851), 1L);
+            if (Rnd.get(100) < Q00327_RecoverTheFarmland.FRAGMENTS_DROP_PROB.get(npc.getId())) {
+                giveItems(killer, Rnd.get(1848, 1851), 1L);
             }
         }
         return super.onKill(npc, killer, isSummon);

@@ -6,7 +6,7 @@ package org.l2j.gameserver.network.authcomm.as2gs;
 
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.network.GameClient;
-import org.l2j.gameserver.network.serverpackets.ServerPacket;
+import io.github.joealisson.mmocore.WritablePacket;
 import org.l2j.gameserver.network.serverpackets.ServerClose;
 import org.l2j.gameserver.network.Disconnection;
 import org.l2j.gameserver.network.SystemMessageId;
@@ -36,7 +36,7 @@ public class KickPlayer extends ReceivablePacket
             Disconnection.of(activeChar).defaultSequence(false);
         }
         else {
-            client.close(ServerClose.STATIC_PACKET);
+            client.close((WritablePacket)ServerClose.STATIC_PACKET);
         }
     }
 }

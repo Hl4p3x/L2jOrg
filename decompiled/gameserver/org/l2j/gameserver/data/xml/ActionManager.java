@@ -46,17 +46,17 @@ public final class ActionManager extends GameXmlReader
     
     public void parseDocument(final Document doc, final File f) {
         final NamedNodeMap attrs;
-        final Integer id;
-        final Integer optionId;
+        final int id;
+        final int optionId;
         final ActionData action;
         this.forEach((Node)doc, "list", listNode -> this.forEach(listNode, "action", actionNode -> {
             attrs = actionNode.getAttributes();
-            id = this.parseInteger(attrs, "id");
-            optionId = this.parseInteger(attrs, "option");
+            id = this.parseInt(attrs, "id");
+            optionId = this.parseInt(attrs, "option");
             action = new ActionData(id, this.parseString(attrs, "handler"), optionId, this.parseBoolean(attrs, "auto-use"));
-            this.actions.put((int)id, (Object)action);
+            this.actions.put(id, (Object)action);
             if (this.isActionSkill(action)) {
-                this.actionSkills.put((int)optionId, (int)id);
+                this.actionSkills.put(optionId, id);
             }
         }));
     }

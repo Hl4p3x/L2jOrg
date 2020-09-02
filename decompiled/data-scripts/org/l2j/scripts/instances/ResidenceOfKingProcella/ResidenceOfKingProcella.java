@@ -10,6 +10,7 @@ import org.l2j.gameserver.model.skills.SkillCaster;
 import org.l2j.gameserver.model.WorldObject;
 import org.l2j.gameserver.model.interfaces.ILocational;
 import org.l2j.gameserver.util.MathUtil;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.model.actor.instance.Monster;
@@ -48,7 +49,7 @@ public class ResidenceOfKingProcella extends AbstractInstance
             case "ENTER": {
                 this.enterInstance(player, npc, 197);
                 this._procella = (RaidBoss)addSpawn(29107, 212862, 179828, -15489, 49151, false, 0L, true, player.getInstanceId());
-                this.startQuestTimer("SPAWN_MINION", (long)(300000 + getRandom(-15000, 15000)), (Npc)this._procella, player);
+                this.startQuestTimer("SPAWN_MINION", (long)(300000 + Rnd.get(-15000, 15000)), (Npc)this._procella, player);
                 this.startQuestTimer("SPAWN_STORM", 5000L, (Npc)this._procella, player);
                 this._procellaStormCount = 0;
                 break;
@@ -66,7 +67,7 @@ public class ResidenceOfKingProcella extends AbstractInstance
             case "SPAWN_STORM": {
                 if (this._procellaStormCount < ResidenceOfKingProcella.STORM_MAX_COUNT) {
                     this._procella.useMagic(ResidenceOfKingProcella.HURRICANE_SUMMON.getSkill());
-                    final Npc procellaStorm = addSpawn(29115, this._procella.getX() + getRandom(-500, 500), this._procella.getY() + getRandom(-500, 500), this._procella.getZ(), 31011, true, 0L, true, npc.getInstanceId());
+                    final Npc procellaStorm = addSpawn(29115, this._procella.getX() + Rnd.get(-500, 500), this._procella.getY() + Rnd.get(-500, 500), this._procella.getZ(), 31011, true, 0L, true, npc.getInstanceId());
                     procellaStorm.setRandomWalking(true);
                     ++this._procellaStormCount;
                     this.startQuestTimer("SPAWN_STORM", 60000L, (Npc)this._procella, (Player)null);
@@ -81,7 +82,7 @@ public class ResidenceOfKingProcella extends AbstractInstance
                     break;
                 }
                 this._procella.setInvisible(true);
-                this.startQuestTimer("SPAWN_MINION", (long)(300000 + getRandom(-15000, 15000)), (Npc)this._procella, player);
+                this.startQuestTimer("SPAWN_MINION", (long)(300000 + Rnd.get(-15000, 15000)), (Npc)this._procella, player);
                 break;
             }
             case "CHECK_CHAR_INSIDE_RADIUS_NPC": {

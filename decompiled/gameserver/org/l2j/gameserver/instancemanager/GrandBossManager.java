@@ -6,6 +6,8 @@ package org.l2j.gameserver.instancemanager;
 
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.LoggerFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.BossDAO;
 import java.sql.PreparedStatement;
 import java.util.Iterator;
 import java.sql.ResultSet;
@@ -258,26 +260,7 @@ public final class GrandBossManager implements IStorable
                 final GrandBoss boss = GrandBossManager._bosses.get(bossId);
                 final StatsSet info = GrandBossManager._storedInfo.get(bossId);
                 if (statusOnly || boss == null || info == null) {
-                    final PreparedStatement ps = con.prepareStatement("UPDATE grandboss_data set status = ? where boss_id = ?");
-                    try {
-                        ps.setInt(1, this._bossStatus.get(bossId));
-                        ps.setInt(2, bossId);
-                        ps.executeUpdate();
-                        if (ps != null) {
-                            ps.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (ps != null) {
-                            try {
-                                ps.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
+                    ((BossDAO)DatabaseAccess.getDAO((Class)BossDAO.class)).updateStatus(bossId, this._bossStatus.get(bossId));
                 }
                 else {
                     final PreparedStatement ps = con.prepareStatement("UPDATE grandboss_data set loc_x = ?, loc_y = ?, loc_z = ?, heading = ?, respawn_time = ?, currentHP = ?, currentMP = ?, status = ? where boss_id = ?");
@@ -302,32 +285,32 @@ public final class GrandBossManager implements IStorable
                             ps.close();
                         }
                     }
-                    catch (Throwable t2) {
+                    catch (Throwable t) {
                         if (ps != null) {
                             try {
                                 ps.close();
                             }
-                            catch (Throwable exception2) {
-                                t2.addSuppressed(exception2);
+                            catch (Throwable exception) {
+                                t.addSuppressed(exception);
                             }
                         }
-                        throw t2;
+                        throw t;
                     }
                 }
                 if (con != null) {
                     con.close();
                 }
             }
-            catch (Throwable t3) {
+            catch (Throwable t2) {
                 if (con != null) {
                     try {
                         con.close();
                     }
-                    catch (Throwable exception3) {
-                        t3.addSuppressed(exception3);
+                    catch (Throwable exception2) {
+                        t2.addSuppressed(exception2);
                     }
                 }
-                throw t3;
+                throw t2;
             }
         }
         catch (SQLException e) {

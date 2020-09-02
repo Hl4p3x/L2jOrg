@@ -4,6 +4,7 @@
 
 package org.l2j.scripts.instances;
 
+import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.model.Location;
 import org.l2j.gameserver.model.interfaces.ILocational;
 import java.util.Iterator;
@@ -22,10 +23,12 @@ import org.l2j.gameserver.instancemanager.InstanceManager;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.commons.util.Util;
 import org.l2j.gameserver.model.instancezone.Instance;
+import org.slf4j.Logger;
 import org.l2j.scripts.ai.AbstractNpcAI;
 
 public abstract class AbstractInstance extends AbstractNpcAI
 {
+    private static final Logger LOGGER;
     private final int[] _templateIds;
     
     public AbstractInstance(final int... templateId) {
@@ -68,12 +71,12 @@ public abstract class AbstractInstance extends AbstractNpcAI
             final InstanceManager manager = InstanceManager.getInstance();
             final InstanceTemplate template = manager.getInstanceTemplate(templateId);
             if (template == null) {
-                this.LOGGER.warn("Player {} wants to create instance with unknown template id {} !", (Object)player, (Object)templateId);
+                AbstractInstance.LOGGER.warn("Player {} wants to create instance with unknown template id {} !", (Object)player, (Object)templateId);
                 return;
             }
             final List<Player> enterGroup = (List<Player>)template.getEnterGroup(player);
             if (enterGroup == null) {
-                this.LOGGER.warn("Instance {} has invalid group size limits!", (Object)template);
+                AbstractInstance.LOGGER.warn("Instance {} has invalid group size limits!", (Object)template);
                 return;
             }
             if (!player.canOverrideCond(PcCondOverride.INSTANCE_CONDITIONS) && (!template.validateConditions((List)enterGroup, npc, (BiConsumer)this::showHtmlFile) || !this.validateConditions(enterGroup, npc, template))) {
@@ -115,7 +118,7 @@ public abstract class AbstractInstance extends AbstractNpcAI
             player.teleToLocation((ILocational)loc, instance);
         }
         else {
-            this.LOGGER.warn(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, instance.getId()));
+            AbstractInstance.LOGGER.warn(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, instance.getId()));
         }
     }
     
@@ -139,5 +142,9 @@ public abstract class AbstractInstance extends AbstractNpcAI
     
     protected boolean validateConditions(final List<Player> group, final Npc npc, final InstanceTemplate template) {
         return true;
+    }
+    
+    static {
+        LOGGER = LoggerFactory.getLogger((Class)AbstractInstance.class);
     }
 }

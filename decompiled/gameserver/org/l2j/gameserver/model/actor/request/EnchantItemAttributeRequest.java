@@ -44,7 +44,7 @@ public final class EnchantItemAttributeRequest extends AbstractRequest
     }
     
     @Override
-    public boolean isUsing(final int objectId) {
+    public boolean isUsingItem(final int objectId) {
         return objectId > 0 && (objectId == this._enchantingItemObjectId || objectId == this._enchantingStoneObjectId);
     }
 }

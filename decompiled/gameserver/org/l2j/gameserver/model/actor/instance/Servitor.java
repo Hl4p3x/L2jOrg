@@ -16,8 +16,8 @@ import org.l2j.gameserver.enums.AttributeType;
 import org.l2j.gameserver.model.WorldObject;
 import java.sql.ResultSet;
 import org.l2j.gameserver.model.skills.EffectScope;
-import java.util.List;
 import java.sql.PreparedStatement;
+import java.util.List;
 import java.sql.Connection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
@@ -25,6 +25,8 @@ import org.l2j.gameserver.model.skills.AbnormalType;
 import org.l2j.gameserver.model.skills.BuffInfo;
 import java.util.ArrayList;
 import org.l2j.commons.database.DatabaseFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.PetDAO;
 import java.util.Collections;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.data.sql.impl.PlayerSummonTable;
@@ -214,106 +216,86 @@ public class Servitor extends Summon implements Runnable
         if (SummonEffectsTable.getInstance().getServitorEffectsOwner().getOrDefault(this.getOwner().getObjectId(), Collections.emptyMap()).containsKey(this.getOwner().getClassIndex())) {
             SummonEffectsTable.getInstance().getServitorEffects(this.getOwner()).getOrDefault(this.getReferenceSkill(), (Collection<SummonEffectsTable.SummonEffect>)Collections.emptyList()).clear();
         }
+        ((PetDAO)DatabaseAccess.getDAO((Class)PetDAO.class)).deleteSkillsSave(this.getOwner().getObjectId(), this.getOwner().getClassIndex(), this._referenceSkill);
         try {
             final Connection con = DatabaseFactory.getInstance().getConnection();
             try {
-                final PreparedStatement statement = con.prepareStatement("DELETE FROM character_summon_skills_save WHERE ownerId=? AND ownerClassIndex=? AND summonSkillId=?");
-                try {
-                    statement.setInt(1, this.getOwner().getObjectId());
-                    statement.setInt(2, this.getOwner().getClassIndex());
-                    statement.setInt(3, this._referenceSkill);
-                    statement.execute();
-                    int buff_index = 0;
-                    final List<Long> storedSkills = new ArrayList<Long>();
-                    if (storeEffects) {
-                        final PreparedStatement ps2 = con.prepareStatement("REPLACE INTO character_summon_skills_save (ownerId,ownerClassIndex,summonSkillId,skill_id,skill_level,remaining_time,buff_index) VALUES (?,?,?,?,?,?,?)");
-                        try {
-                            for (final BuffInfo info : this.getEffectList().getEffects()) {
-                                if (info == null) {
-                                    continue;
-                                }
-                                final Skill skill = info.getSkill();
-                                if (skill.isDeleteAbnormalOnLeave()) {
-                                    continue;
-                                }
-                                if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS) {
-                                    continue;
-                                }
-                                if (skill.isToggle()) {
-                                    continue;
-                                }
-                                if (skill.isDance() && !Config.ALT_STORE_DANCES) {
-                                    continue;
-                                }
-                                if (storedSkills.contains(skill.getReuseHashCode())) {
-                                    continue;
-                                }
-                                storedSkills.add(skill.getReuseHashCode());
-                                ps2.setInt(1, this.getOwner().getObjectId());
-                                ps2.setInt(2, this.getOwner().getClassIndex());
-                                ps2.setInt(3, this._referenceSkill);
-                                ps2.setInt(4, skill.getId());
-                                ps2.setInt(5, skill.getLevel());
-                                ps2.setInt(6, info.getTime());
-                                ps2.setInt(7, ++buff_index);
-                                ps2.addBatch();
-                                if (!SummonEffectsTable.getInstance().getServitorEffectsOwner().containsKey(this.getOwner().getObjectId())) {
-                                    SummonEffectsTable.getInstance().getServitorEffectsOwner().put(this.getOwner().getObjectId(), new HashMap<Integer, Map<Integer, Collection<SummonEffectsTable.SummonEffect>>>());
-                                }
-                                if (!SummonEffectsTable.getInstance().getServitorEffectsOwner().get(this.getOwner().getObjectId()).containsKey(this.getOwner().getClassIndex())) {
-                                    SummonEffectsTable.getInstance().getServitorEffectsOwner().get(this.getOwner().getObjectId()).put(this.getOwner().getClassIndex(), new HashMap<Integer, Collection<SummonEffectsTable.SummonEffect>>());
-                                }
-                                if (!SummonEffectsTable.getInstance().getServitorEffects(this.getOwner()).containsKey(this.getReferenceSkill())) {
-                                    SummonEffectsTable.getInstance().getServitorEffects(this.getOwner()).put(this.getReferenceSkill(), (Collection<SummonEffectsTable.SummonEffect>)ConcurrentHashMap.newKeySet());
-                                }
-                                SummonEffectsTable.getInstance().getServitorEffects(this.getOwner()).get(this.getReferenceSkill()).add(new SummonEffectsTable.SummonEffect(skill, info.getTime()));
+                int buff_index = 0;
+                final List<Long> storedSkills = new ArrayList<Long>();
+                if (storeEffects) {
+                    final PreparedStatement ps2 = con.prepareStatement("REPLACE INTO character_summon_skills_save (ownerId,ownerClassIndex,summonSkillId,skill_id,skill_level,remaining_time,buff_index) VALUES (?,?,?,?,?,?,?)");
+                    try {
+                        for (final BuffInfo info : this.getEffectList().getEffects()) {
+                            if (info == null) {
+                                continue;
                             }
-                            ps2.executeBatch();
-                            if (ps2 != null) {
+                            final Skill skill = info.getSkill();
+                            if (skill.isDeleteAbnormalOnLeave()) {
+                                continue;
+                            }
+                            if (skill.getAbnormalType() == AbnormalType.LIFE_FORCE_OTHERS) {
+                                continue;
+                            }
+                            if (skill.isToggle()) {
+                                continue;
+                            }
+                            if (skill.isDance() && !Config.ALT_STORE_DANCES) {
+                                continue;
+                            }
+                            if (storedSkills.contains(skill.getReuseHashCode())) {
+                                continue;
+                            }
+                            storedSkills.add(skill.getReuseHashCode());
+                            ps2.setInt(1, this.getOwner().getObjectId());
+                            ps2.setInt(2, this.getOwner().getClassIndex());
+                            ps2.setInt(3, this._referenceSkill);
+                            ps2.setInt(4, skill.getId());
+                            ps2.setInt(5, skill.getLevel());
+                            ps2.setInt(6, info.getTime());
+                            ps2.setInt(7, ++buff_index);
+                            ps2.addBatch();
+                            if (!SummonEffectsTable.getInstance().getServitorEffectsOwner().containsKey(this.getOwner().getObjectId())) {
+                                SummonEffectsTable.getInstance().getServitorEffectsOwner().put(this.getOwner().getObjectId(), new HashMap<Integer, Map<Integer, Collection<SummonEffectsTable.SummonEffect>>>());
+                            }
+                            if (!SummonEffectsTable.getInstance().getServitorEffectsOwner().get(this.getOwner().getObjectId()).containsKey(this.getOwner().getClassIndex())) {
+                                SummonEffectsTable.getInstance().getServitorEffectsOwner().get(this.getOwner().getObjectId()).put(this.getOwner().getClassIndex(), new HashMap<Integer, Collection<SummonEffectsTable.SummonEffect>>());
+                            }
+                            if (!SummonEffectsTable.getInstance().getServitorEffects(this.getOwner()).containsKey(this.getReferenceSkill())) {
+                                SummonEffectsTable.getInstance().getServitorEffects(this.getOwner()).put(this.getReferenceSkill(), (Collection<SummonEffectsTable.SummonEffect>)ConcurrentHashMap.newKeySet());
+                            }
+                            SummonEffectsTable.getInstance().getServitorEffects(this.getOwner()).get(this.getReferenceSkill()).add(new SummonEffectsTable.SummonEffect(skill, info.getTime()));
+                        }
+                        ps2.executeBatch();
+                        if (ps2 != null) {
+                            ps2.close();
+                        }
+                    }
+                    catch (Throwable t) {
+                        if (ps2 != null) {
+                            try {
                                 ps2.close();
                             }
-                        }
-                        catch (Throwable t) {
-                            if (ps2 != null) {
-                                try {
-                                    ps2.close();
-                                }
-                                catch (Throwable exception) {
-                                    t.addSuppressed(exception);
-                                }
+                            catch (Throwable exception) {
+                                t.addSuppressed(exception);
                             }
-                            throw t;
                         }
+                        throw t;
                     }
-                    if (statement != null) {
-                        statement.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
                 }
                 if (con != null) {
                     con.close();
                 }
             }
-            catch (Throwable t3) {
+            catch (Throwable t2) {
                 if (con != null) {
                     try {
                         con.close();
                     }
-                    catch (Throwable exception3) {
-                        t3.addSuppressed(exception3);
+                    catch (Throwable exception2) {
+                        t2.addSuppressed(exception2);
                     }
                 }
-                throw t3;
+                throw t2;
             }
         }
         catch (Exception e) {

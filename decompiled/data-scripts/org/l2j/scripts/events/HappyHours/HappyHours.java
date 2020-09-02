@@ -60,7 +60,7 @@ public class HappyHours extends LongTimeEvent
                     final SystemMessage systemMsg = SystemMessage.getSystemMessage(SystemMessageId.YOU_OBTAINED_S1_ORIANA_S_COINS);
                     systemMsg.addInt(20);
                     for (final Player plr : World.getInstance().getPlayers()) {
-                        if (plr != null && plr.isOnlineInt() == 1 && plr.isAffectedBySkill(39171)) {
+                        if (plr != null && plr.isOnline() && plr.isAffectedBySkill(39171)) {
                             plr.addItem("HappyHours", 49783, 20L, (WorldObject)player, false);
                             plr.sendPacket(new ServerPacket[] { (ServerPacket)screenMsg });
                             plr.sendPacket(new ServerPacket[] { (ServerPacket)systemMsg });

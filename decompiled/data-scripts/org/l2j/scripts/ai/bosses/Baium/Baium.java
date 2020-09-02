@@ -27,6 +27,7 @@ import org.l2j.gameserver.network.serverpackets.PlaySound;
 import org.l2j.gameserver.network.serverpackets.Earthquake;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.SocialAction;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.interfaces.ILocational;
 import org.l2j.gameserver.model.StatsSet;
 import org.l2j.gameserver.model.actor.Npc;
@@ -142,8 +143,8 @@ public final class Baium extends AbstractNpcAI
                 return htmltext;
             }
             case "teleportOut": {
-                final Location destination = Baium.TELEPORT_OUT_LOC[getRandom(Baium.TELEPORT_OUT_LOC.length)];
-                player.teleToLocation(destination.getX() + getRandom(100), destination.getY() + getRandom(100), destination.getZ());
+                final Location destination = Baium.TELEPORT_OUT_LOC[Rnd.get(Baium.TELEPORT_OUT_LOC.length)];
+                player.teleToLocation(destination.getX() + Rnd.get(100), destination.getY() + Rnd.get(100), destination.getZ());
                 break;
             }
             case "wakeUp": {
@@ -399,7 +400,7 @@ public final class Baium extends AbstractNpcAI
         else {
             final Attackable mob = (Attackable)npc;
             final Creature mostHated = mob.getMostHated();
-            if (getRandom(100) < 10 && SkillCaster.checkUseConditions((Creature)mob, Baium.SPEAR_ATTACK.getSkill())) {
+            if (Rnd.get(100) < 10 && SkillCaster.checkUseConditions((Creature)mob, Baium.SPEAR_ATTACK.getSkill())) {
                 if (mostHated != null && MathUtil.isInsideRadius3D((ILocational)npc, (ILocational)mostHated, 1000) && Baium.zone.isCreatureInZone(mostHated)) {
                     mob.setTarget((WorldObject)mostHated);
                     mob.doCast(Baium.SPEAR_ATTACK.getSkill());
@@ -409,7 +410,7 @@ public final class Baium extends AbstractNpcAI
                     mob.doCast(Baium.SPEAR_ATTACK.getSkill());
                 }
             }
-            if (getRandom(100) < 5 && npc.getCurrentHp() < npc.getMaxHp() * 0.5 && SkillCaster.checkUseConditions((Creature)mob, Baium.ANGEL_HEAL.getSkill())) {
+            if (Rnd.get(100) < 5 && npc.getCurrentHp() < npc.getMaxHp() * 0.5 && SkillCaster.checkUseConditions((Creature)mob, Baium.ANGEL_HEAL.getSkill())) {
                 npc.setTarget((WorldObject)npc);
                 npc.doCast(Baium.ANGEL_HEAL.getSkill());
             }
@@ -479,7 +480,7 @@ public final class Baium extends AbstractNpcAI
     }
     
     private void refreshAiParams(final Creature attacker, final Npc npc, final int damage, final int aggro) {
-        final int newAggroVal = damage + getRandom(3000);
+        final int newAggroVal = damage + Rnd.get(3000);
         final int aggroVal = aggro + 1000;
         final NpcVariables vars = npc.getVariables();
         for (int i = 0; i < 3; ++i) {
@@ -525,16 +526,16 @@ public final class Baium extends AbstractNpcAI
         final int index = CommonUtil.getIndexOfMaxValue(new int[] { vars.getInt("i_quest0"), vars.getInt("i_quest1"), vars.getInt("i_quest2") });
         final Creature player = (Creature)vars.getObject(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, index), (Class)Creature.class);
         final int i2 = vars.getInt(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, index));
-        if (i2 > 0 && getRandom(100) < 70) {
+        if (i2 > 0 && Rnd.get(100) < 70) {
             vars.set(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, index), 500);
         }
         SkillHolder skillToCast = null;
         if (player != null && !player.isDead()) {
             if (npc.getCurrentHp() > npc.getMaxHp() * 0.75) {
-                if (getRandom(100) < 10) {
+                if (Rnd.get(100) < 10) {
                     skillToCast = Baium.ENERGY_WAVE;
                 }
-                else if (getRandom(100) < 10) {
+                else if (Rnd.get(100) < 10) {
                     skillToCast = Baium.EARTH_QUAKE;
                 }
                 else {
@@ -542,13 +543,13 @@ public final class Baium extends AbstractNpcAI
                 }
             }
             else if (npc.getCurrentHp() > npc.getMaxHp() * 0.5) {
-                if (getRandom(100) < 10) {
+                if (Rnd.get(100) < 10) {
                     skillToCast = Baium.GROUP_HOLD;
                 }
-                else if (getRandom(100) < 10) {
+                else if (Rnd.get(100) < 10) {
                     skillToCast = Baium.ENERGY_WAVE;
                 }
-                else if (getRandom(100) < 10) {
+                else if (Rnd.get(100) < 10) {
                     skillToCast = Baium.EARTH_QUAKE;
                 }
                 else {
@@ -556,32 +557,32 @@ public final class Baium extends AbstractNpcAI
                 }
             }
             else if (npc.getCurrentHp() > npc.getMaxHp() * 0.25) {
-                if (getRandom(100) < 10) {
+                if (Rnd.get(100) < 10) {
                     skillToCast = Baium.THUNDERBOLT;
                 }
-                else if (getRandom(100) < 10) {
+                else if (Rnd.get(100) < 10) {
                     skillToCast = Baium.GROUP_HOLD;
                 }
-                else if (getRandom(100) < 10) {
+                else if (Rnd.get(100) < 10) {
                     skillToCast = Baium.ENERGY_WAVE;
                 }
-                else if (getRandom(100) < 10) {
+                else if (Rnd.get(100) < 10) {
                     skillToCast = Baium.EARTH_QUAKE;
                 }
                 else {
                     skillToCast = Baium.BAIUM_ATTACK;
                 }
             }
-            else if (getRandom(100) < 10) {
+            else if (Rnd.get(100) < 10) {
                 skillToCast = Baium.THUNDERBOLT;
             }
-            else if (getRandom(100) < 10) {
+            else if (Rnd.get(100) < 10) {
                 skillToCast = Baium.GROUP_HOLD;
             }
-            else if (getRandom(100) < 10) {
+            else if (Rnd.get(100) < 10) {
                 skillToCast = Baium.ENERGY_WAVE;
             }
-            else if (getRandom(100) < 10) {
+            else if (Rnd.get(100) < 10) {
                 skillToCast = Baium.EARTH_QUAKE;
             }
             else {

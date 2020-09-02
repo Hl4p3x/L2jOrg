@@ -11,7 +11,8 @@ import org.l2j.gameserver.world.zone.ZoneType;
 import org.l2j.gameserver.model.olympiad.OlympiadManager;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.network.serverpackets.ConfirmDlg;
-import org.l2j.gameserver.model.holders.SummonRequestHolder;
+import org.l2j.gameserver.model.actor.request.AbstractRequest;
+import org.l2j.gameserver.model.holders.SummonRequest;
 import org.l2j.gameserver.network.serverpackets.SystemMessage;
 import org.l2j.gameserver.network.SystemMessageId;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
@@ -50,7 +51,7 @@ public final class CallPc extends AbstractEffect
                 target.getInventory().destroyItemByItemId("Consume", this.itemId, (long)this.itemCount, player, (Object)target);
                 target.sendPacket(new ServerPacket[] { (ServerPacket)SystemMessage.getSystemMessage(SystemMessageId.S1_DISAPPEARED).addItemName(this.itemId) });
             }
-            target.addScript((Object)new SummonRequestHolder(player, skill));
+            target.addRequest((AbstractRequest)new SummonRequest(player, skill));
             target.sendPacket(new ServerPacket[] { (ServerPacket)((ConfirmDlg)((ConfirmDlg)new ConfirmDlg(SystemMessageId.C1_WISHES_TO_SUMMON_YOU_FROM_S2_DO_YOU_ACCEPT).addString(player.getName())).addZoneName(player.getX(), player.getY(), player.getZ())).addTime(30000).addRequesterId(player.getObjectId()) });
         }
     }
@@ -75,7 +76,7 @@ public final class CallPc extends AbstractEffect
             creature.sendPacket(SystemMessageId.A_USER_PARTICIPATING_IN_THE_OLYMPIAD_CANNOT_USE_SUMMONING_OR_TELEPORTING);
             return false;
         }
-        if (target.isFlyingMounted() || target.isInTraingCamp() || target.isInTimedHuntingZone()) {
+        if (target.isFlyingMounted() || target.isInTimedHuntingZone()) {
             creature.sendPacket(SystemMessageId.YOU_CANNOT_USE_SUMMONING_OR_TELEPORTING_IN_THIS_AREA);
             return false;
         }

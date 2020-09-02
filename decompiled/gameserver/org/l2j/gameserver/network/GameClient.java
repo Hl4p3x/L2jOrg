@@ -5,47 +5,41 @@
 package org.l2j.gameserver.network;
 
 import org.slf4j.LoggerFactory;
+import java.util.Iterator;
 import org.l2j.gameserver.network.serverpackets.Ex2ndPasswordCheck;
 import org.l2j.gameserver.network.serverpackets.Ex2ndPasswordVerify;
 import org.l2j.gameserver.data.xml.SecondaryAuthManager;
 import java.security.NoSuchAlgorithmException;
 import org.l2j.gameserver.network.serverpackets.Ex2ndPasswordAck;
 import org.l2j.commons.util.Util;
-import org.l2j.gameserver.network.serverpackets.vip.ReceiveVipInfo;
-import java.time.temporal.TemporalUnit;
-import java.time.temporal.ChronoUnit;
-import java.time.Instant;
-import org.l2j.gameserver.engine.vip.VipEngine;
-import org.l2j.gameserver.network.serverpackets.ActionFailed;
-import org.l2j.gameserver.model.actor.instance.PlayerFactory;
 import org.l2j.gameserver.world.World;
 import org.l2j.gameserver.model.Clan;
+import org.l2j.gameserver.data.database.dao.PlayerDAO;
+import java.time.Duration;
+import org.l2j.gameserver.model.actor.instance.PlayerFactory;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.data.sql.impl.ClanTable;
+import org.l2j.gameserver.data.sql.impl.PlayerNameTable;
 import org.l2j.gameserver.engine.mail.MailEngine;
 import org.l2j.gameserver.instancemanager.CommissionManager;
-import org.l2j.gameserver.instancemanager.MentorManager;
 import org.l2j.gameserver.enums.CharacterDeleteFailType;
 import org.l2j.gameserver.network.serverpackets.SystemMessage;
+import io.github.joealisson.mmocore.WritablePacket;
+import org.l2j.gameserver.network.serverpackets.ServerPacket;
+import org.l2j.commons.database.DatabaseAccess;
 import org.l2j.gameserver.data.database.dao.AccountDAO;
 import org.l2j.gameserver.network.serverpackets.LeaveWorld;
 import org.l2j.gameserver.network.serverpackets.ServerClose;
-import org.l2j.gameserver.network.serverpackets.ServerPacket;
-import io.github.joealisson.mmocore.WritablePacket;
 import org.l2j.gameserver.network.authcomm.SendablePacket;
 import org.l2j.gameserver.network.authcomm.gs2as.PlayerLogout;
 import org.l2j.gameserver.network.authcomm.AuthServerCommunication;
 import java.util.Objects;
 import io.github.joealisson.mmocore.Buffer;
-import org.l2j.gameserver.data.database.dao.PlayerDAO;
-import org.l2j.gameserver.data.database.dao.ItemDAO;
-import org.l2j.commons.database.DatabaseAccess;
-import org.l2j.gameserver.data.database.dao.PetDAO;
-import org.l2j.gameserver.data.sql.impl.PlayerNameTable;
-import org.l2j.gameserver.data.database.data.AccountData;
-import org.l2j.gameserver.model.CharSelectInfoPackage;
+import org.l2j.gameserver.model.PlayerSelectInfo;
+import java.util.List;
 import org.l2j.gameserver.model.holders.ClientHardwareInfoHolder;
 import org.l2j.gameserver.model.actor.instance.Player;
+import org.l2j.gameserver.data.database.data.AccountData;
 import org.l2j.commons.network.SessionKey;
 import org.l2j.gameserver.util.FloodProtectors;
 import java.util.concurrent.locks.ReentrantLock;
@@ -55,44 +49,29 @@ import io.github.joealisson.mmocore.Client;
 
 public final class GameClient extends Client<Connection<GameClient>>
 {
-    protected static final Logger LOGGER;
-    protected static final Logger LOGGER_ACCOUNTING;
+    private static final Logger LOGGER;
+    private static final Logger LOGGER_ACCOUNTING;
     private final ReentrantLock activeCharLock;
     private final FloodProtectors floodProtectors;
     private final Crypt crypt;
-    private String accountName;
     private SessionKey sessionId;
-    private Player player;
-    private ClientHardwareInfoHolder hardwareInfo;
-    private boolean isAuthedGG;
-    private CharSelectInfoPackage[] charSlotMapping;
-    private volatile boolean isDetached;
-    private boolean _protocol;
-    private int[][] trace;
     private ConnectionState state;
     private AccountData account;
+    private Player player;
+    private ClientHardwareInfoHolder hardwareInfo;
+    private List<PlayerSelectInfo> playersInfo;
+    private boolean isAuthedGG;
+    private boolean _protocol;
+    private int[][] trace;
     private boolean secondaryAuthed;
+    private int activeSlot;
     
     public GameClient(final Connection<GameClient> connection) {
         super((Connection)connection);
         this.activeCharLock = new ReentrantLock();
         this.floodProtectors = new FloodProtectors(this);
-        this.charSlotMapping = null;
-        this.isDetached = false;
+        this.activeSlot = -1;
         this.crypt = new Crypt();
-    }
-    
-    public static void deleteCharByObjId(final int objId) {
-        if (objId < 0) {
-            return;
-        }
-        PlayerNameTable.getInstance().removeName(objId);
-        ((PetDAO)DatabaseAccess.getDAO((Class)PetDAO.class)).deleteByOwner(objId);
-        final ItemDAO itemDAO = (ItemDAO)DatabaseAccess.getDAO((Class)ItemDAO.class);
-        itemDAO.deleteVariationsByOwner(objId);
-        itemDAO.deleteSpecialAbilitiesByOwner(objId);
-        itemDAO.deleteByOwner(objId);
-        ((PlayerDAO)DatabaseAccess.getDAO((Class)PlayerDAO.class)).deleteById(objId);
     }
     
     public boolean encrypt(final Buffer data, final int offset, final int size) {
@@ -105,31 +84,21 @@ public final class GameClient extends Client<Connection<GameClient>>
     
     protected void onDisconnection() {
         GameClient.LOGGER_ACCOUNTING.debug("Client Disconnected: {}", (Object)this);
-        if (Objects.nonNull(this.getAccountName())) {
+        if (Objects.nonNull(this.account)) {
             if (this.state == ConnectionState.AUTHENTICATED) {
-                AuthServerCommunication.getInstance().removeAuthedClient(this.getAccountName());
+                AuthServerCommunication.getInstance().removeAuthedClient(this.account.getAccountName());
             }
             else {
-                AuthServerCommunication.getInstance().removeWaitingClient(this.getAccountName());
+                AuthServerCommunication.getInstance().removeWaitingClient(this.account.getAccountName());
             }
-            AuthServerCommunication.getInstance().sendPacket(new PlayerLogout(this.getAccountName()));
+            AuthServerCommunication.getInstance().sendPacket(new PlayerLogout(this.account.getAccountName()));
         }
-        if (this.player == null || !this.player.isInOfflineMode()) {
-            Disconnection.of(this).onDisconnection();
-        }
+        Disconnection.of(this).onDisconnection();
     }
     
     public void onConnected() {
         this.setConnectionState(ConnectionState.CONNECTED);
         GameClient.LOGGER_ACCOUNTING.debug("Client Connected: {}", (Object)this);
-    }
-    
-    public void closeNow() {
-        super.close((WritablePacket)null);
-    }
-    
-    public void close(final ServerPacket packet) {
-        super.close((WritablePacket)packet);
     }
     
     public void close(final boolean toLoginScreen) {
@@ -163,14 +132,13 @@ public final class GameClient extends Client<Connection<GameClient>>
     }
     
     public String getAccountName() {
-        return this.accountName;
+        return this.account.getAccountName();
     }
     
-    public synchronized void setAccountName(final String accountName) {
-        this.accountName = accountName;
-        this.account = ((AccountDAO)DatabaseAccess.getDAO((Class)AccountDAO.class)).findById(this.accountName);
+    public synchronized void loadAccount(final String accountName) {
+        this.account = ((AccountDAO)DatabaseAccess.getDAO((Class)AccountDAO.class)).findById(accountName);
         if (Objects.isNull(this.account)) {
-            this.createNewAccountData();
+            this.account = AccountData.of(accountName);
         }
     }
     
@@ -183,7 +151,7 @@ public final class GameClient extends Client<Connection<GameClient>>
     }
     
     public void sendPacket(final ServerPacket packet) {
-        if (this.isDetached || Objects.isNull(packet)) {
+        if (Objects.isNull(packet)) {
             return;
         }
         this.writePacket((WritablePacket)packet);
@@ -194,48 +162,37 @@ public final class GameClient extends Client<Connection<GameClient>>
         this.sendPacket(SystemMessage.getSystemMessage(smId));
     }
     
-    public boolean isDetached() {
-        return this.isDetached;
-    }
-    
-    public void setDetached(final boolean b) {
-        this.isDetached = b;
-    }
-    
-    public CharacterDeleteFailType markToDeleteChar(final int characterSlot) {
-        final int objectId = this.getObjectIdForSlot(characterSlot);
-        if (objectId < 0) {
+    public CharacterDeleteFailType markToDeleteChar(final int slot) {
+        final PlayerSelectInfo info = this.getPlayerSelection(slot);
+        if (Objects.isNull(info)) {
             return CharacterDeleteFailType.UNKNOWN;
         }
-        if (MentorManager.getInstance().isMentor(objectId)) {
-            return CharacterDeleteFailType.MENTOR;
-        }
-        if (MentorManager.getInstance().isMentee(objectId)) {
-            return CharacterDeleteFailType.MENTEE;
-        }
-        if (CommissionManager.getInstance().hasCommissionItems(objectId)) {
+        if (CommissionManager.getInstance().hasCommissionItems(info.getObjectId())) {
             return CharacterDeleteFailType.COMMISSION;
         }
-        if (MailEngine.getInstance().hasMailInProgress(objectId)) {
+        if (MailEngine.getInstance().hasMailInProgress(info.getObjectId())) {
             return CharacterDeleteFailType.MAIL;
         }
-        final int clanId = PlayerNameTable.getInstance().getClassIdById(objectId);
+        final int clanId = PlayerNameTable.getInstance().getClassIdById(info.getObjectId());
         if (clanId > 0) {
             final Clan clan = ClanTable.getInstance().getClan(clanId);
             if (clan != null) {
-                if (clan.getLeaderId() == objectId) {
+                if (clan.getLeaderId() == info.getObjectId()) {
                     return CharacterDeleteFailType.PLEDGE_MASTER;
                 }
                 return CharacterDeleteFailType.PLEDGE_MEMBER;
             }
         }
         if (Config.DELETE_DAYS == 0) {
-            deleteCharByObjId(objectId);
+            PlayerFactory.deleteCharByObjId(info.getObjectId());
+            this.playersInfo.remove(slot);
         }
         else {
-            ((PlayerDAO)DatabaseAccess.getDAO((Class)PlayerDAO.class)).updateDeleteTime(objectId, System.currentTimeMillis() + Config.DELETE_DAYS * 86400000);
+            final long deleteTime = Duration.ofDays(Config.DELETE_DAYS).toMillis() + System.currentTimeMillis();
+            info.setDeleteTime(deleteTime);
+            ((PlayerDAO)DatabaseAccess.getDAO((Class)PlayerDAO.class)).updateDeleteTime(info.getObjectId(), deleteTime);
         }
-        GameClient.LOGGER_ACCOUNTING.info(invokedynamic(makeConcatWithConstants:(ILorg/l2j/gameserver/network/GameClient;)Ljava/lang/String;, objectId, this));
+        GameClient.LOGGER_ACCOUNTING.info("{} deleted {}", (Object)this, (Object)info.getObjectId());
         return CharacterDeleteFailType.NONE;
     }
     
@@ -248,15 +205,15 @@ public final class GameClient extends Client<Connection<GameClient>>
         GameClient.LOGGER_ACCOUNTING.info("Restore {} [{}]", (Object)objectId, (Object)this);
     }
     
-    public Player load(final int characterSlot) {
-        final int objectId = this.getObjectIdForSlot(characterSlot);
+    public Player load(final int slot) {
+        final int objectId = this.getObjectIdForSlot(slot);
         if (objectId < 0) {
             return null;
         }
         Player player = World.getInstance().findPlayer(objectId);
         if (player != null) {
-            if (player.isOnlineInt() == 1) {
-                GameClient.LOGGER.error("Attempt of double login: {} ({}) {}", new Object[] { player.getName(), objectId, this.accountName });
+            if (player.isOnline()) {
+                GameClient.LOGGER.error("Attempt of double login: {}", (Object)this);
             }
             if (player.getClient() != null) {
                 Disconnection.of(player).defaultSequence(false);
@@ -269,41 +226,30 @@ public final class GameClient extends Client<Connection<GameClient>>
         }
         player = PlayerFactory.loadPlayer(this, objectId);
         if (player == null) {
-            GameClient.LOGGER.error("Could not restore in slot: {}", (Object)characterSlot);
+            GameClient.LOGGER.error("Could not restore in slot: {}", (Object)slot);
         }
+        this.activeSlot = slot;
         return player;
     }
     
-    public void setCharSelection(final CharSelectInfoPackage[] chars) {
-        this.charSlotMapping = chars;
-    }
-    
-    public CharSelectInfoPackage getCharSelection(final int charslot) {
-        if (Objects.isNull(this.charSlotMapping) || charslot < 0 || charslot >= this.charSlotMapping.length) {
+    public PlayerSelectInfo getPlayerSelection(final int slot) {
+        if (Objects.isNull(this.playersInfo) || slot < 0 || slot >= this.playersInfo.size()) {
             return null;
         }
-        return this.charSlotMapping[charslot];
+        return this.playersInfo.get(slot);
     }
     
-    private int getObjectIdForSlot(final int characterSlot) {
-        final CharSelectInfoPackage info = this.getCharSelection(characterSlot);
+    private int getObjectIdForSlot(final int slot) {
+        final PlayerSelectInfo info = this.getPlayerSelection(slot);
         if (info == null) {
-            GameClient.LOGGER.warn("{} tried to delete Character in slot {} but no characters exits at that slot.", (Object)this, (Object)characterSlot);
+            GameClient.LOGGER.warn("{} tried select in slot {} but no characters exits at that slot.", (Object)this, (Object)slot);
             return -1;
         }
         return info.getObjectId();
     }
     
-    private AccountData getAccountData() {
+    public AccountData getAccount() {
         return this.account;
-    }
-    
-    private void createNewAccountData() {
-        (this.account = new AccountData()).setAccount(this.accountName);
-    }
-    
-    public void sendActionFailed() {
-        this.sendPacket(ActionFailed.STATIC_PACKET);
     }
     
     public boolean isProtocolOk() {
@@ -338,52 +284,8 @@ public final class GameClient extends Client<Connection<GameClient>>
         this.state = state;
     }
     
-    public long getVipPoints() {
-        return this.getAccountData().getVipPoints();
-    }
-    
-    public long getVipTierExpiration() {
-        return this.getAccountData().getVipTierExpiration();
-    }
-    
     public void storeAccountData() {
-        ((AccountDAO)DatabaseAccess.getDAO((Class)AccountDAO.class)).save((Object)this.getAccountData());
-    }
-    
-    public void updateVipPoints(final long points) {
-        if (points == 0L) {
-            return;
-        }
-        final byte currentVipTier = VipEngine.getInstance().getVipTier(this.getVipPoints());
-        this.getAccountData().updateVipPoints(points);
-        final byte newTier = VipEngine.getInstance().getVipTier(this.getVipPoints());
-        if (newTier != currentVipTier && Objects.nonNull(this.player)) {
-            this.player.setVipTier(newTier);
-            if (newTier > 0) {
-                this.getAccountData().setVipTierExpiration(Instant.now().plus(30L, (TemporalUnit)ChronoUnit.DAYS).toEpochMilli());
-                VipEngine.getInstance().manageTier(this.player);
-            }
-            else {
-                this.getAccountData().setVipTierExpiration(0L);
-            }
-        }
-        this.sendPacket(new ReceiveVipInfo());
-    }
-    
-    public int getCoin() {
-        return this.getAccountData().getCoin();
-    }
-    
-    public void updateCoin(final int coins) {
-        this.getAccountData().updateCoins(coins);
-    }
-    
-    public void setCoin(final int coins) {
-        this.getAccountData().setCoins(coins);
-    }
-    
-    public void setVipTierExpiration(final long expiration) {
-        this.getAccountData().setVipTierExpiration(expiration);
+        ((AccountDAO)DatabaseAccess.getDAO((Class)AccountDAO.class)).save((Object)this.account);
     }
     
     public String toString() {
@@ -399,12 +301,12 @@ public final class GameClient extends Client<Connection<GameClient>>
                     break;
                 }
                 case AUTHENTICATED: {
-                    s = invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, this.accountName, (address == null) ? "disconnected" : address);
+                    s = invokedynamic(makeConcatWithConstants:(Lorg/l2j/gameserver/data/database/data/AccountData;Ljava/lang/String;)Ljava/lang/String;, this.account, (address == null) ? "disconnected" : address);
                     break;
                 }
                 case IN_GAME:
                 case JOINING_GAME: {
-                    s = invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;, (this.player == null) ? "disconnected" : invokedynamic(makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;, this.player.getName(), this.player.getObjectId()), this.accountName, (address == null) ? "disconnected" : address);
+                    s = invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Lorg/l2j/gameserver/data/database/data/AccountData;Ljava/lang/String;)Ljava/lang/String;, (this.player == null) ? "disconnected" : invokedynamic(makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;, this.player.getName(), this.player.getObjectId()), this.account, (address == null) ? "disconnected" : address);
                     break;
                 }
                 default: {
@@ -481,7 +383,7 @@ public final class GameClient extends Client<Connection<GameClient>>
                     this.sendPacket(new Ex2ndPasswordVerify(1, attempts));
                 }
                 else {
-                    this.close(new Ex2ndPasswordVerify(2, SecondaryAuthManager.getInstance().getMaxAttempts()));
+                    this.close((WritablePacket)new Ex2ndPasswordVerify(2, SecondaryAuthManager.getInstance().getMaxAttempts()));
                     GameClient.LOGGER.warn("{}  has inputted the wrong password {} times in row.", (Object)this, (Object)attempts);
                 }
                 return false;
@@ -510,6 +412,43 @@ public final class GameClient extends Client<Connection<GameClient>>
         else {
             this.sendPacket(new Ex2ndPasswordCheck(0));
         }
+    }
+    
+    public int getPlayerCount() {
+        return Objects.nonNull(this.playersInfo) ? this.playersInfo.size() : 0;
+    }
+    
+    public List<PlayerSelectInfo> getPlayersInfo() {
+        if (Objects.isNull(this.playersInfo)) {
+            synchronized (this) {
+                if (Objects.isNull(this.playersInfo)) {
+                    this.playersInfo = PlayerFactory.loadPlayersInfo(this);
+                }
+            }
+        }
+        return this.playersInfo;
+    }
+    
+    public void addPlayerInfo(final PlayerSelectInfo playerInfo) {
+        this.activeSlot = this.playersInfo.size();
+        this.playersInfo.add(playerInfo);
+    }
+    
+    public int getActiveSlot() {
+        return this.activeSlot;
+    }
+    
+    public int getPlayerInfoAccessLevel(final int playerId) {
+        for (final PlayerSelectInfo info : this.playersInfo) {
+            if (info.getObjectId() == playerId) {
+                return info.getAccessLevel();
+            }
+        }
+        throw new IllegalStateException(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, playerId));
+    }
+    
+    public void detachPlayersInfo() {
+        this.playersInfo = null;
     }
     
     static {

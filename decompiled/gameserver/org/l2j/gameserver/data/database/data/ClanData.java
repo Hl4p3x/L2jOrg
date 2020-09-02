@@ -44,6 +44,14 @@ public class ClanData
     private long dissolvingExpiryTime;
     @Column("new_leader_id")
     private int newLeaderId;
+    @Column("max_online_member")
+    private int maxOnlineMember;
+    @Column("prev_max_online_member")
+    private int prevMaxOnlineMember;
+    @Column("hunting_points")
+    private int huntingPoints;
+    @Column("prev_hunting_points")
+    private int prevHuntingPoints;
     
     public int getId() {
         return this.id;
@@ -179,6 +187,42 @@ public class ClanData
     
     public void setNewLeader(final int leaderId) {
         this.leaderId = leaderId;
+    }
+    
+    public void setMaxOnlineMembers(final int maxOnlineMember) {
+        this.maxOnlineMember = maxOnlineMember;
+    }
+    
+    public int getMaxOnlineMember() {
+        return this.maxOnlineMember;
+    }
+    
+    public void addHuntingPoints(final int points) {
+        this.huntingPoints += points;
+    }
+    
+    public int getHuntingPoints() {
+        return this.huntingPoints;
+    }
+    
+    public int getPrevMaxOnlineMember() {
+        return this.prevMaxOnlineMember;
+    }
+    
+    public int getPrevHuntingPoints() {
+        return this.prevHuntingPoints;
+    }
+    
+    public void setPrevMaxOnlineMember(final int maxOnlineMember) {
+        this.prevMaxOnlineMember = maxOnlineMember;
+    }
+    
+    public void setPrevHuntingPoints(final int huntingPoints) {
+        this.prevHuntingPoints = huntingPoints;
+    }
+    
+    public void setHuntingPoints(final int huntingPoints) {
+        this.huntingPoints = huntingPoints;
     }
     
     @Override

@@ -7,12 +7,9 @@ package org.l2j.gameserver.model;
 import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.enums.ClanRewardType;
 import org.l2j.gameserver.Config;
-import org.l2j.commons.database.DatabaseAccess;
 import org.l2j.gameserver.data.database.dao.PlayerVariablesDAO;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
-import java.sql.Connection;
-import org.l2j.commons.database.DatabaseFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.PlayerDAO;
 import org.l2j.gameserver.instancemanager.SiegeManager;
 import org.l2j.gameserver.data.database.data.PlayerData;
 import org.l2j.gameserver.model.actor.instance.Player;
@@ -413,7 +410,7 @@ public class ClanMember
     }
     
     public boolean isOnline() {
-        return this._player != null && this._player.isOnline() && this._player.getClient() != null && !this._player.getClient().isDetached();
+        return this._player != null && this._player.isOnline() && this._player.getClient() != null;
     }
     
     public int getClassId() {
@@ -451,48 +448,7 @@ public class ClanMember
     }
     
     public void updatePledgeType() {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("UPDATE characters SET subpledge=? WHERE charId=?");
-                try {
-                    ps.setLong(1, this._pledgeType);
-                    ps.setInt(2, this.getObjectId());
-                    ps.execute();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            ClanMember.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, e.getMessage()), (Throwable)e);
-        }
+        ((PlayerDAO)DatabaseAccess.getDAO((Class)PlayerDAO.class)).updateSubpledge(this._objectId, this._pledgeType);
     }
     
     public int getPowerGrade() {
@@ -505,52 +461,7 @@ public class ClanMember
             this._player.setPowerGrade(powerGrade);
         }
         else {
-            this.updatePowerGrade();
-        }
-    }
-    
-    public void updatePowerGrade() {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("UPDATE characters SET power_grade=? WHERE charId=?");
-                try {
-                    ps.setLong(1, this._powerGrade);
-                    ps.setInt(2, this.getObjectId());
-                    ps.execute();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            ClanMember.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, e.getMessage()), (Throwable)e);
+            ((PlayerDAO)DatabaseAccess.getDAO((Class)PlayerDAO.class)).updatePowerGrade(this._objectId, this._powerGrade);
         }
     }
     
@@ -604,49 +515,7 @@ public class ClanMember
     }
     
     public void saveApprenticeAndSponsor(final int apprentice, final int sponsor) {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("UPDATE characters SET apprentice=?,sponsor=? WHERE charId=?");
-                try {
-                    ps.setInt(1, apprentice);
-                    ps.setInt(2, sponsor);
-                    ps.setInt(3, this.getObjectId());
-                    ps.execute();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (SQLException e) {
-            ClanMember.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, e.getMessage()), (Throwable)e);
-        }
+        ((PlayerDAO)DatabaseAccess.getDAO((Class)PlayerDAO.class)).updateApprenticeAndSponsor(this._objectId, apprentice, sponsor);
     }
     
     public long getOnlineTime() {

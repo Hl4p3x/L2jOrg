@@ -39,7 +39,6 @@ import org.l2j.gameserver.model.actor.Creature;
 import org.l2j.gameserver.model.commission.CommissionItemType;
 import org.l2j.gameserver.model.item.AutoUseType;
 import org.l2j.gameserver.model.item.type.ActionType;
-import org.l2j.gameserver.model.ExtractableProduct;
 import org.l2j.gameserver.model.item.EtcItem;
 import org.l2j.gameserver.model.item.Armor;
 import org.l2j.gameserver.model.item.Weapon;
@@ -170,38 +169,31 @@ public final class ItemEngine extends GameXmlReader
         //    53: aload_3         /* weapon */
         //    54: aload_0         /* this */
         //    55: aload_2         /* attrs */
-        //    56: ldc             "icon"
-        //    58: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseString:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)Ljava/lang/String;
-        //    61: invokevirtual   org/l2j/gameserver/model/item/Weapon.setIcon:(Ljava/lang/String;)V
-        //    64: aload_3         /* weapon */
-        //    65: aload_0         /* this */
-        //    66: aload_2         /* attrs */
-        //    67: ldc             "display-id"
-        //    69: aload_3         /* weapon */
-        //    70: invokevirtual   org/l2j/gameserver/model/item/Weapon.getId:()I
-        //    73: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;I)I
-        //    76: invokevirtual   org/l2j/gameserver/model/item/Weapon.setDisplayId:(I)V
-        //    79: aload_3         /* weapon */
-        //    80: aload_0         /* this */
-        //    81: aload_2         /* attrs */
-        //    82: ldc             "magic"
-        //    84: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseBoolean:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)Ljava/lang/Boolean;
-        //    87: invokevirtual   java/lang/Boolean.booleanValue:()Z
-        //    90: invokevirtual   org/l2j/gameserver/model/item/Weapon.setMagic:(Z)V
-        //    93: aload_0         /* this */
-        //    94: aload_1         /* weaponNode */
-        //    95: aload_0         /* this */
-        //    96: aload_3         /* weapon */
-        //    97: invokedynamic   BootstrapMethod #1, accept:(Lorg/l2j/gameserver/engine/item/ItemEngine;Lorg/l2j/gameserver/model/item/Weapon;)Ljava/util/function/Consumer;
-        //   102: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.forEach:(Lorg/w3c/dom/Node;Ljava/util/function/Consumer;)V
-        //   105: aload_0         /* this */
-        //   106: getfield        org/l2j/gameserver/engine/item/ItemEngine.items:Lio/github/joealisson/primitive/IntMap;
-        //   109: aload_3         /* weapon */
-        //   110: invokevirtual   org/l2j/gameserver/model/item/Weapon.getId:()I
-        //   113: aload_3         /* weapon */
-        //   114: invokeinterface io/github/joealisson/primitive/IntMap.put:(ILjava/lang/Object;)Ljava/lang/Object;
-        //   119: pop            
-        //   120: return         
+        //    56: ldc             "display-id"
+        //    58: aload_3         /* weapon */
+        //    59: invokevirtual   org/l2j/gameserver/model/item/Weapon.getId:()I
+        //    62: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;I)I
+        //    65: invokevirtual   org/l2j/gameserver/model/item/Weapon.setDisplayId:(I)V
+        //    68: aload_3         /* weapon */
+        //    69: aload_0         /* this */
+        //    70: aload_2         /* attrs */
+        //    71: ldc             "magic"
+        //    73: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseBoolean:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)Z
+        //    76: invokevirtual   org/l2j/gameserver/model/item/Weapon.setMagic:(Z)V
+        //    79: aload_0         /* this */
+        //    80: aload_1         /* weaponNode */
+        //    81: aload_0         /* this */
+        //    82: aload_3         /* weapon */
+        //    83: invokedynamic   BootstrapMethod #1, accept:(Lorg/l2j/gameserver/engine/item/ItemEngine;Lorg/l2j/gameserver/model/item/Weapon;)Ljava/util/function/Consumer;
+        //    88: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.forEach:(Lorg/w3c/dom/Node;Ljava/util/function/Consumer;)V
+        //    91: aload_0         /* this */
+        //    92: getfield        org/l2j/gameserver/engine/item/ItemEngine.items:Lio/github/joealisson/primitive/IntMap;
+        //    95: aload_3         /* weapon */
+        //    96: invokevirtual   org/l2j/gameserver/model/item/Weapon.getId:()I
+        //    99: aload_3         /* weapon */
+        //   100: invokeinterface io/github/joealisson/primitive/IntMap.put:(ILjava/lang/Object;)Ljava/lang/Object;
+        //   105: pop            
+        //   106: return         
         //    MethodParameters:
         //  Name        Flags  
         //  ----------  -----
@@ -279,7 +271,7 @@ public final class ItemEngine extends GameXmlReader
         if (Objects.nonNull(condition)) {
             final NamedNodeMap attr = node.getAttributes();
             final String msg = this.parseString(attr, "msg");
-            final Integer msgId = this.parseInteger(attr, "msg-id");
+            final int msgId = this.parseInt(attr, "msg-id");
             if (Objects.nonNull(msg)) {
                 condition.setMessage(msg);
             }
@@ -435,31 +427,25 @@ public final class ItemEngine extends GameXmlReader
         //    54: aload_3         /* armor */
         //    55: aload_0         /* this */
         //    56: aload_2         /* attrs */
-        //    57: ldc             "icon"
-        //    59: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseString:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)Ljava/lang/String;
-        //    62: invokevirtual   org/l2j/gameserver/model/item/Armor.setIcon:(Ljava/lang/String;)V
-        //    65: aload_3         /* armor */
-        //    66: aload_0         /* this */
-        //    67: aload_2         /* attrs */
-        //    68: ldc             "display-id"
-        //    70: aload_3         /* armor */
-        //    71: invokevirtual   org/l2j/gameserver/model/item/Armor.getId:()I
-        //    74: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;I)I
-        //    77: invokevirtual   org/l2j/gameserver/model/item/Armor.setDisplayId:(I)V
-        //    80: aload_0         /* this */
-        //    81: aload_1         /* armorNode */
-        //    82: aload_0         /* this */
-        //    83: aload_3         /* armor */
-        //    84: invokedynamic   BootstrapMethod #4, accept:(Lorg/l2j/gameserver/engine/item/ItemEngine;Lorg/l2j/gameserver/model/item/Armor;)Ljava/util/function/Consumer;
-        //    89: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.forEach:(Lorg/w3c/dom/Node;Ljava/util/function/Consumer;)V
-        //    92: aload_0         /* this */
-        //    93: getfield        org/l2j/gameserver/engine/item/ItemEngine.items:Lio/github/joealisson/primitive/IntMap;
-        //    96: aload_3         /* armor */
-        //    97: invokevirtual   org/l2j/gameserver/model/item/Armor.getId:()I
-        //   100: aload_3         /* armor */
-        //   101: invokeinterface io/github/joealisson/primitive/IntMap.put:(ILjava/lang/Object;)Ljava/lang/Object;
-        //   106: pop            
-        //   107: return         
+        //    57: ldc             "display-id"
+        //    59: aload_3         /* armor */
+        //    60: invokevirtual   org/l2j/gameserver/model/item/Armor.getId:()I
+        //    63: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;I)I
+        //    66: invokevirtual   org/l2j/gameserver/model/item/Armor.setDisplayId:(I)V
+        //    69: aload_0         /* this */
+        //    70: aload_1         /* armorNode */
+        //    71: aload_0         /* this */
+        //    72: aload_3         /* armor */
+        //    73: invokedynamic   BootstrapMethod #4, accept:(Lorg/l2j/gameserver/engine/item/ItemEngine;Lorg/l2j/gameserver/model/item/Armor;)Ljava/util/function/Consumer;
+        //    78: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.forEach:(Lorg/w3c/dom/Node;Ljava/util/function/Consumer;)V
+        //    81: aload_0         /* this */
+        //    82: getfield        org/l2j/gameserver/engine/item/ItemEngine.items:Lio/github/joealisson/primitive/IntMap;
+        //    85: aload_3         /* armor */
+        //    86: invokevirtual   org/l2j/gameserver/model/item/Armor.getId:()I
+        //    89: aload_3         /* armor */
+        //    90: invokeinterface io/github/joealisson/primitive/IntMap.put:(ILjava/lang/Object;)Ljava/lang/Object;
+        //    95: pop            
+        //    96: return         
         //    MethodParameters:
         //  Name       Flags  
         //  ---------  -----
@@ -525,33 +511,27 @@ public final class ItemEngine extends GameXmlReader
         //    45: aload_3         /* item */
         //    46: aload_0         /* this */
         //    47: aload_2         /* attrs */
-        //    48: ldc             "icon"
-        //    50: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseString:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)Ljava/lang/String;
-        //    53: invokevirtual   org/l2j/gameserver/model/item/EtcItem.setIcon:(Ljava/lang/String;)V
-        //    56: aload_3         /* item */
-        //    57: aload_0         /* this */
-        //    58: aload_2         /* attrs */
-        //    59: ldc             "display-id"
-        //    61: aload_3         /* item */
-        //    62: invokevirtual   org/l2j/gameserver/model/item/EtcItem.getId:()I
-        //    65: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;I)I
-        //    68: invokevirtual   org/l2j/gameserver/model/item/EtcItem.setDisplayId:(I)V
-        //    71: aload_0         /* this */
-        //    72: aload_1         /* itemNode */
-        //    73: aload_0         /* this */
-        //    74: aload_3         /* item */
-        //    75: invokedynamic   BootstrapMethod #5, accept:(Lorg/l2j/gameserver/engine/item/ItemEngine;Lorg/l2j/gameserver/model/item/EtcItem;)Ljava/util/function/Consumer;
-        //    80: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.forEach:(Lorg/w3c/dom/Node;Ljava/util/function/Consumer;)V
-        //    83: aload_3         /* item */
-        //    84: invokevirtual   org/l2j/gameserver/model/item/EtcItem.fillType2:()V
-        //    87: aload_0         /* this */
-        //    88: getfield        org/l2j/gameserver/engine/item/ItemEngine.items:Lio/github/joealisson/primitive/IntMap;
-        //    91: aload_3         /* item */
-        //    92: invokevirtual   org/l2j/gameserver/model/item/EtcItem.getId:()I
-        //    95: aload_3         /* item */
-        //    96: invokeinterface io/github/joealisson/primitive/IntMap.put:(ILjava/lang/Object;)Ljava/lang/Object;
-        //   101: pop            
-        //   102: return         
+        //    48: ldc             "display-id"
+        //    50: aload_3         /* item */
+        //    51: invokevirtual   org/l2j/gameserver/model/item/EtcItem.getId:()I
+        //    54: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;I)I
+        //    57: invokevirtual   org/l2j/gameserver/model/item/EtcItem.setDisplayId:(I)V
+        //    60: aload_0         /* this */
+        //    61: aload_1         /* itemNode */
+        //    62: aload_0         /* this */
+        //    63: aload_3         /* item */
+        //    64: invokedynamic   BootstrapMethod #5, accept:(Lorg/l2j/gameserver/engine/item/ItemEngine;Lorg/l2j/gameserver/model/item/EtcItem;)Ljava/util/function/Consumer;
+        //    69: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.forEach:(Lorg/w3c/dom/Node;Ljava/util/function/Consumer;)V
+        //    72: aload_3         /* item */
+        //    73: invokevirtual   org/l2j/gameserver/model/item/EtcItem.fillType2:()V
+        //    76: aload_0         /* this */
+        //    77: getfield        org/l2j/gameserver/engine/item/ItemEngine.items:Lio/github/joealisson/primitive/IntMap;
+        //    80: aload_3         /* item */
+        //    81: invokevirtual   org/l2j/gameserver/model/item/EtcItem.getId:()I
+        //    84: aload_3         /* item */
+        //    85: invokeinterface io/github/joealisson/primitive/IntMap.put:(ILjava/lang/Object;)Ljava/lang/Object;
+        //    90: pop            
+        //    91: return         
         //    MethodParameters:
         //  Name      Flags  
         //  --------  -----
@@ -590,12 +570,126 @@ public final class ItemEngine extends GameXmlReader
     }
     
     private void parseItemExtract(final EtcItem item, final Node node) {
-        item.setHandler("ExtractableItems");
-        final NamedNodeMap attr;
-        this.forEach(node, "item", itemNode -> {
-            attr = itemNode.getAttributes();
-            item.addCapsuledItem(new ExtractableProduct(this.parseInt(attr, "id"), this.parseInt(attr, "min-count"), this.parseInt(attr, "min-count"), this.parseDouble(attr, "chance"), this.parseInt(attr, "min-enchant"), this.parseInt(attr, "max-enchant")));
-        });
+        // 
+        // This method could not be decompiled.
+        // 
+        // Original Bytecode:
+        // 
+        //     1: ldc_w           "ExtractableItems"
+        //     4: invokevirtual   org/l2j/gameserver/model/item/EtcItem.setHandler:(Ljava/lang/String;)V
+        //     7: aload_1         /* item */
+        //     8: aload_0         /* this */
+        //     9: aload_2         /* node */
+        //    10: invokeinterface org/w3c/dom/Node.getAttributes:()Lorg/w3c/dom/NamedNodeMap;
+        //    15: ldc_w           "max"
+        //    18: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)I
+        //    21: invokevirtual   org/l2j/gameserver/model/item/EtcItem.setExtractableMax:(I)V
+        //    24: aload_2         /* node */
+        //    25: invokeinterface org/w3c/dom/Node.getFirstChild:()Lorg/w3c/dom/Node;
+        //    30: astore_3        /* itemNode */
+        //    31: aload_3         /* itemNode */
+        //    32: invokestatic    java/util/Objects.nonNull:(Ljava/lang/Object;)Z
+        //    35: ifeq            135
+        //    38: aload_3         /* itemNode */
+        //    39: invokeinterface org/w3c/dom/Node.getNodeName:()Ljava/lang/String;
+        //    44: ldc_w           "item"
+        //    47: invokevirtual   java/lang/String.equals:(Ljava/lang/Object;)Z
+        //    50: ifeq            125
+        //    53: aload_3         /* itemNode */
+        //    54: invokeinterface org/w3c/dom/Node.getAttributes:()Lorg/w3c/dom/NamedNodeMap;
+        //    59: astore          attr
+        //    61: aload_1         /* item */
+        //    62: new             new            !!! ERROR
+        //    65: dup            
+        //    66: aload_0         /* this */
+        //    67: aload           attr
+        //    69: ldc             "id"
+        //    71: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)I
+        //    74: aload_0         /* this */
+        //    75: aload           attr
+        //    77: ldc_w           "min-count"
+        //    80: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)I
+        //    83: aload_0         /* this */
+        //    84: aload           attr
+        //    86: ldc_w           "min-count"
+        //    89: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)I
+        //    92: aload_0         /* this */
+        //    93: aload           attr
+        //    95: ldc_w           "chance"
+        //    98: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseDouble:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)D
+        //   101: aload_0         /* this */
+        //   102: aload           attr
+        //   104: ldc_w           "min-enchant"
+        //   107: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)I
+        //   110: aload_0         /* this */
+        //   111: aload           attr
+        //   113: ldc_w           "max-enchant"
+        //   116: invokevirtual   org/l2j/gameserver/engine/item/ItemEngine.parseInt:(Lorg/w3c/dom/NamedNodeMap;Ljava/lang/String;)I
+        //   119: invokespecial   invokespecial  !!! ERROR
+        //   122: invokevirtual   org/l2j/gameserver/model/item/EtcItem.addCapsuledItem:(invokevirtual  !!! ERROR
+        //   125: aload_3         /* itemNode */
+        //   126: invokeinterface org/w3c/dom/Node.getNextSibling:()Lorg/w3c/dom/Node;
+        //   131: astore_3        /* itemNode */
+        //   132: goto            31
+        //   135: return         
+        //    MethodParameters:
+        //  Name  Flags  
+        //  ----  -----
+        //  item  
+        //  node  
+        //    StackMapTable: 00 03 FC 00 1F 07 00 55 FB 00 5D FA 00 09
+        // 
+        // The error that occurred was:
+        // 
+        // java.lang.reflect.GenericSignatureFormatError
+        //     at com.strobel.assembler.metadata.signatures.SignatureParser.error(SignatureParser.java:70)
+        //     at com.strobel.assembler.metadata.signatures.SignatureParser.parseFormalParameters(SignatureParser.java:416)
+        //     at com.strobel.assembler.metadata.signatures.SignatureParser.parseMethodTypeSignature(SignatureParser.java:407)
+        //     at com.strobel.assembler.metadata.signatures.SignatureParser.parseMethodSignature(SignatureParser.java:88)
+        //     at com.strobel.assembler.metadata.MetadataParser.parseMethodSignature(MetadataParser.java:234)
+        //     at com.strobel.assembler.metadata.MetadataParser.parseMethod(MetadataParser.java:166)
+        //     at com.strobel.assembler.metadata.ClassFileReader$Scope.lookupMethod(ClassFileReader.java:1303)
+        //     at com.strobel.assembler.metadata.ClassFileReader$Scope.lookupMethodHandle(ClassFileReader.java:1258)
+        //     at com.strobel.assembler.metadata.ClassFileReader$Scope.lookup(ClassFileReader.java:1352)
+        //     at com.strobel.assembler.ir.MetadataReader.readAttributeCore(MetadataReader.java:306)
+        //     at com.strobel.assembler.metadata.ClassFileReader.readAttributeCore(ClassFileReader.java:261)
+        //     at com.strobel.assembler.ir.MetadataReader.inflateAttributes(MetadataReader.java:439)
+        //     at com.strobel.assembler.metadata.ClassFileReader.visitAttributes(ClassFileReader.java:1134)
+        //     at com.strobel.assembler.metadata.ClassFileReader.readClass(ClassFileReader.java:439)
+        //     at com.strobel.assembler.metadata.ClassFileReader.readClass(ClassFileReader.java:377)
+        //     at com.strobel.assembler.metadata.MetadataSystem.resolveType(MetadataSystem.java:129)
+        //     at com.strobel.decompiler.NoRetryMetadataSystem.resolveType(DecompilerDriver.java:476)
+        //     at com.strobel.assembler.metadata.MetadataSystem.resolveCore(MetadataSystem.java:81)
+        //     at com.strobel.assembler.metadata.MetadataResolver.resolve(MetadataResolver.java:104)
+        //     at com.strobel.assembler.metadata.CoreMetadataFactory$UnresolvedType.resolve(CoreMetadataFactory.java:616)
+        //     at com.strobel.assembler.metadata.MetadataResolver.resolve(MetadataResolver.java:128)
+        //     at com.strobel.assembler.metadata.CoreMetadataFactory$UnresolvedType.resolve(CoreMetadataFactory.java:626)
+        //     at com.strobel.assembler.metadata.MethodReference.resolve(MethodReference.java:177)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.inferCall(TypeAnalysis.java:2438)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.doInferTypeForExpression(TypeAnalysis.java:1029)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.inferTypeForExpression(TypeAnalysis.java:803)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.runInference(TypeAnalysis.java:672)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.inferTypesForVariables(TypeAnalysis.java:586)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.runInference(TypeAnalysis.java:397)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.run(TypeAnalysis.java:96)
+        //     at com.strobel.decompiler.ast.AstOptimizer.optimize(AstOptimizer.java:109)
+        //     at com.strobel.decompiler.ast.AstOptimizer.optimize(AstOptimizer.java:42)
+        //     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:214)
+        //     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:99)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethodBody(AstBuilder.java:782)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethod(AstBuilder.java:675)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.addTypeMembers(AstBuilder.java:552)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeCore(AstBuilder.java:519)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeNoCache(AstBuilder.java:161)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createType(AstBuilder.java:150)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.addType(AstBuilder.java:125)
+        //     at com.strobel.decompiler.languages.java.JavaLanguage.buildAst(JavaLanguage.java:71)
+        //     at com.strobel.decompiler.languages.java.JavaLanguage.decompileType(JavaLanguage.java:59)
+        //     at com.strobel.decompiler.DecompilerDriver.decompileType(DecompilerDriver.java:330)
+        //     at com.strobel.decompiler.DecompilerDriver.decompileJar(DecompilerDriver.java:251)
+        //     at com.strobel.decompiler.DecompilerDriver.main(DecompilerDriver.java:126)
+        // 
+        throw new IllegalStateException("An error occurred while decompiling this method.");
     }
     
     private void parseSkillReducer(final EtcItem item, final Node node) {
@@ -628,7 +722,7 @@ public final class ItemEngine extends GameXmlReader
         item.setCommissionType((CommissionItemType)this.parseEnum(attr, (Class)CommissionItemType.class, "commission-type", (Enum)CommissionItemType.OTHER_ITEM));
         item.setReuseDelay(this.parseInt(attr, "reuse-delay"));
         item.setReuseGroup(this.parseInt(attr, "reuse-group"));
-        item.setDuration(this.parselong(attr, "duration"));
+        item.setDuration(this.parseLong(attr, "duration"));
         item.setForNpc(this.parseBoolean(attr, "for-npc"));
     }
     

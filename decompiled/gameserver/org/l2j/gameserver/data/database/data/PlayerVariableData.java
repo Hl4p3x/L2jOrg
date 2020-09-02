@@ -66,10 +66,6 @@ public class PlayerVariableData
     private String instanceOrigin;
     @Column("instance_restore")
     private int instanceRestore;
-    @Column("mentor_penalty_id")
-    private int mentorPenaltyId;
-    @Column("mentor_penalty_time")
-    private long mentorPenaltyTime;
     @Column("claimed_clan_rewards")
     private int claimedClanRewards;
     @Column("cond_override_key")
@@ -85,11 +81,14 @@ public class PlayerVariableData
     @Column("monster_return")
     private int monsterReturn;
     
-    public static PlayerVariableData init(final int playerId) {
+    public static PlayerVariableData init(final int playerId, final byte face, final byte hairStyle, final byte hairColor) {
         final PlayerVariableData data = new PlayerVariableData();
         data.revengeTeleports = 5;
         data.revengeLocations = 5;
         data.playerId = playerId;
+        data.visualFaceId = face;
+        data.visualHairId = hairStyle;
+        data.visualHairColorId = hairColor;
         return data;
     }
     
@@ -200,14 +199,6 @@ public class PlayerVariableData
     
     public int getInstanceRestore() {
         return this.instanceRestore;
-    }
-    
-    public int getMentorPenaltyId() {
-        return this.mentorPenaltyId;
-    }
-    
-    public long getMentorPenaltyTime() {
-        return this.mentorPenaltyTime;
     }
     
     public int getClaimedClanRewards() {
@@ -340,14 +331,6 @@ public class PlayerVariableData
     
     public void setInstanceRestore(final int instanceRestore) {
         this.instanceRestore = instanceRestore;
-    }
-    
-    public void setMentorPenaltyId(final int mentorPenaltyId) {
-        this.mentorPenaltyId = mentorPenaltyId;
-    }
-    
-    public void setMentorPenaltyTime(final long mentorPenaltyTime) {
-        this.mentorPenaltyTime = mentorPenaltyTime;
     }
     
     public void setClaimedClanRewards(final int claimedClanRewards) {

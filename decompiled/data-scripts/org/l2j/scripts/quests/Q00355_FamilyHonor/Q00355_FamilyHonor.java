@@ -9,6 +9,7 @@ import org.l2j.gameserver.model.WorldObject;
 import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.model.quest.QuestState;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import io.github.joealisson.primitive.IntCollection;
@@ -83,7 +84,7 @@ public final class Q00355_FamilyHonor extends Quest
                 break;
             }
             case "30929-03.html": {
-                final int random = getRandom(100);
+                final int random = Rnd.get(100);
                 if (hasQuestItems(player, 4350)) {
                     if (random < 2) {
                         giveItems(player, 4351, 1L);
@@ -120,7 +121,7 @@ public final class Q00355_FamilyHonor extends Quest
             return null;
         }
         final DropInfo info = (DropInfo)Q00355_FamilyHonor.MOBS.get(npc.getId());
-        final int random = getRandom(1000);
+        final int random = Rnd.get(1000);
         if (random < info.getFirstChance()) {
             giveItemRandomly(killer, npc, 4252, 1L, 0L, 1.0, true);
         }

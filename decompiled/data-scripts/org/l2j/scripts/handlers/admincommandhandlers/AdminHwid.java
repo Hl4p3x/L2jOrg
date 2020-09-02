@@ -17,7 +17,7 @@ public class AdminHwid implements IAdminCommandHandler
     
     public boolean useAdminCommand(final String command, final Player activeChar) {
         if (!GameUtils.isPlayer(activeChar.getTarget()) || activeChar.getTarget().getActingPlayer().getClient() == null || activeChar.getTarget().getActingPlayer().getClient().getHardwareInfo() == null) {
-            return true;
+            return false;
         }
         final Player target = activeChar.getTarget().getActingPlayer();
         final NpcHtmlMessage html = new NpcHtmlMessage(0, 1);

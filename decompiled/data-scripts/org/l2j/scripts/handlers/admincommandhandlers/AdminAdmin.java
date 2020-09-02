@@ -24,7 +24,7 @@ import org.l2j.gameserver.settings.RateSettings;
 import java.util.StringTokenizer;
 import org.l2j.gameserver.model.entity.Hero;
 import org.l2j.gameserver.util.GameUtils;
-import org.l2j.gameserver.engine.olympiad.OlympiadEngine;
+import org.l2j.gameserver.engine.olympiad.Olympiad;
 import org.l2j.gameserver.network.SystemMessageId;
 import org.l2j.gameserver.util.BuilderUtil;
 import org.l2j.gameserver.data.xml.impl.AdminData;
@@ -66,7 +66,7 @@ public class AdminAdmin implements IAdminCommandHandler
             AdminHtml.showAdminHtml(activeChar, "gm_menu.htm");
         }
         else if (command.startsWith("admin_saveolymp")) {
-            OlympiadEngine.getInstance().saveOlympiadStatus();
+            Olympiad.getInstance().saveOlympiadStatus();
             BuilderUtil.sendSysMessage(activeChar, "olympiad system saved.");
         }
         else if (command.startsWith("admin_sethero")) {

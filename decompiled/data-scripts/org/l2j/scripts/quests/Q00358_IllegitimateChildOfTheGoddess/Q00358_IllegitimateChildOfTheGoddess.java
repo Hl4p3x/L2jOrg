@@ -5,6 +5,7 @@
 package org.l2j.scripts.quests.Q00358_IllegitimateChildOfTheGoddess;
 
 import io.github.joealisson.primitive.HashIntMap;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.quest.QuestState;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
@@ -69,7 +70,7 @@ public final class Q00358_IllegitimateChildOfTheGoddess extends Quest
                 htmltext = "30862-06.html";
             }
             else {
-                rewardItems(player, Q00358_IllegitimateChildOfTheGoddess.REWARDS[getRandom(Q00358_IllegitimateChildOfTheGoddess.REWARDS.length)], 1L);
+                rewardItems(player, Q00358_IllegitimateChildOfTheGoddess.REWARDS[Rnd.get(Q00358_IllegitimateChildOfTheGoddess.REWARDS.length)], 1L);
                 st.exitQuest(true, true);
                 htmltext = "30862-07.html";
             }

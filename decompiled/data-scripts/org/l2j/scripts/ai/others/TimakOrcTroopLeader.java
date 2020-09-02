@@ -7,6 +7,7 @@ package org.l2j.scripts.ai.others;
 import java.util.Iterator;
 import org.l2j.gameserver.enums.ChatType;
 import org.l2j.gameserver.model.holders.MinionHolder;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Monster;
 import org.l2j.gameserver.model.WorldObject;
 import org.l2j.gameserver.util.GameUtils;
@@ -27,11 +28,11 @@ public final class TimakOrcTroopLeader extends AbstractNpcAI
     public String onAttack(final Npc npc, final Player attacker, final int damage, final boolean isSummon) {
         if (GameUtils.isMonster((WorldObject)npc)) {
             final Monster monster = (Monster)npc;
-            if (!monster.isTeleporting() && !monster.hasMinions() && getRandom(1, 100) <= npc.getParameters().getInt("SummonPrivateRate", 0)) {
+            if (!monster.isTeleporting() && !monster.hasMinions() && Rnd.get(1, 100) <= npc.getParameters().getInt("SummonPrivateRate", 0)) {
                 for (final MinionHolder is : npc.getParameters().getMinionList("Privates")) {
                     this.addMinion((Monster)npc, is.getId());
                 }
-                npc.broadcastSay(ChatType.NPC_GENERAL, (NpcStringId)getRandomEntry((Object[])TimakOrcTroopLeader.ON_ATTACK_MSG), new String[0]);
+                npc.broadcastSay(ChatType.NPC_GENERAL, (NpcStringId)Rnd.get((Object[])TimakOrcTroopLeader.ON_ATTACK_MSG), new String[0]);
             }
         }
         return super.onAttack(npc, attacker, damage, isSummon);

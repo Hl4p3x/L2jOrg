@@ -20,7 +20,7 @@ import org.l2j.gameserver.Config;
 import org.l2j.gameserver.model.olympiad.CompetitionType;
 import org.l2j.gameserver.network.SystemMessageId;
 import org.l2j.gameserver.enums.CategoryType;
-import org.l2j.gameserver.engine.olympiad.OlympiadEngine;
+import org.l2j.gameserver.engine.olympiad.Olympiad;
 import org.l2j.gameserver.model.olympiad.OlympiadManager;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
@@ -66,8 +66,8 @@ public final class OlyManager extends AbstractNpcAI implements IBypassHandler
                     break;
                 }
                 htmltext = this.getHtml(player, "OlyManager-joinMatch.html");
-                htmltext = htmltext.replace("%olympiad_round%", String.valueOf(OlympiadEngine.getInstance().getPeriod()));
-                htmltext = htmltext.replace("%olympiad_week%", String.valueOf(OlympiadEngine.getInstance().getCurrentSeason()));
+                htmltext = htmltext.replace("%olympiad_round%", String.valueOf(Olympiad.getInstance().getPeriod()));
+                htmltext = htmltext.replace("%olympiad_week%", String.valueOf(Olympiad.getInstance().getCurrentSeason()));
                 htmltext = htmltext.replace("%olympiad_participant%", String.valueOf(OlympiadManager.getInstance().getCountOpponents()));
                 break;
             }
@@ -80,7 +80,7 @@ public final class OlyManager extends AbstractNpcAI implements IBypassHandler
                     htmltext = "OlyManager-noNoble.html";
                     break;
                 }
-                if (OlympiadEngine.getInstance().getOlympiadPoints(player) <= 0) {
+                if (Olympiad.getInstance().getOlympiadPoints(player) <= 0) {
                     htmltext = "OlyManager-noPoints.html";
                     break;
                 }
@@ -132,7 +132,7 @@ public final class OlyManager extends AbstractNpcAI implements IBypassHandler
         try {
             final Npc olymanager = player.getLastFolkNPC();
             if (command.startsWith(OlyManager.BYPASSES[0])) {
-                if (!OlympiadEngine.getInstance().isMatchInProgress()) {
+                if (!Olympiad.getInstance().isMatchesInProgress()) {
                     player.sendPacket(SystemMessageId.THE_OLYMPIAD_GAMES_ARE_NOT_CURRENTLY_IN_PROGRESS);
                     return false;
                 }
@@ -146,7 +146,7 @@ public final class OlyManager extends AbstractNpcAI implements IBypassHandler
                     player.sendPacket(SystemMessageId.YOU_MAY_NOT_OBSERVE_A_OLYMPIAD_GAMES_MATCH_WHILE_YOU_ARE_ON_THE_WAITING_LIST);
                     return false;
                 }
-                if (!OlympiadEngine.getInstance().isMatchInProgress()) {
+                if (!Olympiad.getInstance().isMatchesInProgress()) {
                     player.sendPacket(SystemMessageId.THE_OLYMPIAD_GAMES_ARE_NOT_CURRENTLY_IN_PROGRESS);
                     return false;
                 }

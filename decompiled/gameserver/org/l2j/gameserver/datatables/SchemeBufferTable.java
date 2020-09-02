@@ -5,84 +5,54 @@
 package org.l2j.gameserver.datatables;
 
 import org.slf4j.LoggerFactory;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import io.github.joealisson.primitive.Containers;
 import java.util.Comparator;
 import java.util.TreeMap;
+import java.util.PrimitiveIterator;
 import java.util.Iterator;
+import java.sql.PreparedStatement;
+import java.sql.Connection;
+import org.l2j.commons.database.DatabaseFactory;
+import io.github.joealisson.primitive.ArrayIntList;
+import java.sql.ResultSet;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.Document;
 import javax.xml.parsers.DocumentBuilder;
-import java.sql.ResultSet;
-import java.sql.PreparedStatement;
-import java.sql.Connection;
 import java.io.File;
 import org.l2j.gameserver.Config;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.l2j.commons.database.DatabaseFactory;
-import java.util.LinkedHashMap;
-import java.util.concurrent.ConcurrentHashMap;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.SchemeBufferDAO;
+import io.github.joealisson.primitive.LinkedHashIntMap;
+import io.github.joealisson.primitive.CHashIntMap;
 import org.l2j.gameserver.model.holders.BuffSkillHolder;
-import java.util.ArrayList;
+import io.github.joealisson.primitive.IntList;
 import java.util.Map;
+import io.github.joealisson.primitive.IntMap;
 import org.slf4j.Logger;
 
 public class SchemeBufferTable
 {
     private static final Logger LOGGER;
-    private static final String LOAD_SCHEMES = "SELECT * FROM buffer_schemes";
-    private static final String DELETE_SCHEMES = "TRUNCATE TABLE buffer_schemes";
     private static final String INSERT_SCHEME = "INSERT INTO buffer_schemes (object_id, scheme_name, skills) VALUES (?,?,?)";
-    private final Map<Integer, Map<String, ArrayList<Integer>>> _schemesTable;
-    private final Map<Integer, BuffSkillHolder> _availableBuffs;
+    private final IntMap<Map<String, IntList>> schemes;
+    private final IntMap<BuffSkillHolder> availableBuffs;
     
     private SchemeBufferTable() {
-        this._schemesTable = new ConcurrentHashMap<Integer, Map<String, ArrayList<Integer>>>();
-        this._availableBuffs = new LinkedHashMap<Integer, BuffSkillHolder>();
-        int count = 0;
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement st = con.prepareStatement("SELECT * FROM buffer_schemes");
-                final ResultSet rs = st.executeQuery();
-                while (rs.next()) {
-                    final int objectId = rs.getInt("object_id");
-                    final String schemeName = rs.getString("scheme_name");
-                    final String[] skills = rs.getString("skills").split(",");
-                    final ArrayList<Integer> schemeList = new ArrayList<Integer>();
-                    for (final String skill : skills) {
-                        if (skill.isEmpty()) {
-                            break;
-                        }
-                        schemeList.add(Integer.valueOf(skill));
-                    }
-                    this.setScheme(objectId, schemeName, schemeList);
-                    ++count;
-                }
-                rs.close();
-                st.close();
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception) {
-                        t.addSuppressed(exception);
-                    }
-                }
-                throw t;
-            }
-        }
-        catch (Exception e) {
-            SchemeBufferTable.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/Exception;)Ljava/lang/String;, e));
-        }
+        this.schemes = (IntMap<Map<String, IntList>>)new CHashIntMap();
+        this.availableBuffs = (IntMap<BuffSkillHolder>)new LinkedHashIntMap();
+        this.load();
+    }
+    
+    private void load() {
+        ((SchemeBufferDAO)DatabaseAccess.getDAO((Class)SchemeBufferDAO.class)).loadAll(this::loadBufferSchema);
         try {
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setAttribute("http://javax.xml.XMLConstants/property/accessExternalDTD", "");
+            dbf.setAttribute("http://javax.xml.XMLConstants/property/accessExternalSchema", "");
             final DocumentBuilder db = dbf.newDocumentBuilder();
             final Document doc = db.parse(new File(Config.DATAPACK_ROOT, "data/SchemeBufferSkills.xml"));
             final Node n = doc.getFirstChild();
@@ -93,57 +63,92 @@ public class SchemeBufferTable
                         if (c.getNodeName().equalsIgnoreCase("buff")) {
                             final NamedNodeMap attrs = c.getAttributes();
                             final int skillId = Integer.parseInt(attrs.getNamedItem("id").getNodeValue());
-                            this._availableBuffs.put(skillId, new BuffSkillHolder(skillId, Integer.parseInt(attrs.getNamedItem("price").getNodeValue()), category, attrs.getNamedItem("desc").getNodeValue()));
+                            this.availableBuffs.put(skillId, (Object)new BuffSkillHolder(skillId, Integer.parseInt(attrs.getNamedItem("price").getNodeValue()), category, attrs.getNamedItem("desc").getNodeValue()));
                         }
                     }
                 }
             }
         }
         catch (Exception e) {
-            SchemeBufferTable.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/Exception;)Ljava/lang/String;, e));
+            SchemeBufferTable.LOGGER.warn("SchemeBufferTable: Failed to load buff info", (Throwable)e);
         }
-        SchemeBufferTable.LOGGER.info(invokedynamic(makeConcatWithConstants:(II)Ljava/lang/String;, count, this._availableBuffs.size()));
+        SchemeBufferTable.LOGGER.info("Loaded {} players schemes and {} available buffs.", (Object)this.schemes.size(), (Object)this.availableBuffs.size());
+    }
+    
+    private void loadBufferSchema(final ResultSet resultSet) {
+        try {
+            while (resultSet.next()) {
+                final int objectId = resultSet.getInt("object_id");
+                final String schemeName = resultSet.getString("scheme_name");
+                final String[] skills = resultSet.getString("skills").split(",");
+                final IntList schemeList = (IntList)new ArrayIntList();
+                for (final String skill : skills) {
+                    if (skill.isEmpty()) {
+                        break;
+                    }
+                    schemeList.add(Integer.parseInt(skill));
+                }
+                this.setScheme(objectId, schemeName, schemeList, false);
+            }
+        }
+        catch (Exception e) {
+            SchemeBufferTable.LOGGER.warn(e.getMessage(), (Throwable)e);
+        }
     }
     
     public void saveSchemes() {
+        ((SchemeBufferDAO)DatabaseAccess.getDAO((Class)SchemeBufferDAO.class)).deleteAll();
         try {
             final Connection con = DatabaseFactory.getInstance().getConnection();
             try {
-                PreparedStatement st = con.prepareStatement("TRUNCATE TABLE buffer_schemes");
-                st.execute();
-                st.close();
-                st = con.prepareStatement("INSERT INTO buffer_schemes (object_id, scheme_name, skills) VALUES (?,?,?)");
-                for (final Map.Entry<Integer, Map<String, ArrayList<Integer>>> player : this._schemesTable.entrySet()) {
-                    for (final Map.Entry<String, ArrayList<Integer>> scheme : player.getValue().entrySet()) {
-                        final StringBuilder sb = new StringBuilder();
-                        for (final int skillId : scheme.getValue()) {
-                            sb.append(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, skillId));
+                final PreparedStatement stInsert = con.prepareStatement("INSERT INTO buffer_schemes (object_id, scheme_name, skills) VALUES (?,?,?)");
+                try {
+                    for (final IntMap.Entry<Map<String, IntList>> player : this.schemes.entrySet()) {
+                        for (final Map.Entry<String, IntList> scheme : ((Map)player.getValue()).entrySet()) {
+                            final StringBuilder sb = new StringBuilder();
+                            final PrimitiveIterator.OfInt it = scheme.getValue().iterator();
+                            while (it.hasNext()) {
+                                sb.append(it.nextInt()).append(",");
+                            }
+                            if (sb.length() > 0) {
+                                sb.setLength(sb.length() - 1);
+                            }
+                            stInsert.setInt(1, player.getKey());
+                            stInsert.setString(2, scheme.getKey());
+                            stInsert.setString(3, sb.toString());
+                            stInsert.addBatch();
                         }
-                        if (sb.length() > 0) {
-                            sb.setLength(sb.length() - 1);
-                        }
-                        st.setInt(1, player.getKey());
-                        st.setString(2, scheme.getKey());
-                        st.setString(3, sb.toString());
-                        st.addBatch();
+                    }
+                    stInsert.executeBatch();
+                    if (stInsert != null) {
+                        stInsert.close();
                     }
                 }
-                st.executeBatch();
-                st.close();
+                catch (Throwable t) {
+                    if (stInsert != null) {
+                        try {
+                            stInsert.close();
+                        }
+                        catch (Throwable exception) {
+                            t.addSuppressed(exception);
+                        }
+                    }
+                    throw t;
+                }
                 if (con != null) {
                     con.close();
                 }
             }
-            catch (Throwable t) {
+            catch (Throwable t2) {
                 if (con != null) {
                     try {
                         con.close();
                     }
-                    catch (Throwable exception) {
-                        t.addSuppressed(exception);
+                    catch (Throwable exception2) {
+                        t2.addSuppressed(exception2);
                     }
                 }
-                throw t;
+                throw t2;
             }
         }
         catch (Exception e) {
@@ -151,44 +156,38 @@ public class SchemeBufferTable
         }
     }
     
-    public void setScheme(final int playerId, final String schemeName, final ArrayList<Integer> list) {
-        if (!this._schemesTable.containsKey(playerId)) {
-            this._schemesTable.put(playerId, new TreeMap<String, ArrayList<Integer>>(String.CASE_INSENSITIVE_ORDER));
+    public void setScheme(final int playerId, final String schemeName, final IntList list, final boolean save) {
+        if (!this.schemes.containsKey(playerId)) {
+            this.schemes.put(playerId, (Object)new TreeMap((Comparator<? super Object>)String.CASE_INSENSITIVE_ORDER));
         }
-        else if (this._schemesTable.get(playerId).size() >= Config.BUFFER_MAX_SCHEMES) {
+        else if (((Map)this.schemes.get(playerId)).size() >= Config.BUFFER_MAX_SCHEMES) {
             return;
         }
-        this._schemesTable.get(playerId).put(schemeName, list);
-        this.saveSchemes();
-    }
-    
-    public Map<String, ArrayList<Integer>> getPlayerSchemes(final int playerId) {
-        return this._schemesTable.get(playerId);
-    }
-    
-    public List<Integer> getScheme(final int playerId, final String schemeName) {
-        if (this._schemesTable.get(playerId) == null || this._schemesTable.get(playerId).get(schemeName) == null) {
-            return Collections.emptyList();
+        ((Map)this.schemes.get(playerId)).put(schemeName, list);
+        if (save) {
+            this.saveSchemes();
         }
-        return this._schemesTable.get(playerId).get(schemeName);
+    }
+    
+    public Map<String, IntList> getPlayerSchemes(final int playerId) {
+        return (Map<String, IntList>)this.schemes.get(playerId);
+    }
+    
+    public IntList getScheme(final int playerId, final String schemeName) {
+        if (this.schemes.get(playerId) == null || ((Map)this.schemes.get(playerId)).get(schemeName) == null) {
+            return Containers.emptyList();
+        }
+        return ((Map)this.schemes.get(playerId)).get(schemeName);
     }
     
     public boolean getSchemeContainsSkill(final int playerId, final String schemeName, final int skillId) {
-        final List<Integer> skills = this.getScheme(playerId, schemeName);
-        if (skills.isEmpty()) {
-            return false;
-        }
-        for (final int id : skills) {
-            if (id == skillId) {
-                return true;
-            }
-        }
-        return false;
+        final IntList skills = this.getScheme(playerId, schemeName);
+        return skills.contains(skillId);
     }
     
     public List<Integer> getSkillsIdsByType(final String groupType) {
         final List<Integer> skills = new ArrayList<Integer>();
-        for (final BuffSkillHolder skill : this._availableBuffs.values()) {
+        for (final BuffSkillHolder skill : this.availableBuffs.values()) {
             if (skill.getType().equalsIgnoreCase(groupType)) {
                 skills.add(skill.getId());
             }
@@ -198,7 +197,7 @@ public class SchemeBufferTable
     
     public List<String> getSkillTypes() {
         final List<String> skillTypes = new ArrayList<String>();
-        for (final BuffSkillHolder skill : this._availableBuffs.values()) {
+        for (final BuffSkillHolder skill : this.availableBuffs.values()) {
             if (!skillTypes.contains(skill.getType())) {
                 skillTypes.add(skill.getType());
             }
@@ -207,7 +206,11 @@ public class SchemeBufferTable
     }
     
     public BuffSkillHolder getAvailableBuff(final int skillId) {
-        return this._availableBuffs.get(skillId);
+        return (BuffSkillHolder)this.availableBuffs.get(skillId);
+    }
+    
+    public static void init() {
+        getInstance().load();
     }
     
     public static SchemeBufferTable getInstance() {

@@ -6,10 +6,11 @@ package org.l2j.gameserver.model.punishment;
 
 public enum PunishmentType
 {
+    JAIL, 
     BAN, 
+    PERMANENT_BAN, 
     CHAT_BAN, 
-    PARTY_BAN, 
-    JAIL;
+    PARTY_BAN;
     
     public static PunishmentType getByName(final String name) {
         for (final PunishmentType type : values()) {

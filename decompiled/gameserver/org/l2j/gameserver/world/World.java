@@ -21,6 +21,7 @@ import java.util.function.Predicate;
 import org.l2j.commons.configuration.Configurator;
 import org.l2j.gameserver.settings.CharacterSettings;
 import org.l2j.gameserver.ai.CtrlEvent;
+import java.util.Iterator;
 import org.l2j.commons.util.Util;
 import org.l2j.gameserver.ai.CreatureAI;
 import org.l2j.gameserver.model.events.impl.IBaseEvent;
@@ -230,18 +231,25 @@ public final class World
     }
     
     private void switchRegion(final WorldObject object, final WorldRegion oldRegion, final WorldRegion newRegion) {
-        newRegion.forEachSurroundingRegion(w -> {
-            if (!w.isSurroundingRegion(oldRegion)) {
-                w.forEachObject(WorldObject.class, other -> this.beAwareOfEachOther(object, other), other -> !object.equals(other) && Objects.equals(other.getInstanceWorld(), object.getInstanceWorld()));
-            }
-            return;
-        });
-        if (Objects.nonNull(oldRegion)) {
-            oldRegion.forEachSurroundingRegion(w -> {
-                if (!newRegion.isSurroundingRegion(w)) {
-                    w.forEachObject(WorldObject.class, other -> this.forgetEachOther(object, other), other -> !object.equals(other));
+        for (final WorldRegion region : newRegion.surroundingRegions()) {
+            if (!region.isSurroundingRegion(oldRegion)) {
+                for (final WorldObject other : region.objects()) {
+                    if (!other.equals(object) && Objects.equals(other.getInstanceWorld(), object.getInstanceWorld())) {
+                        this.beAwareOfEachOther(object, other);
+                    }
                 }
-            });
+            }
+        }
+        if (Objects.nonNull(oldRegion)) {
+            for (final WorldRegion region : oldRegion.surroundingRegions()) {
+                if (!region.isSurroundingRegion(oldRegion)) {
+                    for (final WorldObject other : region.objects()) {
+                        if (!other.equals(object)) {
+                            this.forgetEachOther(object, other);
+                        }
+                    }
+                }
+            }
         }
     }
     
@@ -408,7 +416,7 @@ public final class World
             if (GameUtils.isNpc(object)) {
                 final Npc npc = (Npc)object;
                 npc.deleteMe();
-                World.LOGGER.warn("Deleting npc {} NPCID[{}] from invalid location X:{} Y:{} Z: {}", new Object[] { object.getName(), npc.getId(), object.getX(), object.getY(), object.getZ() });
+                World.LOGGER.warn("Deleting npc {} from invalid location X:{} Y:{} Z: {}", new Object[] { npc, object.getX(), object.getY(), object.getZ() });
                 final Spawn spawn = npc.getSpawn();
                 if (Objects.nonNull(spawn)) {
                     World.LOGGER.warn("Spawn location X:{} Y:{} Z:{} Heading:{}", new Object[] { spawn.getX(), spawn.getY(), spawn.getZ(), spawn.getHeading() });

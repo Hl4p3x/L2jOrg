@@ -6,6 +6,7 @@ package org.l2j.gameserver.network.clientpackets;
 
 import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
+import io.github.joealisson.mmocore.WritablePacket;
 import org.l2j.gameserver.network.serverpackets.KeyPacket;
 import org.l2j.gameserver.network.authcomm.SendablePacket;
 import org.l2j.gameserver.network.authcomm.gs2as.PlayerLogout;
@@ -27,13 +28,13 @@ public final class ProtocolVersion extends ClientPacket
     
     public void runImpl() {
         if (this.version == -2) {
-            ((GameClient)this.client).closeNow();
+            ((GameClient)this.client).close();
         }
         else if (!Util.contains(((ServerSettings)Configurator.getSettings((Class)ServerSettings.class)).acceptedProtocols(), this.version)) {
             ProtocolVersion.LOGGER_ACCOUNTING.warn("Wrong protocol version {}, {}", (Object)this.version, (Object)this.client);
             AuthServerCommunication.getInstance().sendPacket(new PlayerLogout(((GameClient)this.client).getAccountName()));
             ((GameClient)this.client).setProtocolOk(false);
-            ((GameClient)this.client).close(new KeyPacket(((GameClient)this.client).enableCrypt(), 0));
+            ((GameClient)this.client).close((WritablePacket)new KeyPacket(((GameClient)this.client).enableCrypt(), 0));
         }
         else {
             ((GameClient)this.client).setProtocolOk(true);

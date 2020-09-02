@@ -5,10 +5,10 @@
 package org.l2j.gameserver.network.clientpackets;
 
 import org.l2j.gameserver.model.Clan;
-import org.l2j.gameserver.model.clan.entry.PledgeRecruitInfo;
+import org.l2j.gameserver.data.database.data.PledgeRecruitData;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.network.serverpackets.pledge.PledgeShowMemberListAll;
-import org.l2j.gameserver.network.serverpackets.ExPledgeCount;
+import org.l2j.gameserver.network.serverpackets.pledge.ExPledgeCount;
 import org.l2j.gameserver.network.serverpackets.pledge.PledgeShowInfoUpdate;
 import org.l2j.gameserver.network.serverpackets.PledgeShowMemberListAdd;
 import org.l2j.gameserver.instancemanager.CastleManager;
@@ -33,7 +33,7 @@ public class RequestPledgeSignInForOpenJoiningMethod extends ClientPacket
         if (activeChar == null) {
             return;
         }
-        final PledgeRecruitInfo pledgeRecruitInfo = ClanEntryManager.getInstance().getClanById(this._clanId);
+        final PledgeRecruitData pledgeRecruitInfo = ClanEntryManager.getInstance().getClanById(this._clanId);
         if (pledgeRecruitInfo != null) {
             final Clan clan = pledgeRecruitInfo.getClan();
             if (clan != null && activeChar.getClan() == null) {

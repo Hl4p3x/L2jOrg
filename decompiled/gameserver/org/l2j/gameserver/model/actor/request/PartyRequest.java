@@ -30,7 +30,7 @@ public class PartyRequest extends AbstractRequest
     }
     
     @Override
-    public boolean isUsing(final int objectId) {
+    public boolean isUsingItem(final int objectId) {
         return false;
     }
     

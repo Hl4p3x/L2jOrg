@@ -9,6 +9,8 @@ import org.l2j.gameserver.instancemanager.PunishmentManager;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.skills.AbnormalVisualEffect;
 import org.l2j.gameserver.world.World;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.PunishmentDAO;
 import org.l2j.gameserver.handler.IPunishmentHandler;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
@@ -24,7 +26,6 @@ public class PunishmentTask implements Runnable
 {
     protected static final Logger LOGGER;
     private static final String INSERT_QUERY = "INSERT INTO punishments (`key`, `affect`, `type`, `expiration`, `reason`, `punishedBy`) VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String UPDATE_QUERY = "UPDATE punishments SET expiration = ? WHERE id = ?";
     private final String _key;
     private final PunishmentAffect _affect;
     private final PunishmentType _type;
@@ -186,51 +187,10 @@ public class PunishmentTask implements Runnable
     
     private void onEnd() {
         if (this._isStored) {
-            try {
-                final Connection con = DatabaseFactory.getInstance().getConnection();
-                try {
-                    final PreparedStatement st = con.prepareStatement("UPDATE punishments SET expiration = ? WHERE id = ?");
-                    try {
-                        st.setLong(1, System.currentTimeMillis());
-                        st.setLong(2, this._id);
-                        st.execute();
-                        if (st != null) {
-                            st.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (st != null) {
-                            try {
-                                st.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (con != null) {
-                        con.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (con != null) {
-                        try {
-                            con.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-            }
-            catch (SQLException e) {
-                PunishmentTask.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;Lorg/l2j/gameserver/model/punishment/PunishmentAffect;Ljava/lang/String;I)Ljava/lang/String;, this.getClass().getSimpleName(), this._affect, this._key, this._id), (Throwable)e);
-            }
+            ((PunishmentDAO)DatabaseAccess.getDAO((Class)PunishmentDAO.class)).updateExpiration(this._id, System.currentTimeMillis());
         }
         if (this._type == PunishmentType.CHAT_BAN && this._affect == PunishmentAffect.CHARACTER) {
-            final Player player = World.getInstance().findPlayer(Integer.valueOf(this._key));
+            final Player player = World.getInstance().findPlayer(Integer.parseInt(this._key));
             if (player != null) {
                 player.getEffectList().stopAbnormalVisualEffect(AbnormalVisualEffect.NO_CHAT);
             }

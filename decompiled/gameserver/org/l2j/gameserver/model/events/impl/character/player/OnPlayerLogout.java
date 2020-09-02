@@ -16,7 +16,7 @@ public class OnPlayerLogout implements IBaseEvent
         this._activeChar = activeChar;
     }
     
-    public Player getActiveChar() {
+    public Player getPlayer() {
         return this._activeChar;
     }
     

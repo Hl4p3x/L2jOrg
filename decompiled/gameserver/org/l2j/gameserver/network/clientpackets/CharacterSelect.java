@@ -5,7 +5,7 @@
 package org.l2j.gameserver.network.clientpackets;
 
 import org.slf4j.LoggerFactory;
-import org.l2j.gameserver.model.CharSelectInfoPackage;
+import org.l2j.gameserver.model.PlayerSelectInfo;
 import org.l2j.gameserver.network.serverpackets.CharSelected;
 import org.l2j.gameserver.network.ConnectionState;
 import org.l2j.gameserver.network.Disconnection;
@@ -15,11 +15,12 @@ import org.l2j.gameserver.model.events.impl.character.player.OnPlayerSelect;
 import org.l2j.gameserver.model.events.EventDispatcher;
 import org.l2j.gameserver.model.events.returns.TerminateReturn;
 import org.l2j.gameserver.data.sql.impl.PlayerNameTable;
+import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.network.serverpackets.html.NpcHtmlMessage;
 import org.l2j.gameserver.instancemanager.AntiFeedManager;
 import org.l2j.gameserver.Config;
-import org.l2j.gameserver.network.serverpackets.ServerPacket;
+import io.github.joealisson.mmocore.WritablePacket;
 import org.l2j.gameserver.network.serverpackets.ServerClose;
 import org.l2j.gameserver.model.punishment.PunishmentType;
 import org.l2j.gameserver.model.punishment.PunishmentAffect;
@@ -48,16 +49,16 @@ public class CharacterSelect extends ClientPacket
         if (((GameClient)this.client).getActivePlayerLock().tryLock()) {
             try {
                 if (((GameClient)this.client).getPlayer() == null) {
-                    final CharSelectInfoPackage info = ((GameClient)this.client).getCharSelection(this.selectedSlot);
+                    final PlayerSelectInfo info = ((GameClient)this.client).getPlayerSelection(this.selectedSlot);
                     if (info == null) {
                         return;
                     }
                     if (PunishmentManager.getInstance().hasPunishment(info.getObjectId(), PunishmentAffect.CHARACTER, PunishmentType.BAN) || PunishmentManager.getInstance().hasPunishment(((GameClient)this.client).getAccountName(), PunishmentAffect.ACCOUNT, PunishmentType.BAN) || PunishmentManager.getInstance().hasPunishment(((GameClient)this.client).getHostAddress(), PunishmentAffect.IP, PunishmentType.BAN)) {
-                        ((GameClient)this.client).close(ServerClose.STATIC_PACKET);
+                        ((GameClient)this.client).close((WritablePacket)ServerClose.STATIC_PACKET);
                         return;
                     }
                     if (info.getAccessLevel() < 0) {
-                        ((GameClient)this.client).close(ServerClose.STATIC_PACKET);
+                        ((GameClient)this.client).close((WritablePacket)ServerClose.STATIC_PACKET);
                         return;
                     }
                     if (Config.DUALBOX_CHECK_MAX_PLAYERS_PER_IP > 0 && !AntiFeedManager.getInstance().tryAddClient(0, (GameClient)this.client, Config.DUALBOX_CHECK_MAX_PLAYERS_PER_IP)) {
@@ -80,6 +81,7 @@ public class CharacterSelect extends ClientPacket
                     }
                     ((GameClient)this.client).setConnectionState(ConnectionState.JOINING_GAME);
                     ((GameClient)this.client).sendPacket(new CharSelected(player, ((GameClient)this.client).getSessionId().getGameServerSessionId()));
+                    ((GameClient)this.client).detachPlayersInfo();
                 }
             }
             finally {

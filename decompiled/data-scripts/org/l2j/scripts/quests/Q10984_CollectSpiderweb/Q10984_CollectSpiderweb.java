@@ -17,6 +17,7 @@ import org.l2j.gameserver.model.holders.NpcLogListHolder;
 import java.util.Set;
 import org.l2j.gameserver.network.serverpackets.ExShowScreenMessage;
 import org.l2j.gameserver.enums.QuestSound;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.network.serverpackets.classchange.ExRequestClassChangeUi;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.enums.CategoryType;
@@ -180,7 +181,7 @@ public class Q10984_CollectSpiderweb extends Quest
         final QuestState qs = this.getQuestState(killer, false);
         if (qs != null && qs.isCond(1)) {
             final int killCount = qs.getInt("KillCount") + 1;
-            if (getRandom(100) < Q10984_CollectSpiderweb.MONSTER_DROP_CHANCES.get(npc.getId())) {
+            if (Rnd.get(100) < Q10984_CollectSpiderweb.MONSTER_DROP_CHANCES.get(npc.getId())) {
                 giveItems(killer, 91652, 1L);
                 playSound(killer, QuestSound.ITEMSOUND_QUEST_ITEMGET);
             }

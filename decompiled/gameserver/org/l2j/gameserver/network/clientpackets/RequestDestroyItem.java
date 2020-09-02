@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.model.skills.SkillCaster;
 import java.util.Iterator;
 import java.util.Set;
-import java.sql.PreparedStatement;
-import java.sql.Connection;
 import org.l2j.gameserver.model.actor.Summon;
 import org.l2j.gameserver.model.WorldObject;
 import org.l2j.gameserver.model.actor.instance.Player;
@@ -17,7 +15,8 @@ import org.l2j.gameserver.network.serverpackets.InventoryUpdate;
 import org.l2j.gameserver.enums.InventorySlot;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.SystemMessage;
-import org.l2j.commons.database.DatabaseFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.PetDAO;
 import org.l2j.gameserver.model.PcCondOverride;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.handler.AdminCommandHandler;
@@ -109,47 +108,7 @@ public final class RequestDestroyItem extends ClientPacket
                 if (pet != null && pet.getControlObjectId() == this._objectId) {
                     pet.unSummon(activeChar);
                 }
-                try {
-                    final Connection con = DatabaseFactory.getInstance().getConnection();
-                    try {
-                        final PreparedStatement statement = con.prepareStatement("DELETE FROM pets WHERE item_obj_id=?");
-                        try {
-                            statement.setInt(1, this._objectId);
-                            statement.execute();
-                            if (statement != null) {
-                                statement.close();
-                            }
-                        }
-                        catch (Throwable t) {
-                            if (statement != null) {
-                                try {
-                                    statement.close();
-                                }
-                                catch (Throwable exception) {
-                                    t.addSuppressed(exception);
-                                }
-                            }
-                            throw t;
-                        }
-                        if (con != null) {
-                            con.close();
-                        }
-                    }
-                    catch (Throwable t2) {
-                        if (con != null) {
-                            try {
-                                con.close();
-                            }
-                            catch (Throwable exception2) {
-                                t2.addSuppressed(exception2);
-                            }
-                        }
-                        throw t2;
-                    }
-                }
-                catch (Exception e) {
-                    RequestDestroyItem.LOGGER.warn("could not delete pet objectid: ", (Throwable)e);
-                }
+                ((PetDAO)DatabaseAccess.getDAO((Class)PetDAO.class)).deleteByItem(this._objectId);
             }
             if (itemToRemove.isTimeLimitedItem()) {
                 itemToRemove.endOfLife();

@@ -109,10 +109,10 @@ public final class WalkingManager extends GameXmlReader
                 for (Node r = d.getFirstChild(); r != null; r = r.getNextSibling()) {
                     if (r.getNodeName().equals("point")) {
                         final NamedNodeMap attrs = r.getAttributes();
-                        final int x = this.parseInteger(attrs, "X");
-                        final int y = this.parseInteger(attrs, "Y");
-                        final int z = this.parseInteger(attrs, "Z");
-                        final int delay = this.parseInteger(attrs, "delay");
+                        final int x = this.parseInt(attrs, "X");
+                        final int y = this.parseInt(attrs, "Y");
+                        final int z = this.parseInt(attrs, "Z");
+                        final int delay = this.parseInt(attrs, "delay");
                         final boolean run = this.parseBoolean(attrs, "run");
                         NpcStringId npcString = null;
                         String chatString = null;

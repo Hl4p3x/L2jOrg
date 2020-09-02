@@ -12,6 +12,7 @@ import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.Config;
 import java.util.ArrayList;
 import org.l2j.gameserver.model.quest.QuestState;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import io.github.joealisson.primitive.IntCollection;
@@ -76,7 +77,7 @@ public final class Q00662_AGameOfCards extends Quest
                     int i3;
                     int i4;
                     int i5;
-                    for (i1 = 0, i2 = 0, i3 = 0, i4 = 0, i5 = 0; i1 == i2 || i1 == i3 || i1 == i4 || i1 == i5 || i2 == i3 || i2 == i4 || i2 == i5 || i3 == i4 || i3 == i5 || i4 == i5; i1 = getRandom(70) + 1, i2 = getRandom(70) + 1, i3 = getRandom(70) + 1, i4 = getRandom(70) + 1, i5 = getRandom(70) + 1) {}
+                    for (i1 = 0, i2 = 0, i3 = 0, i4 = 0, i5 = 0; i1 == i2 || i1 == i3 || i1 == i4 || i1 == i5 || i2 == i3 || i2 == i4 || i2 == i5 || i3 == i4 || i3 == i5 || i4 == i5; i1 = Rnd.get(70) + 1, i2 = Rnd.get(70) + 1, i3 = Rnd.get(70) + 1, i4 = Rnd.get(70) + 1, i5 = Rnd.get(70) + 1) {}
                     if (i1 >= 57) {
                         i1 -= 56;
                     }
@@ -481,8 +482,8 @@ public final class Q00662_AGameOfCards extends Quest
                 }
             }
         }
-        final Player player = players.get(getRandom(players.size()));
-        if (player != null && GameUtils.checkIfInRange(Config.ALT_PARTY_RANGE, (WorldObject)npc, (WorldObject)player, false) && Q00662_AGameOfCards.MONSTERS.get(npc.getId()) < getRandom(1000)) {
+        final Player player = players.get(Rnd.get(players.size()));
+        if (player != null && GameUtils.checkIfInRange(Config.ALT_PARTY_RANGE, (WorldObject)npc, (WorldObject)player, false) && Q00662_AGameOfCards.MONSTERS.get(npc.getId()) < Rnd.get(1000)) {
             final QuestState st = this.getQuestState(player, false);
             if (st != null) {
                 giveItemRandomly(st.getPlayer(), npc, 8765, 1L, 0L, (double)Q00662_AGameOfCards.MONSTERS.get(npc.getId()), true);

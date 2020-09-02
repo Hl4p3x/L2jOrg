@@ -42,11 +42,6 @@ import org.l2j.gameserver.model.events.impl.character.player.OnPlayerSelect;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerRestore;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerLevelChanged;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerReputationChanged;
-import org.l2j.gameserver.model.events.impl.character.player.OnPlayerMentorStatus;
-import org.l2j.gameserver.model.events.impl.character.player.OnPlayerMenteeStatus;
-import org.l2j.gameserver.model.events.impl.character.player.OnPlayerMenteeRemove;
-import org.l2j.gameserver.model.events.impl.character.player.OnPlayerMenteeLeft;
-import org.l2j.gameserver.model.events.impl.character.player.OnPlayerMenteeAdd;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerItemTransfer;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerItemPickup;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerItemDrop;
@@ -206,11 +201,6 @@ public enum EventType
     ON_PLAYER_ITEM_DROP((Class<? extends IBaseEvent>)OnPlayerItemDrop.class, (Class<?>[])new Class[] { Void.TYPE }), 
     ON_PLAYER_ITEM_PICKUP((Class<? extends IBaseEvent>)OnPlayerItemPickup.class, (Class<?>[])new Class[] { Void.TYPE }), 
     ON_PLAYER_ITEM_TRANSFER((Class<? extends IBaseEvent>)OnPlayerItemTransfer.class, (Class<?>[])new Class[] { Void.TYPE }), 
-    ON_PLAYER_MENTEE_ADD((Class<? extends IBaseEvent>)OnPlayerMenteeAdd.class, (Class<?>[])new Class[] { Void.TYPE }), 
-    ON_PLAYER_MENTEE_LEFT((Class<? extends IBaseEvent>)OnPlayerMenteeLeft.class, (Class<?>[])new Class[] { Void.TYPE }), 
-    ON_PLAYER_MENTEE_REMOVE((Class<? extends IBaseEvent>)OnPlayerMenteeRemove.class, (Class<?>[])new Class[] { Void.TYPE }), 
-    ON_PLAYER_MENTEE_STATUS((Class<? extends IBaseEvent>)OnPlayerMenteeStatus.class, (Class<?>[])new Class[] { Void.TYPE }), 
-    ON_PLAYER_MENTOR_STATUS((Class<? extends IBaseEvent>)OnPlayerMentorStatus.class, (Class<?>[])new Class[] { Void.TYPE }), 
     ON_PLAYER_REPUTATION_CHANGED((Class<? extends IBaseEvent>)OnPlayerReputationChanged.class, (Class<?>[])new Class[] { Void.TYPE }), 
     ON_PLAYER_LEVEL_CHANGED((Class<? extends IBaseEvent>)OnPlayerLevelChanged.class, (Class<?>[])new Class[] { Void.TYPE }), 
     ON_PLAYER_RESTORE((Class<? extends IBaseEvent>)OnPlayerRestore.class, (Class<?>[])new Class[] { Void.TYPE }), 

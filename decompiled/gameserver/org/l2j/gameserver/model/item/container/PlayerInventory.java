@@ -4,7 +4,6 @@
 
 package org.l2j.gameserver.model.item.container;
 
-import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.model.skills.SkillCaster;
 import org.l2j.gameserver.model.actor.Creature;
 import org.l2j.gameserver.model.item.type.ItemType;
@@ -15,6 +14,7 @@ import org.l2j.commons.util.Util;
 import org.l2j.gameserver.engine.item.ItemEngine;
 import org.l2j.gameserver.network.SystemMessageId;
 import org.l2j.gameserver.model.item.ItemTemplate;
+import java.util.List;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerItemDrop;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerItemDestroy;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerItemTransfer;
@@ -37,10 +37,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Collection;
 import org.l2j.gameserver.enums.ItemLocation;
-import org.l2j.gameserver.data.database.data.ItemData;
-import java.util.List;
-import org.l2j.commons.database.DatabaseAccess;
-import org.l2j.gameserver.data.database.dao.ItemDAO;
 import java.util.function.Consumer;
 import java.util.ServiceLoader;
 import org.l2j.gameserver.api.item.PlayerInventoryListener;
@@ -48,17 +44,14 @@ import org.l2j.gameserver.enums.InventoryBlockType;
 import io.github.joealisson.primitive.IntCollection;
 import org.l2j.gameserver.model.item.instance.Item;
 import org.l2j.gameserver.model.actor.instance.Player;
-import org.slf4j.Logger;
 
 public class PlayerInventory extends Inventory
 {
-    private static final Logger LOGGER;
     private final Player owner;
     private Item _adena;
-    private Item _ancientAdena;
     private Item _beautyTickets;
     private Item silverCoin;
-    private Item rustyCoin;
+    private Item goldCoin;
     private Item l2Coin;
     private Item currentAmmunition;
     private IntCollection blockItems;
@@ -69,26 +62,6 @@ public class PlayerInventory extends Inventory
         this.blockMode = InventoryBlockType.NONE;
         this.owner = owner;
         ServiceLoader.load(PlayerInventoryListener.class).forEach(this::addPaperdollListener);
-    }
-    
-    public static int[][] restoreVisibleInventory(final int objectId) {
-        final int[][] paperdoll = new int[60][3];
-        try {
-            final List<ItemData> paperDollItems = ((ItemDAO)DatabaseAccess.getDAO((Class)ItemDAO.class)).findAllPaperDollItemsByObjectId(objectId);
-            final int slot;
-            final Object o;
-            paperDollItems.forEach(paperDollItem -> {
-                slot = paperDollItem.getLocData();
-                o[slot][0] = paperDollItem.getObjectId();
-                o[slot][1] = paperDollItem.getItemId();
-                o[slot][2] = paperDollItem.getEnchantLevel();
-                return;
-            });
-        }
-        catch (Exception e) {
-            PlayerInventory.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, e.getMessage()), (Throwable)e);
-        }
-        return paperdoll;
     }
     
     @Override
@@ -115,14 +88,6 @@ public class PlayerInventory extends Inventory
         return (this._adena != null) ? this._adena.getCount() : 0L;
     }
     
-    public Item getAncientAdenaInstance() {
-        return this._ancientAdena;
-    }
-    
-    public long getAncientAdena() {
-        return (this._ancientAdena != null) ? this._ancientAdena.getCount() : 0L;
-    }
-    
     public Item getBeautyTicketsInstance() {
         return this._beautyTickets;
     }
@@ -132,17 +97,14 @@ public class PlayerInventory extends Inventory
         return (this._beautyTickets != null) ? this._beautyTickets.getCount() : 0L;
     }
     
-    public Collection<Item> getUniqueItems(final boolean allowAdena, final boolean allowAncientAdena) {
-        return this.getUniqueItems(allowAdena, allowAncientAdena, true);
+    public Collection<Item> getUniqueItems(final boolean allowAdena) {
+        return this.getUniqueItems(allowAdena, true);
     }
     
-    public Collection<Item> getUniqueItems(final boolean allowAdena, final boolean allowAncientAdena, final boolean onlyAvailable) {
+    public Collection<Item> getUniqueItems(final boolean allowAdena, final boolean onlyAvailable) {
         final Collection<Item> list = new LinkedList<Item>();
         for (final Item item : this.items.values()) {
             if (!allowAdena && item.getId() == 57) {
-                continue;
-            }
-            if (!allowAncientAdena && item.getId() == 5575) {
                 continue;
             }
             boolean isDuplicate = false;
@@ -243,16 +205,6 @@ public class PlayerInventory extends Inventory
         return count > 0L && this.destroyItemByItemId(process, 36308, count, actor, reference) != null;
     }
     
-    public void addAncientAdena(final String process, final long count, final Player actor, final Object reference) {
-        if (count > 0L) {
-            this.addItem(process, 5575, count, actor, reference);
-        }
-    }
-    
-    public boolean reduceAncientAdena(final String process, final long count, final Player actor, final Object reference) {
-        return count > 0L && this.destroyItemByItemId(process, 5575, count, actor, reference) != null;
-    }
-    
     @Override
     public Item addItem(final String process, Item item, final Player actor, final Object reference) {
         item = super.addItem(process, item, actor, reference);
@@ -260,17 +212,14 @@ public class PlayerInventory extends Inventory
             if (item.getId() == 57 && !item.equals(this._adena)) {
                 this._adena = item;
             }
-            else if (item.getId() == 5575 && !item.equals(this._ancientAdena)) {
-                this._ancientAdena = item;
-            }
             else if (item.getId() == 36308 && !item.equals(this._beautyTickets)) {
                 this._beautyTickets = item;
             }
             else if (item.getId() == 29983 && !item.equals(this.silverCoin)) {
                 this.silverCoin = item;
             }
-            else if (item.getId() == 29984 && !item.equals(this.rustyCoin)) {
-                this.rustyCoin = item;
+            else if (item.getId() == 29984 && !item.equals(this.goldCoin)) {
+                this.goldCoin = item;
             }
             else if (item.getId() == 91663 && !item.equals(this.l2Coin)) {
                 this.l2Coin = item;
@@ -301,17 +250,14 @@ public class PlayerInventory extends Inventory
             if (item.getId() == 57 && !item.equals(this._adena)) {
                 this._adena = item;
             }
-            else if (item.getId() == 5575 && !item.equals(this._ancientAdena)) {
-                this._ancientAdena = item;
-            }
             else if (item.getId() == 36308 && !item.equals(this._beautyTickets)) {
                 this._beautyTickets = item;
             }
             else if (item.getId() == 29983 && !item.equals(this.silverCoin)) {
                 this.silverCoin = item;
             }
-            else if (item.getId() == 29984 && !item.equals(this.rustyCoin)) {
-                this.rustyCoin = item;
+            else if (item.getId() == 29984 && !item.equals(this.goldCoin)) {
+                this.goldCoin = item;
             }
             else if (item.getId() == 91663 && !item.equals(this.l2Coin)) {
                 this.l2Coin = item;
@@ -333,9 +279,6 @@ public class PlayerInventory extends Inventory
         final Item item = super.transferItem(process, objectId, count, target, actor, reference);
         if (this._adena != null && (this._adena.getCount() <= 0L || this._adena.getOwnerId() != this.getOwnerId())) {
             this._adena = null;
-        }
-        if (this._ancientAdena != null && (this._ancientAdena.getCount() <= 0L || this._ancientAdena.getOwnerId() != this.getOwnerId())) {
-            this._ancientAdena = null;
         }
         EventDispatcher.getInstance().notifyEventAsync(new OnPlayerItemTransfer(actor, item, target), item.getTemplate());
         return item;
@@ -360,9 +303,6 @@ public class PlayerInventory extends Inventory
         item = super.destroyItem(process, item, count, actor, reference);
         if (this._adena != null && this._adena.getCount() <= 0L) {
             this._adena = null;
-        }
-        if (this._ancientAdena != null && this._ancientAdena.getCount() <= 0L) {
-            this._ancientAdena = null;
         }
         if (Objects.nonNull(item)) {
             if (item.isEquipped()) {
@@ -397,9 +337,6 @@ public class PlayerInventory extends Inventory
         if (this._adena != null && (this._adena.getCount() <= 0L || this._adena.getOwnerId() != this.getOwnerId())) {
             this._adena = null;
         }
-        if (this._ancientAdena != null && (this._ancientAdena.getCount() <= 0L || this._ancientAdena.getOwnerId() != this.getOwnerId())) {
-            this._ancientAdena = null;
-        }
         if (item != null) {
             EventDispatcher.getInstance().notifyEventAsync(new OnPlayerItemDrop(actor, item, item.getLocation()), item.getTemplate());
         }
@@ -411,9 +348,6 @@ public class PlayerInventory extends Inventory
         final Item item = super.dropItem(process, objectId, count, actor, reference);
         if (this._adena != null && (this._adena.getCount() <= 0L || this._adena.getOwnerId() != this.getOwnerId())) {
             this._adena = null;
-        }
-        if (this._ancientAdena != null && (this._ancientAdena.getCount() <= 0L || this._ancientAdena.getOwnerId() != this.getOwnerId())) {
-            this._ancientAdena = null;
         }
         if (item != null) {
             EventDispatcher.getInstance().notifyEventAsync(new OnPlayerItemDrop(actor, item, item.getLocation()), item.getTemplate());
@@ -430,9 +364,6 @@ public class PlayerInventory extends Inventory
         if (item.getId() == 57) {
             this._adena = null;
         }
-        else if (item.getId() == 5575) {
-            this._ancientAdena = null;
-        }
         else if (item.getId() == 36308) {
             this._beautyTickets = null;
         }
@@ -448,9 +379,8 @@ public class PlayerInventory extends Inventory
     public void restore() {
         super.restore();
         this._adena = this.getItemByItemId(57);
-        this._ancientAdena = this.getItemByItemId(5575);
         this._beautyTickets = this.getItemByItemId(36308);
-        this.rustyCoin = this.getItemByItemId(29984);
+        this.goldCoin = this.getItemByItemId(29984);
         this.silverCoin = this.getItemByItemId(29983);
         this.l2Coin = this.getItemByItemId(91663);
     }
@@ -609,8 +539,8 @@ public class PlayerInventory extends Inventory
         return false;
     }
     
-    public long getRustyCoin() {
-        return Objects.nonNull(this.rustyCoin) ? this.rustyCoin.getCount() : 0L;
+    public long getGoldCoin() {
+        return Objects.nonNull(this.goldCoin) ? this.goldCoin.getCount() : 0L;
     }
     
     public long getSilverCoin() {
@@ -650,9 +580,5 @@ public class PlayerInventory extends Inventory
         }
         final ItemType itemType = weapon.getItemType();
         return (ammunition.getItemType() == EtcItemType.ARROW && itemType == WeaponType.BOW) || (ammunition.getItemType() == EtcItemType.BOLT && itemType == WeaponType.CROSSBOW) || itemType == WeaponType.TWO_HAND_CROSSBOW;
-    }
-    
-    static {
-        LOGGER = LoggerFactory.getLogger((Class)PlayerInventory.class);
     }
 }

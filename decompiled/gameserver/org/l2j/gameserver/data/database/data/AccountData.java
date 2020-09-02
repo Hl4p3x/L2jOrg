@@ -4,13 +4,15 @@
 
 package org.l2j.gameserver.data.database.data;
 
+import java.time.LocalDateTime;
 import org.l2j.commons.database.annotation.Column;
 import org.l2j.commons.database.annotation.Table;
 
 @Table("account_data")
 public class AccountData
 {
-    private String account;
+    @Column("account")
+    private String accountName;
     private int coin;
     @Column("vip_point")
     private long vipPoints;
@@ -20,9 +22,19 @@ public class AccountData
     private String secAuthPassword;
     @Column("sec_auth_attempts")
     private int secAuthAttempts;
+    @Column("next_attendance")
+    private LocalDateTime nextAttendance;
+    @Column("last_attendance_reward")
+    private byte lastAttendanceReward;
     
-    public void setAccount(final String accountName) {
-        this.account = accountName;
+    public static AccountData of(final String accountName) {
+        final AccountData account = new AccountData();
+        account.accountName = accountName;
+        return account;
+    }
+    
+    public String getAccountName() {
+        return this.accountName;
     }
     
     public long getVipPoints() {
@@ -71,5 +83,26 @@ public class AccountData
     
     public int increaseSecAuthAttempts() {
         return ++this.secAuthAttempts;
+    }
+    
+    public LocalDateTime nextAttendance() {
+        return this.nextAttendance;
+    }
+    
+    public void setNextAttendance(final LocalDateTime nextAttendance) {
+        this.nextAttendance = nextAttendance;
+    }
+    
+    public byte lastAttendanceReward() {
+        return this.lastAttendanceReward;
+    }
+    
+    public void setLastAttendanceReward(final byte reward) {
+        this.lastAttendanceReward = reward;
+    }
+    
+    @Override
+    public String toString() {
+        return this.accountName;
     }
 }

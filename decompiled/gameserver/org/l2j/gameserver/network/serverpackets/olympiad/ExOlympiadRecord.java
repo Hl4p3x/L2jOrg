@@ -4,6 +4,8 @@
 
 package org.l2j.gameserver.network.serverpackets.olympiad;
 
+import org.l2j.gameserver.engine.olympiad.OlympiadRuleType;
+import org.l2j.gameserver.engine.olympiad.Olympiad;
 import org.l2j.gameserver.network.ServerExPacketId;
 import org.l2j.gameserver.network.GameClient;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
@@ -13,6 +15,7 @@ public class ExOlympiadRecord extends ServerPacket
     @Override
     protected void writeImpl(final GameClient client) {
         this.writeId(ServerExPacketId.EX_OLYMPIAD_RECORD);
+        final Olympiad olympiad = Olympiad.getInstance();
         this.writeInt(0);
         this.writeInt(0);
         this.writeInt(0);
@@ -28,11 +31,11 @@ public class ExOlympiadRecord extends ServerPacket
         this.writeInt(0);
         this.writeInt(0);
         this.writeInt(0);
-        this.writeInt(2020);
-        this.writeInt(6);
-        this.writeByte(true);
-        this.writeInt(2);
-        this.writeByte(false);
-        this.writeByte(1);
+        this.writeInt(olympiad.getSeasonYear());
+        this.writeInt(olympiad.getSeasonMonth());
+        this.writeByte(olympiad.isMatchesInProgress());
+        this.writeInt(olympiad.getCurrentSeason());
+        this.writeByte(olympiad.isRegistered(client.getPlayer()));
+        this.writeByte(OlympiadRuleType.CLASSLESS.ordinal());
     }
 }

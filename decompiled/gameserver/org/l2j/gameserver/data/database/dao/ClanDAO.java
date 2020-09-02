@@ -117,4 +117,7 @@ public interface ClanDAO extends DAO<ClanData>
     
     @Query("DELETE FROM clan_skills WHERE clan_id=:clanId: AND skill_id=:skillId:")
     void removeSkill(final int clanId, final int skillId);
+    
+    @Query("DELETE FROM clan_variables WHERE clanId = :clanId:")
+    void deleteVariables(final int clanId);
 }

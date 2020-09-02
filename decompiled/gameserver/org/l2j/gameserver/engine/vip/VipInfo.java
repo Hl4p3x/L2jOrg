@@ -10,7 +10,7 @@ class VipInfo
     private final long pointsRequired;
     private final long pointsDepreciated;
     private float silverCoinChance;
-    private float rustyCoinChance;
+    private float goldCoinChance;
     private int skill;
     
     VipInfo(final byte tier, final long pointsRequired, final long pointsDepreciated) {
@@ -31,12 +31,12 @@ class VipInfo
         return this.silverCoinChance;
     }
     
-    void setRustyCoinChance(final float rustyCoinChance) {
-        this.rustyCoinChance = rustyCoinChance;
+    void setGoldCoinChance(final float goldCoinChance) {
+        this.goldCoinChance = goldCoinChance;
     }
     
-    float getRustyCoinChance() {
-        return this.rustyCoinChance;
+    float getGoldCoinChance() {
+        return this.goldCoinChance;
     }
     
     long getPointsRequired() {

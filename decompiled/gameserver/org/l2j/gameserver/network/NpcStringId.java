@@ -300,6 +300,8 @@ public final class NpcStringId
     public static NpcStringId PROTECT_THE_CENTRAL_TOWER_FROM_DIVINE_ANGELS;
     @ClientString(id = 1803290, message = "My servants can keep me safe! I have nothing to fear!")
     public static NpcStringId MY_SERVANTS_CAN_KEEP_ME_SAFE_I_HAVE_NOTHING_TO_FEAR;
+    @ClientString(id = 1803770, message = "Glory to the heroes who have defeated Lord Ishka!")
+    public static NpcStringId GLORY_TO_THE_HEROES_WHO_HAVE_DEFEATED_LORD_ISHKA;
     private static IntMap<NpcStringId> VALUES;
     private final int _id;
     private String _name;

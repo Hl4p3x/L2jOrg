@@ -8,7 +8,7 @@ import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.model.actor.instance.Player;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class AbstractEventMember<T extends AbstractEvent<?>>
+public abstract class AbstractEventMember<T extends AbstractEvent>
 {
     private final T _event;
     private final AtomicInteger _score;

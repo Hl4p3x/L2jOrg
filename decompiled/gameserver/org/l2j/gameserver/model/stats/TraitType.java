@@ -4,8 +4,7 @@
 
 package org.l2j.gameserver.model.stats;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.EnumSet;
 
 public enum TraitType
 {
@@ -80,11 +79,7 @@ public enum TraitType
     STAFF(1);
     
     private final int _type;
-    private static final List<TraitType> _weaknesses;
-    
-    public static List<TraitType> getAllWeakness() {
-        return TraitType._weaknesses;
-    }
+    private static final EnumSet<TraitType> WEAKNESSES;
     
     private TraitType(final int type) {
         this._type = type;
@@ -94,24 +89,11 @@ public enum TraitType
         return this._type;
     }
     
+    public static EnumSet<TraitType> getAllWeakness() {
+        return TraitType.WEAKNESSES;
+    }
+    
     static {
-        (_weaknesses = new ArrayList<TraitType>()).add(TraitType.BUG_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.ANIMAL_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.PLANT_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.BEAST_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.DRAGON_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.GIANT_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.CONSTRUCT_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.VALAKAS);
-        TraitType._weaknesses.add(TraitType.ANESTHESIA);
-        TraitType._weaknesses.add(TraitType.DEMONIC_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.DIVINE_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.ELEMENTAL_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.FAIRY_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.HUMAN_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.HUMANOID_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.UNDEAD_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.EMBRYO_WEAKNESS);
-        TraitType._weaknesses.add(TraitType.SPIRIT_WEAKNESS);
+        WEAKNESSES = EnumSet.of(TraitType.BUG_WEAKNESS, TraitType.ANIMAL_WEAKNESS, TraitType.PLANT_WEAKNESS, TraitType.BEAST_WEAKNESS, TraitType.DRAGON_WEAKNESS, TraitType.GIANT_WEAKNESS, TraitType.CONSTRUCT_WEAKNESS, TraitType.VALAKAS, TraitType.ANESTHESIA, TraitType.DEMONIC_WEAKNESS, TraitType.DIVINE_WEAKNESS, TraitType.ELEMENTAL_WEAKNESS, TraitType.FAIRY_WEAKNESS, TraitType.HUMAN_WEAKNESS, TraitType.HUMANOID_WEAKNESS, TraitType.UNDEAD_WEAKNESS, TraitType.EMBRYO_WEAKNESS, TraitType.SPIRIT_WEAKNESS);
     }
 }

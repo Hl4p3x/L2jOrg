@@ -6,6 +6,7 @@ package org.l2j.scripts.quests.Q00360_PlunderTheirSupplies;
 
 import io.github.joealisson.primitive.HashIntIntMap;
 import org.l2j.gameserver.enums.QuestSound;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.WorldObject;
 import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.Config;
@@ -62,7 +63,7 @@ public final class Q00360_PlunderTheirSupplies extends Quest
         if (st == null || !GameUtils.checkIfInRange(Config.ALT_PARTY_RANGE, (WorldObject)npc, (WorldObject)killer, false)) {
             return super.onKill(npc, killer, isPet);
         }
-        if (getRandom(100) < Q00360_PlunderTheirSupplies.MONSTER_DROP_CHANCES.get(npc.getId())) {
+        if (Rnd.get(100) < Q00360_PlunderTheirSupplies.MONSTER_DROP_CHANCES.get(npc.getId())) {
             giveItems(killer, 5872, 1L);
             playSound(killer, QuestSound.ITEMSOUND_QUEST_ITEMGET);
         }

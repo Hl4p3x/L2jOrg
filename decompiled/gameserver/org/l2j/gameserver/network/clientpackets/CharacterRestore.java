@@ -4,31 +4,32 @@
 
 package org.l2j.gameserver.network.clientpackets;
 
-import org.l2j.gameserver.model.CharSelectInfoPackage;
+import org.l2j.gameserver.model.PlayerSelectInfo;
 import org.l2j.gameserver.model.events.impl.IBaseEvent;
 import org.l2j.gameserver.model.events.impl.character.player.OnPlayerRestore;
 import org.l2j.gameserver.model.events.EventDispatcher;
+import java.util.Objects;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
-import org.l2j.gameserver.network.serverpackets.CharSelectionInfo;
+import org.l2j.gameserver.network.serverpackets.PlayerSelectionInfo;
 import org.l2j.gameserver.network.GameClient;
 
 public final class CharacterRestore extends ClientPacket
 {
-    private int _charSlot;
+    private int slot;
     
     public void readImpl() {
-        this._charSlot = this.readInt();
+        this.slot = this.readInt();
     }
     
     public void runImpl() {
         if (!((GameClient)this.client).getFloodProtectors().getCharacterSelect().tryPerformAction("CharacterRestore")) {
             return;
         }
-        ((GameClient)this.client).restore(this._charSlot);
-        final CharSelectionInfo cl = new CharSelectionInfo(((GameClient)this.client).getAccountName(), ((GameClient)this.client).getSessionId().getGameServerSessionId(), 0);
-        ((GameClient)this.client).sendPacket(cl);
-        ((GameClient)this.client).setCharSelection(cl.getCharInfo());
-        final CharSelectInfoPackage charInfo = ((GameClient)this.client).getCharSelection(this._charSlot);
-        EventDispatcher.getInstance().notifyEvent(new OnPlayerRestore(charInfo.getObjectId(), charInfo.getName(), (GameClient)this.client));
+        ((GameClient)this.client).restore(this.slot);
+        ((GameClient)this.client).sendPacket(new PlayerSelectionInfo((GameClient)this.client, this.slot));
+        final PlayerSelectInfo playerInfo = ((GameClient)this.client).getPlayerSelection(this.slot);
+        if (Objects.nonNull(playerInfo)) {
+            EventDispatcher.getInstance().notifyEvent(new OnPlayerRestore(playerInfo.getObjectId(), playerInfo.getName(), (GameClient)this.client));
+        }
     }
 }

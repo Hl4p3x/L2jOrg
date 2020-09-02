@@ -17,10 +17,8 @@ public abstract class ManagedScript
     
     public ManagedScript() {
         this._scriptFile = this.getScriptPath();
-        this.setLastLoadTime(System.currentTimeMillis());
+        this._lastLoadTime = System.currentTimeMillis();
     }
-    
-    public abstract Path getScriptPath();
     
     public boolean reload() {
         try {
@@ -32,8 +30,6 @@ public abstract class ManagedScript
             return false;
         }
     }
-    
-    public abstract boolean unload();
     
     public boolean isActive() {
         return this._isActive;
@@ -55,7 +51,11 @@ public abstract class ManagedScript
         this._lastLoadTime = lastLoadTime;
     }
     
+    public abstract Path getScriptPath();
+    
     public abstract String getScriptName();
+    
+    public abstract boolean unload();
     
     static {
         LOGGER = LoggerFactory.getLogger((Class)ManagedScript.class);

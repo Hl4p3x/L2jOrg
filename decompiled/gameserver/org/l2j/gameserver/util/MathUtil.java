@@ -151,7 +151,7 @@ public final class MathUtil
         return angleTarget;
     }
     
-    public static boolean checkOverFlow(final long x, final long y) {
+    public static boolean checkAddOverFlow(final long x, final long y) {
         final long r = x + y;
         return ((x ^ r) & (y ^ r)) < 0L;
     }

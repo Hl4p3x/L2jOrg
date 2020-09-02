@@ -18,18 +18,18 @@ public class ExInzoneWaiting extends ServerPacket
 {
     private final int _currentTemplateId;
     private final IntLongMap _instanceTimes;
-    private final boolean _sendByClient;
+    private final boolean _hide;
     
-    public ExInzoneWaiting(final Player activeChar, final boolean sendByClient) {
+    public ExInzoneWaiting(final Player activeChar, final boolean hide) {
         final Instance instance = InstanceManager.getInstance().getPlayerInstance(activeChar, false);
         this._currentTemplateId = ((instance != null && instance.getTemplateId() >= 0) ? instance.getTemplateId() : -1);
         this._instanceTimes = InstanceManager.getInstance().getAllInstanceTimes(activeChar);
-        this._sendByClient = sendByClient;
+        this._hide = hide;
     }
     
     public void writeImpl(final GameClient client) {
         this.writeId(ServerExPacketId.EX_INZONE_WAITING_INFO);
-        this.writeByte((byte)(byte)(this._sendByClient ? 0 : 1));
+        this.writeByte((byte)(byte)(this._hide ? 0 : 1));
         this.writeInt(this._currentTemplateId);
         this.writeInt(this._instanceTimes.size());
         for (final IntLong entry : this._instanceTimes.entrySet()) {

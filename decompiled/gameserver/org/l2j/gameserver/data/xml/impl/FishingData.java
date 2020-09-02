@@ -52,8 +52,8 @@ public final class FishingData extends GameXmlReader
                     final String nodeName = listItem.getNodeName();
                     switch (nodeName) {
                         case "baitDistance": {
-                            this._baitDistanceMin = this.parseInteger(listItem.getAttributes(), "min");
-                            this._baitDistanceMax = this.parseInteger(listItem.getAttributes(), "max");
+                            this._baitDistanceMin = this.parseInt(listItem.getAttributes(), "min");
+                            this._baitDistanceMax = this.parseInt(listItem.getAttributes(), "max");
                             break;
                         }
                         case "experienceRate": {
@@ -70,18 +70,18 @@ public final class FishingData extends GameXmlReader
                             for (Node bait = listItem.getFirstChild(); bait != null; bait = bait.getNextSibling()) {
                                 if ("bait".equalsIgnoreCase(bait.getNodeName())) {
                                     final NamedNodeMap attrs = bait.getAttributes();
-                                    final int itemId = this.parseInteger(attrs, "itemId");
-                                    final int level = this.parseInteger(attrs, "level");
-                                    final int minPlayerLevel = this.parseInteger(attrs, "minPlayerLevel");
+                                    final int itemId = this.parseInt(attrs, "itemId");
+                                    final int level = this.parseInt(attrs, "level");
+                                    final int minPlayerLevel = this.parseInt(attrs, "minPlayerLevel");
                                     final double chance = this.parseDouble(attrs, "chance");
-                                    final int timeMin = this.parseInteger(attrs, "timeMin");
-                                    final int timeMax = this.parseInteger(attrs, "timeMax");
-                                    final int waitMin = this.parseInteger(attrs, "waitMin");
-                                    final int waitMax = this.parseInteger(attrs, "waitMax");
+                                    final int timeMin = this.parseInt(attrs, "timeMin");
+                                    final int timeMax = this.parseInt(attrs, "timeMax");
+                                    final int waitMin = this.parseInt(attrs, "waitMin");
+                                    final int waitMax = this.parseInt(attrs, "waitMax");
                                     final FishingBaitData baitData = new FishingBaitData(itemId, level, minPlayerLevel, chance, timeMin, timeMax, waitMin, waitMax);
                                     for (Node c = bait.getFirstChild(); c != null; c = c.getNextSibling()) {
                                         if ("catch".equalsIgnoreCase(c.getNodeName())) {
-                                            baitData.addReward(this.parseInteger(c.getAttributes(), "itemId"));
+                                            baitData.addReward(this.parseInt(c.getAttributes(), "itemId"));
                                         }
                                     }
                                     this._baitData.put(baitData.getItemId(), baitData);

@@ -95,10 +95,10 @@ public final class MultisellData extends GameXmlReader
                         entry = new MultisellEntryHolder(ingredients, products);
                         for (d = itemNode.getFirstChild(); d != null; d = d.getNextSibling()) {
                             if ("ingredient".equalsIgnoreCase(d.getNodeName())) {
-                                id = this.parseInteger(d.getAttributes(), "id");
+                                id = this.parseInt(d.getAttributes(), "id");
                                 count = this.parseLong(d.getAttributes(), "count");
-                                enchantmentLevel = this.parseByte(d.getAttributes(), "enchantmentLevel", (Byte)0);
-                                maintainIngredient = this.parseBoolean(d.getAttributes(), "maintainIngredient", Boolean.valueOf((boolean)(0 != 0)));
+                                enchantmentLevel = this.parseByte(d.getAttributes(), "enchantmentLevel", (byte)0);
+                                maintainIngredient = this.parseBoolean(d.getAttributes(), "maintainIngredient", (boolean)(0 != 0));
                                 ingredient = new ItemChanceHolder(id, 0.0, count, enchantmentLevel, maintainIngredient);
                                 if (this.itemExists(ingredient)) {
                                     ingredients.add(ingredient);
@@ -108,10 +108,10 @@ public final class MultisellData extends GameXmlReader
                                 }
                             }
                             else if ("production".equalsIgnoreCase(d.getNodeName())) {
-                                id2 = this.parseInteger(d.getAttributes(), "id");
+                                id2 = this.parseInt(d.getAttributes(), "id");
                                 count2 = this.parseLong(d.getAttributes(), "count");
-                                chance = this.parseDouble(d.getAttributes(), "chance", Double.valueOf(Double.NaN));
-                                enchantmentLevel2 = this.parseByte(d.getAttributes(), "enchantmentLevel", (Byte)0);
+                                chance = this.parseDouble(d.getAttributes(), "chance", Double.NaN);
+                                enchantmentLevel2 = this.parseByte(d.getAttributes(), "enchantmentLevel", (byte)0);
                                 product = new ItemChanceHolder(id2, chance, count2, enchantmentLevel2);
                                 if (this.itemExists(product)) {
                                     if ((!Double.isNaN(chance) && chance < 0.0) || chance > 100.0) {

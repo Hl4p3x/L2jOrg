@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import org.l2j.gameserver.enums.MacroType;
 import java.util.StringTokenizer;
 import java.util.ArrayList;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.PlayerDAO;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
 import org.l2j.commons.database.DatabaseFactory;
@@ -147,48 +149,7 @@ public class MacroList implements IRestorable
     }
     
     private void deleteMacroFromDb(final Macro macro) {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("DELETE FROM character_macroses WHERE charId=? AND id=?");
-                try {
-                    ps.setInt(1, this.owner.getObjectId());
-                    ps.setInt(2, macro.getId());
-                    ps.execute();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            MacroList.LOGGER.warn("could not delete macro:", (Throwable)e);
-        }
+        ((PlayerDAO)DatabaseAccess.getDAO((Class)PlayerDAO.class)).deleteMacro(this.owner.getObjectId(), macro.getId());
     }
     
     @Override

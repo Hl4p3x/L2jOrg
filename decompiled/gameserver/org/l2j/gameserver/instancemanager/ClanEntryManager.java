@@ -13,656 +13,173 @@ import java.util.ArrayList;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.l2j.commons.util.CommonUtil;
+import java.util.function.ToIntFunction;
 import java.util.OptionalInt;
-import java.sql.PreparedStatement;
-import java.util.Collections;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.sql.Connection;
-import java.util.concurrent.ConcurrentHashMap;
-import org.l2j.gameserver.data.sql.impl.ClanTable;
-import org.l2j.commons.database.DatabaseFactory;
+import java.util.Objects;
+import io.github.joealisson.primitive.Containers;
 import org.l2j.commons.threading.ThreadPool;
+import java.util.Iterator;
+import org.l2j.gameserver.data.sql.impl.ClanTable;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.PledgeRecruitDAO;
+import io.github.joealisson.primitive.CHashIntMap;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ScheduledFuture;
-import org.l2j.gameserver.model.clan.entry.PledgeApplicantInfo;
-import org.l2j.gameserver.model.clan.entry.PledgeRecruitInfo;
-import org.l2j.gameserver.model.clan.entry.PledgeWaitingInfo;
-import java.util.Map;
+import org.l2j.gameserver.data.database.data.PledgeApplicantData;
+import org.l2j.gameserver.data.database.data.PledgeRecruitData;
+import org.l2j.gameserver.data.database.data.PledgeWaitingData;
+import io.github.joealisson.primitive.IntMap;
 import org.slf4j.Logger;
 
 public class ClanEntryManager
 {
-    protected static final Logger LOGGER;
-    private static final Map<Integer, PledgeWaitingInfo> _waitingList;
-    private static final Map<Integer, PledgeRecruitInfo> _clanList;
-    private static final Map<Integer, Map<Integer, PledgeApplicantInfo>> _applicantList;
-    private static final Map<Integer, ScheduledFuture<?>> _clanLocked;
-    private static final Map<Integer, ScheduledFuture<?>> _playerLocked;
-    private static final String INSERT_APPLICANT = "INSERT INTO pledge_applicant VALUES (?, ?, ?, ?)";
-    private static final String DELETE_APPLICANT = "DELETE FROM pledge_applicant WHERE charId = ? AND clanId = ?";
-    private static final String INSERT_WAITING_LIST = "INSERT INTO pledge_waiting_list VALUES (?, ?)";
-    private static final String DELETE_WAITING_LIST = "DELETE FROM pledge_waiting_list WHERE char_id = ?";
-    private static final String INSERT_CLAN_RECRUIT = "INSERT INTO pledge_recruit VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String UPDATE_CLAN_RECRUIT = "UPDATE pledge_recruit SET karma = ?, information = ?, detailed_information = ?, application_type = ?, recruit_type = ? WHERE clan_id = ?";
-    private static final String DELETE_CLAN_RECRUIT = "DELETE FROM pledge_recruit WHERE clan_id = ?";
-    private static final List<Comparator<PledgeWaitingInfo>> PLAYER_COMPARATOR;
-    private static final List<Comparator<PledgeRecruitInfo>> CLAN_COMPARATOR;
+    private static final Logger LOGGER;
+    private IntMap<PledgeWaitingData> waitings;
+    private IntMap<PledgeRecruitData> clans;
+    private final IntMap<IntMap<PledgeApplicantData>> applicants;
+    private final IntMap<ScheduledFuture<?>> clanLocked;
+    private final IntMap<ScheduledFuture<?>> playerLocked;
+    private static final List<Comparator<PledgeWaitingData>> PLAYER_COMPARATOR;
+    private static final List<Comparator<PledgeRecruitData>> CLAN_COMPARATOR;
     private static final long LOCK_TIME;
     
     private ClanEntryManager() {
-        this.load();
-    }
-    
-    private static void lockPlayer(final int playerId) {
-        ClanEntryManager._playerLocked.put(playerId, ThreadPool.schedule(() -> ClanEntryManager._playerLocked.remove(playerId), ClanEntryManager.LOCK_TIME));
-    }
-    
-    private static void lockClan(final int clanId) {
-        ClanEntryManager._clanLocked.put(clanId, ThreadPool.schedule(() -> ClanEntryManager._clanLocked.remove(clanId), ClanEntryManager.LOCK_TIME));
+        this.waitings = (IntMap<PledgeWaitingData>)new CHashIntMap();
+        this.clans = (IntMap<PledgeRecruitData>)new CHashIntMap();
+        this.applicants = (IntMap<IntMap<PledgeApplicantData>>)new CHashIntMap();
+        this.clanLocked = (IntMap<ScheduledFuture<?>>)new CHashIntMap();
+        this.playerLocked = (IntMap<ScheduledFuture<?>>)new CHashIntMap();
     }
     
     private void load() {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final Statement s = con.createStatement();
-                try {
-                    final ResultSet rs = s.executeQuery("SELECT * FROM pledge_recruit");
-                    try {
-                        while (rs.next()) {
-                            final int clanId = rs.getInt("clan_id");
-                            ClanEntryManager._clanList.put(clanId, new PledgeRecruitInfo(clanId, rs.getInt("karma"), rs.getString("information"), rs.getString("detailed_information"), rs.getInt("application_type"), rs.getInt("recruit_type")));
-                            if (ClanTable.getInstance().getClan(clanId) == null) {
-                                this.removeFromClanList(clanId);
-                            }
-                        }
-                        ClanEntryManager.LOGGER.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;, this.getClass().getSimpleName(), ClanEntryManager._clanList.size()));
-                        if (rs != null) {
-                            rs.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (rs != null) {
-                            try {
-                                rs.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (s != null) {
-                        s.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (s != null) {
-                        try {
-                            s.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t3) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception3) {
-                        t3.addSuppressed(exception3);
-                    }
-                }
-                throw t3;
-            }
+        final PledgeRecruitDAO pledgeRecruitDAO = (PledgeRecruitDAO)DatabaseAccess.getDAO((Class)PledgeRecruitDAO.class);
+        this.clans = (IntMap<PledgeRecruitData>)pledgeRecruitDAO.findAll(pledgeRecruit -> pledgeRecruit.setClan(ClanTable.getInstance().getClan(pledgeRecruit.getClanId())));
+        ClanEntryManager.LOGGER.info("Loaded {} clan entry", (Object)this.clans.size());
+        this.waitings = (IntMap<PledgeWaitingData>)pledgeRecruitDAO.findAllWaiting();
+        ClanEntryManager.LOGGER.info("Loaded {} player in waiting list", (Object)this.waitings.size());
+        final List<PledgeApplicantData> applicantList = pledgeRecruitDAO.findAllApplicant();
+        for (final PledgeApplicantData applicant : applicantList) {
+            ((IntMap)this.applicants.computeIfAbsent(applicant.getRequestClanId(), k -> new CHashIntMap())).put(applicant.getPlayerId(), (Object)applicant);
         }
-        catch (Exception e) {
-            ClanEntryManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName()), (Throwable)e);
-        }
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final Statement s = con.createStatement();
-                try {
-                    final ResultSet rs = s.executeQuery("SELECT a.char_id, a.karma, b.base_class, b.level, b.char_name FROM pledge_waiting_list as a LEFT JOIN characters as b ON a.char_id = b.charId");
-                    try {
-                        while (rs.next()) {
-                            ClanEntryManager._waitingList.put(rs.getInt("char_id"), new PledgeWaitingInfo(rs.getInt("char_id"), rs.getInt("level"), rs.getInt("karma"), rs.getInt("base_class"), rs.getString("char_name")));
-                        }
-                        ClanEntryManager.LOGGER.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;, this.getClass().getSimpleName(), ClanEntryManager._waitingList.size()));
-                        if (rs != null) {
-                            rs.close();
-                        }
-                    }
-                    catch (Throwable t4) {
-                        if (rs != null) {
-                            try {
-                                rs.close();
-                            }
-                            catch (Throwable exception4) {
-                                t4.addSuppressed(exception4);
-                            }
-                        }
-                        throw t4;
-                    }
-                    if (s != null) {
-                        s.close();
-                    }
-                }
-                catch (Throwable t5) {
-                    if (s != null) {
-                        try {
-                            s.close();
-                        }
-                        catch (Throwable exception5) {
-                            t5.addSuppressed(exception5);
-                        }
-                    }
-                    throw t5;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t6) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception6) {
-                        t6.addSuppressed(exception6);
-                    }
-                }
-                throw t6;
-            }
-        }
-        catch (Exception e) {
-            ClanEntryManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName()), (Throwable)e);
-        }
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final Statement s = con.createStatement();
-                try {
-                    final ResultSet rs = s.executeQuery("SELECT a.charId, a.clanId, a.karma, a.message, b.base_class, b.level, b.char_name FROM pledge_applicant as a LEFT JOIN characters as b ON a.charId = b.charId");
-                    try {
-                        while (rs.next()) {
-                            ClanEntryManager._applicantList.computeIfAbsent(Integer.valueOf(rs.getInt("clanId")), k -> new ConcurrentHashMap()).put(rs.getInt("charId"), new PledgeApplicantInfo(rs.getInt("charId"), rs.getString("char_name"), rs.getInt("level"), rs.getInt("karma"), rs.getInt("clanId"), rs.getString("message")));
-                        }
-                        ClanEntryManager.LOGGER.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;, this.getClass().getSimpleName(), ClanEntryManager._applicantList.size()));
-                        if (rs != null) {
-                            rs.close();
-                        }
-                    }
-                    catch (Throwable t7) {
-                        if (rs != null) {
-                            try {
-                                rs.close();
-                            }
-                            catch (Throwable exception7) {
-                                t7.addSuppressed(exception7);
-                            }
-                        }
-                        throw t7;
-                    }
-                    if (s != null) {
-                        s.close();
-                    }
-                }
-                catch (Throwable t8) {
-                    if (s != null) {
-                        try {
-                            s.close();
-                        }
-                        catch (Throwable exception8) {
-                            t8.addSuppressed(exception8);
-                        }
-                    }
-                    throw t8;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t9) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception9) {
-                        t9.addSuppressed(exception9);
-                    }
-                }
-                throw t9;
-            }
-        }
-        catch (Exception e) {
-            ClanEntryManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getClass().getSimpleName()), (Throwable)e);
+        ClanEntryManager.LOGGER.info("Loaded {} player applications", (Object)applicantList.size());
+    }
+    
+    private void lockPlayer(final int playerId) {
+        this.playerLocked.put(playerId, (Object)ThreadPool.schedule(() -> this.playerLocked.remove(playerId), ClanEntryManager.LOCK_TIME));
+    }
+    
+    private void lockClan(final int clanId) {
+        this.clanLocked.put(clanId, (Object)ThreadPool.schedule(() -> this.clanLocked.remove(clanId), ClanEntryManager.LOCK_TIME));
+    }
+    
+    public IntMap<PledgeApplicantData> getApplicantListForClan(final int clanId) {
+        return (IntMap<PledgeApplicantData>)this.applicants.getOrDefault(clanId, (Object)Containers.emptyIntMap());
+    }
+    
+    public PledgeApplicantData getPlayerApplication(final int clanId, final int playerId) {
+        return (PledgeApplicantData)((IntMap)this.applicants.getOrDefault(clanId, (Object)Containers.emptyIntMap())).get(playerId);
+    }
+    
+    public void removePlayerApplication(final int clanId, final int playerId) {
+        final IntMap<PledgeApplicantData> clanApplicantList = (IntMap<PledgeApplicantData>)this.applicants.get(clanId);
+        if (Objects.nonNull(clanApplicantList) && Objects.nonNull(clanApplicantList.remove(playerId))) {
+            ((PledgeRecruitDAO)DatabaseAccess.getDAO((Class)PledgeRecruitDAO.class)).deleteApplicant(playerId, clanId);
         }
     }
     
-    public Map<Integer, PledgeWaitingInfo> getWaitingList() {
-        return ClanEntryManager._waitingList;
-    }
-    
-    public Map<Integer, PledgeRecruitInfo> getClanList() {
-        return ClanEntryManager._clanList;
-    }
-    
-    public Map<Integer, Map<Integer, PledgeApplicantInfo>> getApplicantList() {
-        return ClanEntryManager._applicantList;
-    }
-    
-    public Map<Integer, PledgeApplicantInfo> getApplicantListForClan(final int clanId) {
-        return ClanEntryManager._applicantList.getOrDefault(clanId, Collections.emptyMap());
-    }
-    
-    public PledgeApplicantInfo getPlayerApplication(final int clanId, final int playerId) {
-        return ClanEntryManager._applicantList.getOrDefault(clanId, Collections.emptyMap()).get(playerId);
-    }
-    
-    public boolean removePlayerApplication(final int clanId, final int playerId) {
-        final Map<Integer, PledgeApplicantInfo> clanApplicantList = ClanEntryManager._applicantList.get(clanId);
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement statement = con.prepareStatement("DELETE FROM pledge_applicant WHERE charId = ? AND clanId = ?");
-                try {
-                    statement.setInt(1, playerId);
-                    statement.setInt(2, clanId);
-                    statement.executeUpdate();
-                    if (statement != null) {
-                        statement.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            ClanEntryManager.LOGGER.warn(e.getMessage(), (Throwable)e);
-        }
-        return clanApplicantList != null && clanApplicantList.remove(playerId) != null;
-    }
-    
-    public boolean addPlayerApplicationToClan(final int clanId, final PledgeApplicantInfo info) {
-        if (!ClanEntryManager._playerLocked.containsKey(info.getPlayerId())) {
-            ClanEntryManager._applicantList.computeIfAbsent(Integer.valueOf(clanId), k -> new ConcurrentHashMap()).put(info.getPlayerId(), info);
-            try {
-                final Connection con = DatabaseFactory.getInstance().getConnection();
-                try {
-                    final PreparedStatement statement = con.prepareStatement("INSERT INTO pledge_applicant VALUES (?, ?, ?, ?)");
-                    try {
-                        statement.setInt(1, info.getPlayerId());
-                        statement.setInt(2, info.getRequestClanId());
-                        statement.setInt(3, info.getKarma());
-                        statement.setString(4, info.getMessage());
-                        statement.executeUpdate();
-                        if (statement != null) {
-                            statement.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (statement != null) {
-                            try {
-                                statement.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (con != null) {
-                        con.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (con != null) {
-                        try {
-                            con.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-            }
-            catch (Exception e) {
-                ClanEntryManager.LOGGER.warn(e.getMessage(), (Throwable)e);
-            }
+    public boolean addPlayerApplicationToClan(final int clanId, final PledgeApplicantData info) {
+        if (!this.playerLocked.containsKey(info.getPlayerId())) {
+            ((IntMap)this.applicants.computeIfAbsent(clanId, k -> new CHashIntMap())).put(info.getPlayerId(), (Object)info);
+            ((PledgeRecruitDAO)DatabaseAccess.getDAO((Class)PledgeRecruitDAO.class)).save(info);
             return true;
         }
         return false;
     }
     
     public OptionalInt getClanIdForPlayerApplication(final int playerId) {
-        return ClanEntryManager._applicantList.entrySet().stream().filter(e -> e.getValue().containsKey(playerId)).mapToInt(e -> e.getKey()).findFirst();
+        return this.applicants.entrySet().stream().filter(e -> ((IntMap)e.getValue()).containsKey(playerId)).mapToInt(IntMap.Entry::getKey).findFirst();
     }
     
-    public boolean addToWaitingList(final int playerId, final PledgeWaitingInfo info) {
-        if (!ClanEntryManager._playerLocked.containsKey(playerId)) {
-            try {
-                final Connection con = DatabaseFactory.getInstance().getConnection();
-                try {
-                    final PreparedStatement statement = con.prepareStatement("INSERT INTO pledge_waiting_list VALUES (?, ?)");
-                    try {
-                        statement.setInt(1, info.getPlayerId());
-                        statement.setInt(2, info.getKarma());
-                        statement.executeUpdate();
-                        if (statement != null) {
-                            statement.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (statement != null) {
-                            try {
-                                statement.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (con != null) {
-                        con.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (con != null) {
-                        try {
-                            con.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-            }
-            catch (Exception e) {
-                ClanEntryManager.LOGGER.warn(e.getMessage(), (Throwable)e);
-            }
-            ClanEntryManager._waitingList.put(playerId, info);
+    public boolean addToWaitingList(final int playerId, final PledgeWaitingData info) {
+        if (!this.playerLocked.containsKey(playerId)) {
+            ((PledgeRecruitDAO)DatabaseAccess.getDAO((Class)PledgeRecruitDAO.class)).save(info);
+            this.waitings.put(playerId, (Object)info);
             return true;
         }
         return false;
     }
     
     public boolean removeFromWaitingList(final int playerId) {
-        if (ClanEntryManager._waitingList.containsKey(playerId)) {
-            try {
-                final Connection con = DatabaseFactory.getInstance().getConnection();
-                try {
-                    final PreparedStatement statement = con.prepareStatement("DELETE FROM pledge_waiting_list WHERE char_id = ?");
-                    try {
-                        statement.setInt(1, playerId);
-                        statement.executeUpdate();
-                        if (statement != null) {
-                            statement.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (statement != null) {
-                            try {
-                                statement.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (con != null) {
-                        con.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (con != null) {
-                        try {
-                            con.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-            }
-            catch (Exception e) {
-                ClanEntryManager.LOGGER.warn(e.getMessage(), (Throwable)e);
-            }
-            ClanEntryManager._waitingList.remove(playerId);
-            lockPlayer(playerId);
+        if (this.waitings.containsKey(playerId)) {
+            ((PledgeRecruitDAO)DatabaseAccess.getDAO((Class)PledgeRecruitDAO.class)).deleteWaiting(playerId);
+            this.waitings.remove(playerId);
+            this.lockPlayer(playerId);
             return true;
         }
         return false;
     }
     
-    public boolean addToClanList(final int clanId, final PledgeRecruitInfo info) {
-        if (!ClanEntryManager._clanList.containsKey(clanId) && !ClanEntryManager._clanLocked.containsKey(clanId)) {
-            try {
-                final Connection con = DatabaseFactory.getInstance().getConnection();
-                try {
-                    final PreparedStatement statement = con.prepareStatement("INSERT INTO pledge_recruit VALUES (?, ?, ?, ?, ?, ?)");
-                    try {
-                        statement.setInt(1, info.getClanId());
-                        statement.setInt(2, info.getKarma());
-                        statement.setString(3, info.getInformation());
-                        statement.setString(4, info.getDetailedInformation());
-                        statement.setInt(5, info.getApplicationType());
-                        statement.setInt(6, info.getRecruitType());
-                        statement.executeUpdate();
-                        if (statement != null) {
-                            statement.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (statement != null) {
-                            try {
-                                statement.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (con != null) {
-                        con.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (con != null) {
-                        try {
-                            con.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-            }
-            catch (Exception e) {
-                ClanEntryManager.LOGGER.warn(e.getMessage(), (Throwable)e);
-            }
-            ClanEntryManager._clanList.put(clanId, info);
+    public boolean addToClanList(final int clanId, final PledgeRecruitData info) {
+        if (!this.clans.containsKey(clanId) && !this.clanLocked.containsKey(clanId)) {
+            ((PledgeRecruitDAO)DatabaseAccess.getDAO((Class)PledgeRecruitDAO.class)).save((Object)info);
+            this.clans.put(clanId, (Object)info);
             return true;
         }
         return false;
     }
     
-    public boolean updateClanList(final int clanId, final PledgeRecruitInfo info) {
-        if (ClanEntryManager._clanList.containsKey(clanId) && !ClanEntryManager._clanLocked.containsKey(clanId)) {
-            try {
-                final Connection con = DatabaseFactory.getInstance().getConnection();
-                try {
-                    final PreparedStatement statement = con.prepareStatement("UPDATE pledge_recruit SET karma = ?, information = ?, detailed_information = ?, application_type = ?, recruit_type = ? WHERE clan_id = ?");
-                    try {
-                        statement.setInt(1, info.getKarma());
-                        statement.setString(2, info.getInformation());
-                        statement.setString(3, info.getDetailedInformation());
-                        statement.setInt(4, info.getApplicationType());
-                        statement.setInt(5, info.getRecruitType());
-                        statement.setInt(6, info.getClanId());
-                        statement.executeUpdate();
-                        if (statement != null) {
-                            statement.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (statement != null) {
-                            try {
-                                statement.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (con != null) {
-                        con.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (con != null) {
-                        try {
-                            con.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-            }
-            catch (Exception e) {
-                ClanEntryManager.LOGGER.warn(e.getMessage(), (Throwable)e);
-            }
-            return ClanEntryManager._clanList.replace(clanId, info) != null;
+    public boolean updateClanList(final int clanId, final PledgeRecruitData info) {
+        if (this.clans.containsKey(clanId) && !this.clanLocked.containsKey(clanId)) {
+            ((PledgeRecruitDAO)DatabaseAccess.getDAO((Class)PledgeRecruitDAO.class)).save((Object)info);
+            return this.clans.replace(clanId, (Object)info) != null;
         }
         return false;
     }
     
     public boolean removeFromClanList(final int clanId) {
-        if (ClanEntryManager._clanList.containsKey(clanId)) {
-            try {
-                final Connection con = DatabaseFactory.getInstance().getConnection();
-                try {
-                    final PreparedStatement statement = con.prepareStatement("DELETE FROM pledge_recruit WHERE clan_id = ?");
-                    try {
-                        statement.setInt(1, clanId);
-                        statement.executeUpdate();
-                        if (statement != null) {
-                            statement.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (statement != null) {
-                            try {
-                                statement.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (con != null) {
-                        con.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (con != null) {
-                        try {
-                            con.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-            }
-            catch (Exception e) {
-                ClanEntryManager.LOGGER.warn(e.getMessage(), (Throwable)e);
-            }
-            ClanEntryManager._clanList.remove(clanId);
-            lockClan(clanId);
+        if (this.clans.containsKey(clanId)) {
+            ((PledgeRecruitDAO)DatabaseAccess.getDAO((Class)PledgeRecruitDAO.class)).deleteRecruit(clanId);
+            this.clans.remove(clanId);
+            this.lockClan(clanId);
             return true;
         }
         return false;
     }
     
-    public List<PledgeWaitingInfo> getSortedWaitingList(final int levelMin, final int levelMax, final int role, int sortBy, final boolean descending) {
+    public List<PledgeWaitingData> getSortedWaitingList(final int levelMin, final int levelMax, final int role, int sortBy, final boolean descending) {
         sortBy = CommonUtil.constrain(sortBy, 1, ClanEntryManager.PLAYER_COMPARATOR.size() - 1);
-        return ClanEntryManager._waitingList.values().stream().filter(p -> p.getPlayerLvl() >= levelMin && p.getPlayerLvl() <= levelMax).sorted(descending ? ClanEntryManager.PLAYER_COMPARATOR.get(sortBy).reversed() : ClanEntryManager.PLAYER_COMPARATOR.get(sortBy)).collect((Collector<? super PledgeWaitingInfo, ?, List<PledgeWaitingInfo>>)Collectors.toList());
+        return this.waitings.values().stream().filter(p -> p.getPlayerLvl() >= levelMin && p.getPlayerLvl() <= levelMax).sorted((Comparator<? super Object>)(descending ? ClanEntryManager.PLAYER_COMPARATOR.get(sortBy).reversed() : ClanEntryManager.PLAYER_COMPARATOR.get(sortBy))).collect((Collector<? super Object, ?, List<PledgeWaitingData>>)Collectors.toList());
     }
     
-    public List<PledgeWaitingInfo> queryWaitingListByName(final String name) {
-        return ClanEntryManager._waitingList.values().stream().filter(p -> p.getPlayerName().toLowerCase().contains(name)).collect((Collector<? super PledgeWaitingInfo, ?, List<PledgeWaitingInfo>>)Collectors.toList());
+    public List<PledgeWaitingData> queryWaitingListByName(final String name) {
+        return this.waitings.values().stream().filter(p -> p.getPlayerName().toLowerCase().contains(name)).collect((Collector<? super Object, ?, List<PledgeWaitingData>>)Collectors.toList());
     }
     
-    public List<PledgeRecruitInfo> getSortedClanListByName(final String query, final int type) {
-        return (List<PledgeRecruitInfo>)((type == 1) ? ClanEntryManager._clanList.values().stream().filter(p -> p.getClanName().toLowerCase().contains(query)).collect((Collector<? super PledgeRecruitInfo, ?, List<? super PledgeRecruitInfo>>)Collectors.toList()) : ClanEntryManager._clanList.values().stream().filter(p -> p.getClanLeaderName().toLowerCase().contains(query)).collect((Collector<? super PledgeRecruitInfo, ?, List<? super PledgeRecruitInfo>>)Collectors.toList()));
+    public List<PledgeRecruitData> getSortedClanListByName(final String query, final int type) {
+        return (List<PledgeRecruitData>)((type == 1) ? this.clans.values().stream().filter(p -> p.getClanName().toLowerCase().contains(query)).collect((Collector<? super Object, ?, List<Object>>)Collectors.toList()) : this.clans.values().stream().filter(p -> p.getClanLeaderName().toLowerCase().contains(query)).collect((Collector<? super Object, ?, List<Object>>)Collectors.toList()));
     }
     
-    public PledgeRecruitInfo getClanById(final int clanId) {
-        return ClanEntryManager._clanList.get(clanId);
+    public PledgeRecruitData getClanById(final int clanId) {
+        return (PledgeRecruitData)this.clans.get(clanId);
     }
     
     public boolean isClanRegistred(final int clanId) {
-        return ClanEntryManager._clanList.get(clanId) != null;
+        return this.clans.get(clanId) != null;
     }
     
     public boolean isPlayerRegistred(final int playerId) {
-        return ClanEntryManager._waitingList.get(playerId) != null;
+        return this.waitings.get(playerId) != null;
     }
     
-    public List<PledgeRecruitInfo> getUnSortedClanList() {
-        return new ArrayList<PledgeRecruitInfo>(ClanEntryManager._clanList.values());
+    public List<PledgeRecruitData> getUnSortedClanList() {
+        return new ArrayList<PledgeRecruitData>(this.clans.values());
     }
     
-    public List<PledgeRecruitInfo> getSortedClanList(final int clanLevel, final int karma, int sortBy, final boolean descending) {
+    public List<PledgeRecruitData> getSortedClanList(final int clanLevel, final int karma, int sortBy, final boolean descending) {
         sortBy = CommonUtil.constrain(sortBy, 1, ClanEntryManager.CLAN_COMPARATOR.size() - 1);
         final boolean b;
-        return ClanEntryManager._clanList.values().stream().filter(p -> {
+        return this.clans.values().stream().filter(p -> {
             if (clanLevel >= 0 || karma < 0 || karma == p.getKarma()) {
                 if (clanLevel >= 0 && karma < 0) {
                     if (clanLevel != ((p.getClan() != null) ? p.getClanLevel() : 0)) {
@@ -677,15 +194,19 @@ public class ClanEntryManager
                 return b;
             }
             return b;
-        }).sorted(descending ? ClanEntryManager.CLAN_COMPARATOR.get(sortBy).reversed() : ClanEntryManager.CLAN_COMPARATOR.get(sortBy)).collect((Collector<? super PledgeRecruitInfo, ?, List<PledgeRecruitInfo>>)Collectors.toList());
+        }).sorted((Comparator<? super Object>)(descending ? ClanEntryManager.CLAN_COMPARATOR.get(sortBy).reversed() : ClanEntryManager.CLAN_COMPARATOR.get(sortBy))).collect((Collector<? super Object, ?, List<PledgeRecruitData>>)Collectors.toList());
     }
     
     public long getPlayerLockTime(final int playerId) {
-        return (ClanEntryManager._playerLocked.get(playerId) == null) ? 0L : ClanEntryManager._playerLocked.get(playerId).getDelay(TimeUnit.MINUTES);
+        return (this.playerLocked.get(playerId) == null) ? 0L : ((ScheduledFuture)this.playerLocked.get(playerId)).getDelay(TimeUnit.MINUTES);
     }
     
     public long getClanLockTime(final int playerId) {
-        return (ClanEntryManager._clanLocked.get(playerId) == null) ? 0L : ClanEntryManager._clanLocked.get(playerId).getDelay(TimeUnit.MINUTES);
+        return (this.clanLocked.get(playerId) == null) ? 0L : ((ScheduledFuture)this.clanLocked.get(playerId)).getDelay(TimeUnit.MINUTES);
+    }
+    
+    public static void init() {
+        getInstance().load();
     }
     
     public static ClanEntryManager getInstance() {
@@ -694,13 +215,8 @@ public class ClanEntryManager
     
     static {
         LOGGER = LoggerFactory.getLogger((Class)ClanEntryManager.class);
-        _waitingList = new ConcurrentHashMap<Integer, PledgeWaitingInfo>();
-        _clanList = new ConcurrentHashMap<Integer, PledgeRecruitInfo>();
-        _applicantList = new ConcurrentHashMap<Integer, Map<Integer, PledgeApplicantInfo>>();
-        _clanLocked = new ConcurrentHashMap<Integer, ScheduledFuture<?>>();
-        _playerLocked = new ConcurrentHashMap<Integer, ScheduledFuture<?>>();
-        PLAYER_COMPARATOR = Arrays.asList(null, Comparator.comparing((Function<? super Object, ? extends Comparable>)PledgeWaitingInfo::getPlayerName), Comparator.comparingInt(PledgeWaitingInfo::getKarma), Comparator.comparingInt(PledgeWaitingInfo::getPlayerLvl), Comparator.comparingInt(PledgeWaitingInfo::getPlayerClassId));
-        CLAN_COMPARATOR = Arrays.asList(null, Comparator.comparing((Function<? super Object, ? extends Comparable>)PledgeRecruitInfo::getClanName), Comparator.comparing((Function<? super Object, ? extends Comparable>)PledgeRecruitInfo::getClanLeaderName), Comparator.comparingInt(PledgeRecruitInfo::getClanLevel), Comparator.comparingInt(PledgeRecruitInfo::getKarma));
+        PLAYER_COMPARATOR = Arrays.asList(null, Comparator.comparing((Function<? super Object, ? extends Comparable>)PledgeWaitingData::getPlayerName), Comparator.comparingInt(PledgeWaitingData::getKarma), Comparator.comparingInt(PledgeWaitingData::getPlayerLvl), Comparator.comparingInt(PledgeWaitingData::getPlayerClassId));
+        CLAN_COMPARATOR = Arrays.asList(null, Comparator.comparing((Function<? super Object, ? extends Comparable>)PledgeRecruitData::getClanName), Comparator.comparing((Function<? super Object, ? extends Comparable>)PledgeRecruitData::getClanLeaderName), Comparator.comparingInt(PledgeRecruitData::getClanLevel), Comparator.comparingInt(PledgeRecruitData::getKarma));
         LOCK_TIME = TimeUnit.MINUTES.toMillis(5L);
     }
     

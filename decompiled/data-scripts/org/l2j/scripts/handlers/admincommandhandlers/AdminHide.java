@@ -19,32 +19,49 @@ public final class AdminHide implements IAdminCommandHandler
         try {
             final String nextToken;
             final String param = nextToken = st.nextToken();
-            switch (nextToken) {
-                case "on": {
-                    if (!BuilderUtil.setHiding(player, true)) {
-                        BuilderUtil.sendSysMessage(player, "Currently, you cannot be seen.");
-                        return true;
+            int n = -1;
+            switch (nextToken.hashCode()) {
+                case 3551: {
+                    if (nextToken.equals("on")) {
+                        n = 0;
+                        break;
                     }
-                    BuilderUtil.sendSysMessage(player, "Now, you cannot be seen.");
-                    return true;
+                    break;
                 }
-                case "off": {
-                    if (!BuilderUtil.setHiding(player, false)) {
-                        BuilderUtil.sendSysMessage(player, "Currently, you can be seen.");
-                        return true;
+                case 109935: {
+                    if (nextToken.equals("off")) {
+                        n = 1;
+                        break;
                     }
-                    BuilderUtil.sendSysMessage(player, "Now, you can be seen.");
-                    return true;
-                }
-                default: {
-                    BuilderUtil.sendSysMessage(player, "//hide [on|off]");
-                    return true;
+                    break;
                 }
             }
+            Label_0139: {
+                switch (n) {
+                    case 0: {
+                        if (!BuilderUtil.setHiding(player, true)) {
+                            BuilderUtil.sendSysMessage(player, "Currently, you cannot be seen.");
+                            break Label_0139;
+                        }
+                        BuilderUtil.sendSysMessage(player, "Now, you cannot be seen.");
+                        break Label_0139;
+                    }
+                    case 1: {
+                        if (!BuilderUtil.setHiding(player, false)) {
+                            BuilderUtil.sendSysMessage(player, "Currently, you can be seen.");
+                            break;
+                        }
+                        BuilderUtil.sendSysMessage(player, "Now, you can be seen.");
+                        break;
+                    }
+                }
+            }
+            BuilderUtil.sendSysMessage(player, "//hide [on|off]");
+            return true;
         }
         catch (Exception e) {
             BuilderUtil.sendSysMessage(player, "//hide [on|off]");
-            return true;
+            return false;
         }
     }
     

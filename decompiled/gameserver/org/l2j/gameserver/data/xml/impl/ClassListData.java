@@ -47,11 +47,11 @@ public final class ClassListData extends GameXmlReader
                     final NamedNodeMap attrs = d.getAttributes();
                     if ("class".equals(d.getNodeName())) {
                         Node attr = attrs.getNamedItem("classId");
-                        final ClassId classId = ClassId.getClassId(this.parseInteger(attr));
+                        final ClassId classId = ClassId.getClassId(this.parseInt(attr));
                         attr = attrs.getNamedItem("name");
                         final String className = attr.getNodeValue();
                         attr = attrs.getNamedItem("parentClassId");
-                        final ClassId parentClassId = (attr != null) ? ClassId.getClassId(this.parseInteger(attr)) : null;
+                        final ClassId parentClassId = (attr != null) ? ClassId.getClassId(this.parseInt(attr)) : null;
                         this._classData.put(classId, new ClassInfo(classId, className, parentClassId));
                     }
                 }

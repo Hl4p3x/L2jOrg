@@ -22,9 +22,11 @@ import org.w3c.dom.Document;
 import org.l2j.commons.configuration.Configurator;
 import org.l2j.gameserver.settings.ServerSettings;
 import java.nio.file.Path;
+import io.github.joealisson.primitive.HashIntMap;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import org.l2j.gameserver.model.Macro;
+import io.github.joealisson.primitive.IntMap;
 import org.l2j.gameserver.data.database.data.Shortcut;
 import java.util.List;
 import org.l2j.gameserver.model.base.ClassId;
@@ -37,12 +39,12 @@ public final class InitialShortcutData extends GameXmlReader
     private static final Logger LOGGER;
     private final Map<ClassId, List<Shortcut>> _initialShortcutData;
     private final List<Shortcut> _initialGlobalShortcutList;
-    private final Map<Integer, Macro> _macroPresets;
+    private final IntMap<Macro> _macroPresets;
     
     private InitialShortcutData() {
-        this._initialShortcutData = new HashMap<ClassId, List<Shortcut>>();
+        this._initialShortcutData = new EnumMap<ClassId, List<Shortcut>>(ClassId.class);
         this._initialGlobalShortcutList = new ArrayList<Shortcut>();
-        this._macroPresets = new HashMap<Integer, Macro>();
+        this._macroPresets = (IntMap<Macro>)new HashIntMap();
         this.load();
     }
     
@@ -87,7 +89,7 @@ public final class InitialShortcutData extends GameXmlReader
         for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling()) {
             if ("page".equals(c.getNodeName())) {
                 attrs = c.getAttributes();
-                final int pageId = this.parseInteger(attrs, "pageId");
+                final int pageId = this.parseInt(attrs, "pageId");
                 for (Node b = c.getFirstChild(); b != null; b = b.getNextSibling()) {
                     if ("slot".equals(b.getNodeName())) {
                         list.add(this.createShortcut(pageId, b));
@@ -107,9 +109,9 @@ public final class InitialShortcutData extends GameXmlReader
         for (Node c = d.getFirstChild(); c != null; c = c.getNextSibling()) {
             if ("macro".equals(c.getNodeName())) {
                 NamedNodeMap attrs = c.getAttributes();
-                if (this.parseBoolean(attrs, "enabled", Boolean.valueOf(true))) {
-                    final int macroId = this.parseInteger(attrs, "macroId");
-                    final int icon = this.parseInteger(attrs, "icon");
+                if (this.parseBoolean(attrs, "enabled", true)) {
+                    final int macroId = this.parseInt(attrs, "macroId");
+                    final int icon = this.parseInt(attrs, "icon");
                     final String name = this.parseString(attrs, "name");
                     final String description = this.parseString(attrs, "description");
                     final String acronym = this.parseString(attrs, "acronym");
@@ -124,31 +126,31 @@ public final class InitialShortcutData extends GameXmlReader
                             final String cmd = b.getTextContent();
                             switch (type) {
                                 case SKILL: {
-                                    d2 = this.parseInteger(attrs, "skillId");
-                                    d3 = this.parseInteger(attrs, "skillLvl", Integer.valueOf(0));
+                                    d2 = this.parseInt(attrs, "skillId");
+                                    d3 = this.parseInt(attrs, "skillLvl", 0);
                                     break;
                                 }
                                 case ACTION: {
-                                    d2 = this.parseInteger(attrs, "actionId");
+                                    d2 = this.parseInt(attrs, "actionId");
                                 }
                                 case SHORTCUT: {
-                                    d2 = this.parseInteger(attrs, "page");
-                                    d3 = this.parseInteger(attrs, "slot", Integer.valueOf(0));
+                                    d2 = this.parseInt(attrs, "page");
+                                    d3 = this.parseInt(attrs, "slot", 0);
                                     break;
                                 }
                                 case ITEM: {
-                                    d2 = this.parseInteger(attrs, "itemId");
+                                    d2 = this.parseInt(attrs, "itemId");
                                     break;
                                 }
                                 case DELAY: {
-                                    d2 = this.parseInteger(attrs, "delay");
+                                    d2 = this.parseInt(attrs, "delay");
                                     break;
                                 }
                             }
                             commands.add(new MacroCmd(entry++, type, d2, d3, cmd));
                         }
                     }
-                    this._macroPresets.put(macroId, new Macro(macroId, icon, name, description, acronym, commands));
+                    this._macroPresets.put(macroId, (Object)new Macro(macroId, icon, name, description, acronym, commands));
                 }
             }
         }
@@ -156,24 +158,12 @@ public final class InitialShortcutData extends GameXmlReader
     
     private Shortcut createShortcut(final int pageId, final Node b) {
         final NamedNodeMap attrs = b.getAttributes();
-        final int slotId = this.parseInteger(attrs, "slotId");
+        final int slotId = this.parseInt(attrs, "slotId");
         final ShortcutType shortcutType = (ShortcutType)this.parseEnum(attrs, (Class)ShortcutType.class, "shortcutType");
-        final int shortcutId = this.parseInteger(attrs, "shortcutId");
-        final int shortcutLevel = this.parseInteger(attrs, "shortcutLevel", Integer.valueOf(0));
-        final int characterType = this.parseInteger(attrs, "characterType", Integer.valueOf(0));
+        final int shortcutId = this.parseInt(attrs, "shortcutId");
+        final int shortcutLevel = this.parseInt(attrs, "shortcutLevel", 0);
+        final int characterType = this.parseInt(attrs, "characterType", 0);
         return new Shortcut(Shortcut.pageAndSlotToClientId(pageId, slotId), shortcutType, shortcutId, shortcutLevel, 0, characterType);
-    }
-    
-    public List<Shortcut> getShortcutList(final ClassId cId) {
-        return this._initialShortcutData.get(cId);
-    }
-    
-    public List<Shortcut> getShortcutList(final int cId) {
-        return this._initialShortcutData.get(ClassId.getClassId(cId));
-    }
-    
-    public List<Shortcut> getGlobalMacroList() {
-        return this._initialGlobalShortcutList;
     }
     
     public void registerAllShortcuts(final Player player) {
@@ -198,7 +188,7 @@ public final class InitialShortcutData extends GameXmlReader
                     break;
                 }
                 case MACRO: {
-                    final Macro macro = this._macroPresets.get(shortcutId);
+                    final Macro macro = (Macro)this._macroPresets.get(shortcutId);
                     if (macro == null) {
                         continue;
                     }
@@ -229,7 +219,7 @@ public final class InitialShortcutData extends GameXmlReader
                         break;
                     }
                     case MACRO: {
-                        final Macro macro = this._macroPresets.get(shortcutId);
+                        final Macro macro = (Macro)this._macroPresets.get(shortcutId);
                         if (macro == null) {
                             continue;
                         }

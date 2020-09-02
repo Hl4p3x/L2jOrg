@@ -17,7 +17,7 @@ import org.l2j.commons.configuration.Configurator;
 import org.l2j.gameserver.settings.ServerSettings;
 import java.nio.file.Path;
 import org.l2j.gameserver.engine.skill.api.Skill;
-import org.l2j.gameserver.data.xml.impl.PrimeShopData;
+import org.l2j.gameserver.engine.item.shop.L2Store;
 import java.util.Objects;
 import org.l2j.gameserver.engine.skill.api.SkillEngine;
 import org.l2j.gameserver.model.actor.instance.Player;
@@ -75,7 +75,7 @@ public final class VipEngine extends GameXmlReader
                 player.addSkill(skill);
             }
         }
-        if (PrimeShopData.getInstance().canReceiveVipGift(player)) {
+        if (L2Store.getInstance().canReceiveVipGift(player)) {
             player.sendPacket(ExBRNewIconCashBtnWnd.SHOW);
         }
         else {
@@ -98,17 +98,17 @@ public final class VipEngine extends GameXmlReader
     
     private void parseVipTier(final Node vipNode) {
         NamedNodeMap attributes = vipNode.getAttributes();
-        final Byte level = this.parseByte(attributes, "tier");
-        final Long pointsRequired = this.parseLong(attributes, "points-required");
-        final Long pointsDepreciated = this.parseLong(attributes, "points-depreciated");
+        final byte level = this.parseByte(attributes, "tier");
+        final long pointsRequired = this.parseLong(attributes, "points-required");
+        final long pointsDepreciated = this.parseLong(attributes, "points-depreciated");
         final VipInfo vipInfo = new VipInfo(level, pointsRequired, pointsDepreciated);
         this.vipTiers.put((int)level, (Object)vipInfo);
         final Node bonusNode = vipNode.getFirstChild();
         if (Objects.nonNull(bonusNode)) {
             attributes = bonusNode.getAttributes();
             vipInfo.setSilverCoinChance(this.parseFloat(attributes, "silver-coin-acquisition"));
-            vipInfo.setRustyCoinChance(this.parseFloat(attributes, "rusty-coin-acquisition"));
-            vipInfo.setSkill(this.parseInteger(attributes, "skill"));
+            vipInfo.setGoldCoinChance(this.parseFloat(attributes, "gold-coin-acquisition"));
+            vipInfo.setSkill(this.parseInt(attributes, "skill"));
         }
     }
     
@@ -150,7 +150,7 @@ public final class VipEngine extends GameXmlReader
     }
     
     public float getRustyCoinDropChance(final Player player) {
-        return this.getVipInfo(player).getRustyCoinChance();
+        return this.getVipInfo(player).getGoldCoinChance();
     }
     
     public boolean checkVipTierExpiration(final Player player) {

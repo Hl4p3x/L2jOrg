@@ -24,7 +24,7 @@ public class PrivateStoreManageListBuy extends AbstractItemPacket
         this._sendType = sendType;
         this._objId = player.getObjectId();
         this._playerAdena = player.getAdena();
-        this._itemList = player.getInventory().getUniqueItems(false, true);
+        this._itemList = player.getInventory().getUniqueItems(false);
         this._buyList = player.getBuyList().getItems();
     }
     

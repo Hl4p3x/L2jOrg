@@ -63,7 +63,7 @@ public class AdminServerInfo implements IAdminCommandHandler
                 int offlineCount = 0;
                 final Collection<Player> objs = (Collection<Player>)World.getInstance().getPlayers();
                 for (final Player player : objs) {
-                    if (player.getClient() == null || player.getClient().isDetached()) {
+                    if (player.getClient() == null) {
                         ++offlineCount;
                     }
                 }
@@ -72,7 +72,7 @@ public class AdminServerInfo implements IAdminCommandHandler
             case "GM": {
                 int onlineGMcount = 0;
                 for (final Player gm : AdminData.getInstance().getAllGms(true)) {
-                    if (gm != null && gm.isOnline() && gm.getClient() != null && !gm.getClient().isDetached()) {
+                    if (gm != null && gm.isOnline() && gm.getClient() != null) {
                         ++onlineGMcount;
                     }
                 }
@@ -81,7 +81,7 @@ public class AdminServerInfo implements IAdminCommandHandler
             case "ALL_REAL": {
                 final Set<String> realPlayers = new HashSet<String>();
                 for (final Player onlinePlayer : World.getInstance().getPlayers()) {
-                    if (onlinePlayer != null && onlinePlayer.getClient() != null && !onlinePlayer.getClient().isDetached()) {
+                    if (onlinePlayer != null && onlinePlayer.getClient() != null) {
                         realPlayers.add(onlinePlayer.getIPAddress());
                     }
                 }

@@ -5,6 +5,7 @@
 package org.l2j.scripts.ai.others;
 
 import org.l2j.gameserver.model.WorldObject;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.Playable;
 import org.l2j.gameserver.model.interfaces.IPositionable;
 import org.l2j.gameserver.model.interfaces.ILocational;
@@ -32,7 +33,7 @@ public class FairyTrees extends AbstractNpcAI
                 final Npc guardian = addSpawn(27189, (IPositionable)npc, false, 30000L);
                 final Playable attacker = (Playable)(isSummon ? ((Playable)killer.getServitors().values().stream().findFirst().orElse((Playable)killer.getPet())) : killer);
                 this.addAttackPlayerDesire(guardian, attacker);
-                if (getRandomBoolean()) {
+                if (Rnd.nextBoolean()) {
                     guardian.setTarget((WorldObject)attacker);
                     guardian.doCast(FairyTrees.VENOMOUS_POISON.getSkill());
                 }

@@ -19,7 +19,7 @@ public final class PcCafePointsManager
     }
     
     public void givePcCafePoint(final Player player, final double exp) {
-        if (!Config.PC_CAFE_ENABLED || player.isInsideZone(ZoneType.PEACE) || player.isInsideZone(ZoneType.PVP) || player.isInsideZone(ZoneType.SIEGE) || player.isOnlineInt() == 0 || player.isJailed()) {
+        if (!Config.PC_CAFE_ENABLED || player.isInsideZone(ZoneType.PEACE) || player.isInsideZone(ZoneType.PVP) || player.isInsideZone(ZoneType.SIEGE) || !player.isOnline() || player.isJailed()) {
             return;
         }
         if (Config.PC_CAFE_ONLY_VIP && player.getVipTier() <= 0) {

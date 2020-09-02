@@ -6,10 +6,9 @@ package org.l2j.gameserver.network.clientpackets;
 
 import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.model.actor.instance.Player;
-import org.l2j.gameserver.network.serverpackets.CharSelectionInfo;
+import org.l2j.gameserver.network.serverpackets.PlayerSelectionInfo;
 import org.l2j.gameserver.network.ConnectionState;
 import org.l2j.gameserver.network.Disconnection;
-import org.l2j.gameserver.util.OfflineTradeUtil;
 import org.l2j.gameserver.network.serverpackets.ActionFailed;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.RestartResponse;
@@ -33,15 +32,11 @@ public final class RequestRestart extends ClientPacket
             player.sendPacket(ActionFailed.STATIC_PACKET);
             return;
         }
-        RequestRestart.LOGGER_ACCOUNTING.info(invokedynamic(makeConcatWithConstants:(Lio/github/joealisson/mmocore/Client;)Ljava/lang/String;, this.client));
-        if (!OfflineTradeUtil.enteredOfflineMode(player)) {
-            Disconnection.of((GameClient)this.client, player).storeMe().deleteMe();
-        }
+        RequestRestart.LOGGER_ACCOUNTING.info("{} Logged out", (Object)this.client);
+        Disconnection.of((GameClient)this.client, player).storeMe().deleteMe();
         ((GameClient)this.client).setConnectionState(ConnectionState.AUTHENTICATED);
         ((GameClient)this.client).sendPacket(RestartResponse.TRUE);
-        final CharSelectionInfo cl = new CharSelectionInfo(((GameClient)this.client).getAccountName(), ((GameClient)this.client).getSessionId().getGameServerSessionId());
-        ((GameClient)this.client).sendPacket(cl);
-        ((GameClient)this.client).setCharSelection(cl.getCharInfo());
+        ((GameClient)this.client).sendPacket(new PlayerSelectionInfo((GameClient)this.client));
     }
     
     static {

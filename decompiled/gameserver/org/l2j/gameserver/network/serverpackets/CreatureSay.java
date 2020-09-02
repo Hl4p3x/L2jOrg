@@ -9,7 +9,6 @@ import org.l2j.gameserver.network.ServerPacketId;
 import org.l2j.gameserver.network.GameClient;
 import java.util.ArrayList;
 import org.l2j.gameserver.network.NpcStringId;
-import org.l2j.gameserver.instancemanager.MentorManager;
 import java.util.Objects;
 import org.l2j.commons.util.Util;
 import org.l2j.gameserver.model.Clan;
@@ -42,9 +41,6 @@ public final class CreatureSay extends ServerPacket
             }
             if (receiver.getClanId() > 0 && receiver.getClanId() == sender.getClanId()) {
                 this._mask |= 0x2;
-            }
-            if (MentorManager.getInstance().getMentee(receiver.getObjectId(), sender.getObjectId()) != null || MentorManager.getInstance().getMentee(sender.getObjectId(), receiver.getObjectId()) != null) {
-                this._mask |= 0x4;
             }
             if (receiver.getAllyId() > 0 && receiver.getAllyId() == sender.getAllyId()) {
                 this._mask |= 0x8;

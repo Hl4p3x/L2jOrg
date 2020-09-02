@@ -13,6 +13,7 @@ import org.l2j.gameserver.model.Spawn;
 import org.l2j.gameserver.datatables.SpawnTable;
 import org.l2j.commons.threading.ThreadPool;
 import org.l2j.gameserver.util.Broadcast;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.model.actor.instance.Player;
 import java.util.concurrent.ScheduledFuture;
@@ -44,12 +45,11 @@ public final class Elpies extends Event
             return false;
         }
         if (!Config.CUSTOM_NPC_DATA) {
-            Elpies.LOGGER.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getName()));
             eventMaker.sendMessage(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getName()));
             return false;
         }
         Elpies.EVENT_ACTIVE = true;
-        final EventLocation randomLoc = (EventLocation)getRandomEntry((Object[])EventLocation.values());
+        final EventLocation randomLoc = (EventLocation)Rnd.get((Object[])EventLocation.values());
         Elpies.CURRENT_ELPY_COUNT = 0;
         final long despawnDelay = 120000L;
         for (int i = 0; i < 100; ++i) {
@@ -108,10 +108,10 @@ public final class Elpies extends Event
     }
     
     private static void dropItem(final Npc mob, final Player player, final int[][] droplist) {
-        final int chance = getRandom(100);
+        final int chance = Rnd.get(100);
         for (final int[] drop : droplist) {
             if (chance >= drop[1]) {
-                mob.dropItem((Creature)player, drop[0], (long)getRandom(drop[2], drop[3]));
+                mob.dropItem((Creature)player, drop[0], (long)Rnd.get(drop[2], drop[3]));
                 break;
             }
         }
@@ -157,11 +157,11 @@ public final class Elpies extends Event
         }
         
         public int getRandomX() {
-            return AbstractScript.getRandom(this._minX, this._maxX);
+            return Rnd.get(this._minX, this._maxX);
         }
         
         public int getRandomY() {
-            return AbstractScript.getRandom(this._minY, this._maxY);
+            return Rnd.get(this._minY, this._maxY);
         }
         
         public int getZ() {

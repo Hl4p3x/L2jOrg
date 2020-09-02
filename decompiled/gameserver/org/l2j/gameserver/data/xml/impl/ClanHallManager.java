@@ -61,7 +61,7 @@ public final class ClanHallManager extends GameXmlReader
             if ("list".equals(listNode.getNodeName())) {
                 for (Node clanHallNode = listNode.getFirstChild(); clanHallNode != null; clanHallNode = clanHallNode.getNextSibling()) {
                     if ("clanHall".equals(clanHallNode.getNodeName())) {
-                        params.set("id", this.parseInteger(clanHallNode.getAttributes(), "id"));
+                        params.set("id", this.parseInt(clanHallNode.getAttributes(), "id"));
                         params.set("name", this.parseString(clanHallNode.getAttributes(), "name", "None"));
                         params.set("grade", this.parseEnum(clanHallNode.getAttributes(), (Class)ClanHallGrade.class, "grade", (Enum)ClanHallGrade.NONE));
                         params.set("type", this.parseEnum(clanHallNode.getAttributes(), (Class)ClanHallType.class, "type", (Enum)ClanHallType.OTHER));
@@ -70,16 +70,16 @@ public final class ClanHallManager extends GameXmlReader
                             switch (nodeName) {
                                 case "auction": {
                                     final NamedNodeMap at = tpNode.getAttributes();
-                                    params.set("minBid", this.parseInteger(at, "min-bid"));
-                                    params.set("lease", this.parseInteger(at, "lease"));
-                                    params.set("deposit", this.parseInteger(at, "deposit"));
+                                    params.set("minBid", this.parseInt(at, "min-bid"));
+                                    params.set("lease", this.parseInt(at, "lease"));
+                                    params.set("deposit", this.parseInt(at, "deposit"));
                                     break;
                                 }
                                 case "npcs": {
                                     for (Node npcNode = tpNode.getFirstChild(); npcNode != null; npcNode = npcNode.getNextSibling()) {
                                         if ("npc".equals(npcNode.getNodeName())) {
                                             final NamedNodeMap np = npcNode.getAttributes();
-                                            final int npcId = this.parseInteger(np, "id");
+                                            final int npcId = this.parseInt(np, "id");
                                             npcs.add(npcId);
                                         }
                                     }
@@ -90,7 +90,7 @@ public final class ClanHallManager extends GameXmlReader
                                     for (Node npcNode = tpNode.getFirstChild(); npcNode != null; npcNode = npcNode.getNextSibling()) {
                                         if ("door".equals(npcNode.getNodeName())) {
                                             final NamedNodeMap np = npcNode.getAttributes();
-                                            final int doorId = this.parseInteger(np, "id");
+                                            final int doorId = this.parseInt(np, "id");
                                             final Door door = DoorDataManager.getInstance().getDoor(doorId);
                                             if (door != null) {
                                                 doors.add(door);
@@ -104,12 +104,12 @@ public final class ClanHallManager extends GameXmlReader
                                     for (Node npcNode = tpNode.getFirstChild(); npcNode != null; npcNode = npcNode.getNextSibling()) {
                                         if ("teleport".equals(npcNode.getNodeName())) {
                                             final NamedNodeMap np = npcNode.getAttributes();
-                                            final int npcStringId = this.parseInteger(np, "npcStringId");
-                                            final int x = this.parseInteger(np, "x");
-                                            final int y = this.parseInteger(np, "y");
-                                            final int z = this.parseInteger(np, "z");
-                                            final int minFunctionLevel = this.parseInteger(np, "minFunctionLevel");
-                                            final int cost = this.parseInteger(np, "cost");
+                                            final int npcStringId = this.parseInt(np, "npcStringId");
+                                            final int x = this.parseInt(np, "x");
+                                            final int y = this.parseInt(np, "y");
+                                            final int z = this.parseInt(np, "z");
+                                            final int minFunctionLevel = this.parseInt(np, "minFunctionLevel");
+                                            final int cost = this.parseInt(np, "cost");
                                             teleports.add(new ClanHallTeleportHolder(npcStringId, x, y, z, minFunctionLevel, cost));
                                         }
                                     }
@@ -118,12 +118,12 @@ public final class ClanHallManager extends GameXmlReader
                                 }
                                 case "ownerRestartPoint": {
                                     final NamedNodeMap ol = tpNode.getAttributes();
-                                    params.set("owner_loc", new Location(this.parseInteger(ol, "x"), this.parseInteger(ol, "y"), this.parseInteger(ol, "z")));
+                                    params.set("owner_loc", new Location(this.parseInt(ol, "x"), this.parseInt(ol, "y"), this.parseInt(ol, "z")));
                                     break;
                                 }
                                 case "banishPoint": {
                                     final NamedNodeMap bl = tpNode.getAttributes();
-                                    params.set("banish_loc", new Location(this.parseInteger(bl, "x"), this.parseInteger(bl, "y"), this.parseInteger(bl, "z")));
+                                    params.set("banish_loc", new Location(this.parseInt(bl, "x"), this.parseInt(bl, "y"), this.parseInt(bl, "z")));
                                     break;
                                 }
                             }

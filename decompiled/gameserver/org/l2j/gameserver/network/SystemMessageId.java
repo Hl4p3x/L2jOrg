@@ -78,7 +78,7 @@ public final class SystemMessageId
     public static SystemMessageId YOU_HAVE_FAILED_TO_PICK_UP_S2_S1_S;
     @ClientString(id = 61, message = "Nothing happened.")
     public static SystemMessageId NOTHING_HAPPENED;
-    @ClientString(id = 80, message = "Your title cannot exceed 16 characters in length.  Please try again.")
+    @ClientString(id = 80, message = "Your title cannot exceed 16 characters in length. Please try again.")
     public static SystemMessageId YOUR_TITLE_CANNOT_EXCEED_16_CHARACTERS_IN_LENGTH_PLEASE_TRY_AGAIN;
     @ClientString(id = 84, message = "You may not attack in a peaceful zone.")
     public static SystemMessageId YOU_MAY_NOT_ATTACK_IN_A_PEACEFUL_ZONE;
@@ -2088,28 +2088,6 @@ public final class SystemMessageId
     public static SystemMessageId S1_S_S2_ATTRIBUTE_HAS_SUCCESSFULLY_CHANGED_TO_S3_ATTRIBUTE;
     @ClientString(id = 3669, message = "The item for changing an attribute does not exist.")
     public static SystemMessageId THE_ITEM_FOR_CHANGING_AN_ATTRIBUTE_DOES_NOT_EXIST;
-    @ClientString(id = 3689, message = "The mentoring relationship with $s1 has been canceled. The mentor cannot obtain another mentee for two days.")
-    public static SystemMessageId THE_MENTORING_RELATIONSHIP_WITH_S1_HAS_BEEN_CANCELED_THE_MENTOR_CANNOT_OBTAIN_ANOTHER_MENTEE_FOR_TWO_DAYS;
-    @ClientString(id = 3691, message = "From now on, $s1 will be your mentor.")
-    public static SystemMessageId FROM_NOW_ON_S1_WILL_BE_YOUR_MENTOR;
-    @ClientString(id = 3692, message = "From now on, $s1 will be your mentee.")
-    public static SystemMessageId FROM_NOW_ON_S1_WILL_BE_YOUR_MENTEE;
-    @ClientString(id = 3693, message = "A mentor can have up to 3 mentees at the same time.")
-    public static SystemMessageId A_MENTOR_CAN_HAVE_UP_TO_3_MENTEES_AT_THE_SAME_TIME;
-    @ClientString(id = 3699, message = "$s1 has declined becoming your mentee.")
-    public static SystemMessageId S1_HAS_DECLINED_BECOMING_YOUR_MENTEE;
-    @ClientString(id = 3700, message = "You have declined $s1's mentoring offer.")
-    public static SystemMessageId YOU_HAVE_DECLINED_S1_S_MENTORING_OFFER;
-    @ClientString(id = 3701, message = "You cannot become your own mentee.")
-    public static SystemMessageId YOU_CANNOT_BECOME_YOUR_OWN_MENTEE;
-    @ClientString(id = 3702, message = "$s1 already has a mentor.")
-    public static SystemMessageId S1_ALREADY_HAS_A_MENTOR;
-    @ClientString(id = 3703, message = "$s1 is above level 85 and cannot become a mentee.")
-    public static SystemMessageId S1_IS_ABOVE_LEVEL_85_AND_CANNOT_BECOME_A_MENTEE;
-    @ClientString(id = 3707, message = "You have offered to become $s1's mentor.")
-    public static SystemMessageId YOU_HAVE_OFFERED_TO_BECOME_S1_S_MENTOR;
-    @ClientString(id = 3710, message = "Invitation can occur only when the mentee is in main class status.")
-    public static SystemMessageId INVITATION_CAN_OCCUR_ONLY_WHEN_THE_MENTEE_IS_IN_MAIN_CLASS_STATUS;
     @ClientString(id = 3712, message = "Plunder skill has been already used on this target.")
     public static SystemMessageId PLUNDER_SKILL_HAS_BEEN_ALREADY_USED_ON_THIS_TARGET;
     @ClientString(id = 3713, message = "You can bond with a new mentee in $s1 day(s) $s2 hour(s) $s3 minute(s).")
@@ -2216,6 +2194,10 @@ public final class SystemMessageId
     public static SystemMessageId HAIR_ACCESSORIES_WILL_BE_DISPLAYED_FROM_NOW_ON;
     @ClientString(id = 4172, message = "You cannot chat while participating in the Olympiad.")
     public static SystemMessageId YOU_CANNOT_CHAT_WHILE_PARTICIPATING_IN_THE_OLYMPIAD;
+    @ClientString(id = 4174, message = "After about 1 minute, you will move to the Olympiad arena.")
+    public static SystemMessageId AFTER_ABOUT_1_MINUTE_YOU_WILL_MOVE_TO_THE_OLYMPIAD_ARENA;
+    @ClientString(id = 4175, message = "You will shortly move to the Olympiad arena.")
+    public static SystemMessageId YOU_WILL_SHORTLY_MOVE_TO_THE_OLYMPIAD_ARENA;
     @ClientString(id = 4201, message = "You are not in a party.")
     public static SystemMessageId YOU_ARE_NOT_IN_A_PARTY;
     @ClientString(id = 4202, message = "You are not in a clan.")
@@ -2376,6 +2358,8 @@ public final class SystemMessageId
     public static SystemMessageId NO_ARTIFACT_BOOK_EQUIPPED_YOU_CANNOT_EQUIP_S1;
     @ClientString(id = 6004, message = "Enchant failed. The enchant skill for the corresponding item will be exactly retained.")
     public static SystemMessageId ENCHANT_FAILED_THE_ENCHANT_SKILL_FOR_THE_CORRESPONDING_ITEM_WILL_BE_EXACTLY_RETAINED;
+    @ClientString(id = 6005, message = "You do not have enough NCoin.")
+    public static SystemMessageId YOU_DO_NOT_HAVE_ENOUGH_NCOIN;
     @ClientString(id = 6083, message = "You cannot use this system during trading, private store, and workshop setup.")
     public static SystemMessageId YOU_CANNOT_USE_THIS_SYSTEM_DURING_TRADING_PRIVATE_STORE_AND_WORKSHOP_SETUP;
     @ClientString(id = 6139, message = "You do not have enough tickets. You cannot continue the game.")
@@ -2444,6 +2428,8 @@ public final class SystemMessageId
     public static SystemMessageId YOU_CAN_SELECT_ANOTHER_COLLECTION_EFFECT_S1_SECONDS_LATER;
     @ClientString(id = 7090, message = "Cannot locate the selected foe. The foe is not online.")
     public static SystemMessageId CANNOT_LOCATE_THE_SELECTED_FOE_THE_FOE_IS_NOT_ONLINE;
+    @ClientString(id = 7113, message = "Not enough L2 Coins to buy it.")
+    public static SystemMessageId NOT_ENOUGH_L2_COINS_TO_BUY_IT;
     @ClientString(id = 7238, message = "You are too far way to trade.")
     public static SystemMessageId YOU_ARE_TOO_FAR_WAY_TO_TRADE;
     @ClientString(id = 7323, message = "Learned $s1 Lv. $s2.")

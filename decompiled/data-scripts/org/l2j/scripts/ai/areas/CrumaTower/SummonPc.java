@@ -9,6 +9,7 @@ import org.l2j.gameserver.model.actor.Attackable;
 import org.l2j.gameserver.model.WorldObject;
 import org.l2j.gameserver.model.interfaces.ILocational;
 import org.l2j.gameserver.util.MathUtil;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.model.holders.SkillHolder;
@@ -26,7 +27,7 @@ public final class SummonPc extends AbstractNpcAI
     }
     
     public String onAttack(final Npc npc, final Player attacker, final int damage, final boolean isSummon) {
-        final int chance = getRandom(100);
+        final int chance = Rnd.get(100);
         final boolean attacked = npc.getVariables().getBoolean("attacked", false);
         if (!MathUtil.isInsideRadius3D((ILocational)npc, (ILocational)attacker, 300) && !attacked) {
             if (chance < 50) {

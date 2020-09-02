@@ -72,9 +72,9 @@ public final class RequestBypassToServer extends ClientPacket
             }
         }
         int bypassOriginId = 0;
-        if (requiresBypassValidation && !player.isGM()) {
+        if (requiresBypassValidation) {
             bypassOriginId = player.validateHtmlAction(this.bypass);
-            if (bypassOriginId == -1) {
+            if (bypassOriginId == -1 && !player.isGM()) {
                 RequestBypassToServer.LOGGER.warn("Player {} sent non cached bypass: '{}'", (Object)player.getName(), (Object)this.bypass);
                 return;
             }

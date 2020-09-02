@@ -35,6 +35,7 @@ import org.l2j.gameserver.model.Party;
 import org.l2j.gameserver.enums.PartyDistributionType;
 import org.l2j.gameserver.model.interfaces.ILocational;
 import org.l2j.gameserver.enums.Team;
+import org.l2j.commons.util.Rnd;
 import java.util.Collections;
 import org.l2j.gameserver.instancemanager.InstanceManager;
 import org.l2j.gameserver.util.Broadcast;
@@ -145,7 +146,7 @@ public class TvT extends Event
             }
             case "TeleportToArena": {
                 for (final Player participant : TvT.PLAYER_LIST) {
-                    if (participant == null || participant.isOnlineInt() != 1) {
+                    if (participant == null || !participant.isOnline()) {
                         TvT.PLAYER_LIST.remove(participant);
                         TvT.PLAYER_SCORES.remove(participant);
                     }
@@ -163,7 +164,7 @@ public class TvT extends Event
                 final InstanceTemplate template = manager.getInstanceTemplate(3049);
                 TvT.PVP_WORLD = manager.createInstance(template, (Player)null);
                 Collections.shuffle(TvT.PLAYER_LIST);
-                boolean team = getRandomBoolean();
+                boolean team = Rnd.nextBoolean();
                 for (final Player participant2 : TvT.PLAYER_LIST) {
                     if (team) {
                         TvT.BLUE_TEAM.add(participant2);
@@ -572,7 +573,7 @@ public class TvT extends Event
     
     @RegisterEvent(EventType.ON_PLAYER_LOGOUT)
     private void OnPlayerLogout(final OnPlayerLogout event) {
-        final Player player = event.getActiveChar();
+        final Player player = event.getPlayer();
         TvT.PLAYER_LIST.remove(player);
         TvT.PLAYER_SCORES.remove(player);
         TvT.BLUE_TEAM.remove(player);

@@ -79,7 +79,7 @@ public final class PlayerTemplateData extends GameXmlReader
                                         }
                                         if ("node".equalsIgnoreCase(cnd.getNodeName())) {
                                             final NamedNodeMap attrs = cnd.getAttributes();
-                                            creationPoints.add(new Location(this.parseInteger(attrs, "x"), this.parseInteger(attrs, "y"), this.parseInteger(attrs, "z")));
+                                            creationPoints.add(new Location(this.parseInt(attrs, "x"), this.parseInt(attrs, "y"), this.parseInt(attrs, "z")));
                                         }
                                         else if ("walk".equalsIgnoreCase(cnd.getNodeName())) {
                                             set.set("baseWalkSpd", cnd.getTextContent());
@@ -112,7 +112,7 @@ public final class PlayerTemplateData extends GameXmlReader
                         for (Node lvlNode = d.getFirstChild(); lvlNode != null; lvlNode = lvlNode.getNextSibling()) {
                             if ("level".equalsIgnoreCase(lvlNode.getNodeName())) {
                                 final NamedNodeMap attrs = lvlNode.getAttributes();
-                                level = this.parseInteger(attrs, "val");
+                                level = this.parseInt(attrs, "val");
                                 final byte maxLevel = LevelData.getInstance().getMaxLevel();
                                 for (Node valNode = lvlNode.getFirstChild(); valNode != null; valNode = valNode.getNextSibling()) {
                                     final String nodeName = valNode.getNodeName();

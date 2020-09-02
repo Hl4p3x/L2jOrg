@@ -139,7 +139,7 @@ public class AdminCreateItem implements IAdminCommandHandler
                 return false;
             }
             for (final Player onlinePlayer : World.getInstance().getPlayers()) {
-                if (activeChar != onlinePlayer && onlinePlayer.isOnline() && onlinePlayer.getClient() != null && !onlinePlayer.getClient().isDetached()) {
+                if (activeChar != onlinePlayer && onlinePlayer.isOnline() && onlinePlayer.getClient() != null) {
                     onlinePlayer.getInventory().addItem("Admin", idval3, numval3, onlinePlayer, (Object)activeChar);
                     onlinePlayer.sendMessage(invokedynamic(makeConcatWithConstants:(JLjava/lang/String;)Ljava/lang/String;, numval3, template.getName()));
                     ++counter;
@@ -232,35 +232,46 @@ public class AdminCreateItem implements IAdminCommandHandler
     }
     
     private int getCoinId(final String name) {
-        int id;
-        if (name.equalsIgnoreCase("adena")) {
-            id = 57;
+        int n2 = 0;
+        switch (name) {
+            case "Adena": {
+                n2 = 57;
+                break;
+            }
+            case "L2Coin": {
+                n2 = 91663;
+                break;
+            }
+            case "SilverCoin": {
+                n2 = 29983;
+                break;
+            }
+            case "GoldCoin": {
+                n2 = 29984;
+                break;
+            }
+            case "BlueEva": {
+                n2 = 4355;
+                break;
+            }
+            case "GoldEinhasad": {
+                n2 = 4356;
+                break;
+            }
+            case "SilverShilen": {
+                n2 = 4357;
+                break;
+            }
+            case "BloodyPaagrio": {
+                n2 = 4358;
+                break;
+            }
+            default: {
+                n2 = 0;
+                break;
+            }
         }
-        else if (name.equalsIgnoreCase("ancientadena")) {
-            id = 5575;
-        }
-        else if (name.equalsIgnoreCase("festivaladena")) {
-            id = 6673;
-        }
-        else if (name.equalsIgnoreCase("blueeva")) {
-            id = 4355;
-        }
-        else if (name.equalsIgnoreCase("goldeinhasad")) {
-            id = 4356;
-        }
-        else if (name.equalsIgnoreCase("silvershilen")) {
-            id = 4357;
-        }
-        else if (name.equalsIgnoreCase("bloodypaagrio")) {
-            id = 4358;
-        }
-        else if (name.equalsIgnoreCase("fantasyislecoin")) {
-            id = 13067;
-        }
-        else {
-            id = 0;
-        }
-        return id;
+        return n2;
     }
     
     static {

@@ -6,7 +6,6 @@ package org.l2j.gameserver.network.clientpackets.attendance;
 
 import org.l2j.gameserver.network.serverpackets.AbstractMessagePacket;
 import org.l2j.gameserver.model.item.ItemTemplate;
-import org.l2j.gameserver.model.holders.AttendanceInfoHolder;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.network.serverpackets.attendance.ExConfirmVipAttendanceCheck;
 import org.l2j.gameserver.model.WorldObject;
@@ -44,9 +43,8 @@ public class RequestVipAttendanceCheck extends ClientPacket
             player.sendPacket(((AbstractMessagePacket<ServerPacket>)SystemMessage.getSystemMessage(SystemMessageId.YOU_CAN_REDEEM_YOUR_REWARD_S1_MINUTES_AFTER_LOGGING_IN_S2_MINUTES_LEFT).addInt(delay)).addInt((int)(delay - player.getUptime())));
             return;
         }
-        final AttendanceInfoHolder attendanceInfo = player.getAttendanceInfo();
-        final boolean isRewardAvailable = attendanceInfo.isRewardAvailable();
-        final int rewardIndex = attendanceInfo.getRewardIndex();
+        final boolean isRewardAvailable = player.canReceiveAttendance();
+        byte rewardIndex = player.lastAttendanceReward();
         final ItemHolder reward = AttendanceRewardData.getInstance().getRewards().get(rewardIndex);
         final ItemTemplate itemTemplate = ItemEngine.getInstance().getTemplate(reward.getId());
         final long weight = itemTemplate.getWeight() * reward.getCount();
@@ -56,12 +54,13 @@ public class RequestVipAttendanceCheck extends ClientPacket
             return;
         }
         if (isRewardAvailable) {
-            player.setAttendanceInfo(rewardIndex + 1);
+            ++rewardIndex;
+            player.updateAttendanceReward(rewardIndex);
             player.addItem("Attendance Reward", reward, player, true);
             final SystemMessage msg = SystemMessage.getSystemMessage(SystemMessageId.YOU_VE_RECEIVED_YOUR_VIP_ATTENDANCE_REWARD_FOR_DAY_S1);
-            msg.addInt(rewardIndex + 1);
+            msg.addInt(rewardIndex);
             player.sendPacket(msg);
-            player.sendPacket(new ExConfirmVipAttendanceCheck(isRewardAvailable, rewardIndex + 1));
+            player.sendPacket(new ExConfirmVipAttendanceCheck(isRewardAvailable, rewardIndex));
         }
     }
 }

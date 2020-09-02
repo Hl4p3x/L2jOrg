@@ -6,7 +6,9 @@ package org.l2j.gameserver.data.database.data;
 
 import java.time.LocalDate;
 import org.l2j.commons.database.annotation.Column;
+import org.l2j.commons.database.annotation.Table;
 
+@Table("characters")
 public class PlayerData
 {
     private int charId;
@@ -17,13 +19,13 @@ public class PlayerData
     private byte level;
     private double maxHp;
     @Column("curHp")
-    private double currentHp;
+    private double hp;
     private double maxCp;
     @Column("curCp")
     private double currentCp;
     private double maxMp;
     @Column("curMp")
-    private double currentMp;
+    private double mp;
     private byte face;
     private byte hairStyle;
     private byte hairColor;
@@ -75,6 +77,20 @@ public class PlayerData
     private String language;
     @Column("pccafe_points")
     private int pcCafePoints;
+    
+    public static PlayerData of(final String accountName, final String name, final int classId, final byte face, final byte hairColor, final byte hairStyle, final boolean female) {
+        final PlayerData data = new PlayerData();
+        data.accountName = accountName;
+        data.name = name;
+        data.classId = classId;
+        data.baseClass = classId;
+        data.face = face;
+        data.hairStyle = hairStyle;
+        data.hairColor = hairColor;
+        data.female = female;
+        data.level = 1;
+        return data;
+    }
     
     public int getCharId() {
         return this.charId;
@@ -244,8 +260,8 @@ public class PlayerData
         return this.maxHp;
     }
     
-    public double getCurrentHp() {
-        return this.currentHp;
+    public double getHp() {
+        return this.hp;
     }
     
     public double getCurrentCp() {
@@ -256,8 +272,8 @@ public class PlayerData
         return this.maxCp;
     }
     
-    public double getCurrentMp() {
-        return this.currentMp;
+    public double getMp() {
+        return this.mp;
     }
     
     public double getMaxtMp() {
@@ -358,5 +374,57 @@ public class PlayerData
     
     public int getRace() {
         return this.race;
+    }
+    
+    public void setMaxHp(final double hp) {
+        this.maxHp = hp;
+    }
+    
+    public void setHp(final double hp) {
+        this.hp = hp;
+    }
+    
+    public void setMaxMp(final double mp) {
+        this.maxMp = mp;
+    }
+    
+    public void setMp(final double mp) {
+        this.mp = mp;
+    }
+    
+    public void setRace(final int race) {
+        this.race = race;
+    }
+    
+    public void setTitleColor(final int color) {
+        this.titleColor = color;
+    }
+    
+    public void setX(final int x) {
+        this.x = x;
+    }
+    
+    public void setY(final int y) {
+        this.y = y;
+    }
+    
+    public void setZ(final int z) {
+        this.z = z;
+    }
+    
+    public void setLevel(final byte level) {
+        this.level = level;
+    }
+    
+    public void setExperience(final long experience) {
+        this.exp = experience;
+    }
+    
+    public void setSp(final int sp) {
+        this.sp = sp;
+    }
+    
+    public void setDeleteTime(final long deleteTime) {
+        this.deletetime = deleteTime;
     }
 }

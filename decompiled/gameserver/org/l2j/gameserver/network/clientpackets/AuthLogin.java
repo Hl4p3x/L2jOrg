@@ -6,10 +6,11 @@ package org.l2j.gameserver.network.clientpackets;
 
 import org.l2j.gameserver.network.authcomm.SendablePacket;
 import org.l2j.gameserver.network.authcomm.gs2as.PlayerAuthRequest;
-import org.l2j.gameserver.network.serverpackets.ServerPacket;
+import io.github.joealisson.mmocore.WritablePacket;
 import org.l2j.gameserver.network.serverpackets.ServerClose;
 import org.l2j.gameserver.network.authcomm.AuthServerCommunication;
 import org.l2j.commons.network.SessionKey;
+import java.util.Objects;
 import org.l2j.gameserver.network.GameClient;
 
 public final class AuthLogin extends ClientPacket
@@ -30,16 +31,16 @@ public final class AuthLogin extends ClientPacket
     
     public void runImpl() {
         if (this.account.isEmpty() || !((GameClient)this.client).isProtocolOk()) {
-            ((GameClient)this.client).closeNow();
+            ((GameClient)this.client).close();
             return;
         }
-        if (((GameClient)this.client).getAccountName() == null) {
-            ((GameClient)this.client).setAccountName(this.account);
+        if (Objects.isNull(((GameClient)this.client).getAccount())) {
+            ((GameClient)this.client).loadAccount(this.account);
             final SessionKey key = new SessionKey(this.authAccountId, this.authKey, this.sessionId, this.accountId);
             ((GameClient)this.client).setSessionId(key);
             final GameClient oldClient = AuthServerCommunication.getInstance().addWaitingClient((GameClient)this.client);
             if (oldClient != null) {
-                oldClient.close(ServerClose.STATIC_PACKET);
+                oldClient.close((WritablePacket)ServerClose.STATIC_PACKET);
             }
             AuthServerCommunication.getInstance().sendPacket(new PlayerAuthRequest((GameClient)this.client));
         }

@@ -50,19 +50,19 @@ public final class CastleDataManager extends GameXmlReader
             if ("list".equals(listNode.getNodeName())) {
                 for (Node castleNode = listNode.getFirstChild(); castleNode != null; castleNode = castleNode.getNextSibling()) {
                     if ("castle".equals(castleNode.getNodeName())) {
-                        final int castleId = this.parseInteger(castleNode.getAttributes(), "id");
+                        final int castleId = this.parseInt(castleNode.getAttributes(), "id");
                         for (Node tpNode = castleNode.getFirstChild(); tpNode != null; tpNode = tpNode.getNextSibling()) {
                             final List<CastleSpawnHolder> spawns = new ArrayList<CastleSpawnHolder>();
                             if ("spawns".equals(tpNode.getNodeName())) {
                                 for (Node npcNode = tpNode.getFirstChild(); npcNode != null; npcNode = npcNode.getNextSibling()) {
                                     if ("npc".equals(npcNode.getNodeName())) {
                                         final NamedNodeMap np = npcNode.getAttributes();
-                                        final int npcId = this.parseInteger(np, "id");
+                                        final int npcId = this.parseInt(np, "id");
                                         final CastleSide side = (CastleSide)this.parseEnum(np, (Class)CastleSide.class, "castleSide", (Enum)CastleSide.NEUTRAL);
-                                        final int x = this.parseInteger(np, "x");
-                                        final int y = this.parseInteger(np, "y");
-                                        final int z = this.parseInteger(np, "z");
-                                        final int heading = this.parseInteger(np, "heading");
+                                        final int x = this.parseInt(np, "x");
+                                        final int y = this.parseInt(np, "y");
+                                        final int z = this.parseInt(np, "z");
+                                        final int heading = this.parseInt(np, "heading");
                                         spawns.add(new CastleSpawnHolder(npcId, side, x, y, z, heading));
                                     }
                                 }
@@ -73,11 +73,11 @@ public final class CastleDataManager extends GameXmlReader
                                 for (Node npcNode2 = tpNode.getFirstChild(); npcNode2 != null; npcNode2 = npcNode2.getNextSibling()) {
                                     if ("guard".equals(npcNode2.getNodeName())) {
                                         final NamedNodeMap np2 = npcNode2.getAttributes();
-                                        final int itemId = this.parseInteger(np2, "itemId");
+                                        final int itemId = this.parseInt(np2, "itemId");
                                         final SiegeGuardType type = (SiegeGuardType)this.parseEnum(tpNode.getAttributes(), (Class)SiegeGuardType.class, "type");
-                                        final boolean stationary = this.parseBoolean(np2, "stationary", Boolean.valueOf(false));
-                                        final int npcId2 = this.parseInteger(np2, "npcId");
-                                        final int npcMaxAmount = this.parseInteger(np2, "npcMaxAmount");
+                                        final boolean stationary = this.parseBoolean(np2, "stationary", false);
+                                        final int npcId2 = this.parseInt(np2, "npcId");
+                                        final int npcMaxAmount = this.parseInt(np2, "npcMaxAmount");
                                         guards.add(new SiegeGuardHolder(castleId, itemId, type, stationary, npcId2, npcMaxAmount));
                                     }
                                 }

@@ -10,7 +10,7 @@ import org.l2j.gameserver.model.quest.Event;
 import org.l2j.gameserver.model.eventengine.AbstractEvent;
 import org.l2j.gameserver.model.eventengine.AbstractEventManager;
 
-public class RaceManager extends AbstractEventManager<AbstractEvent<?>>
+public class RaceManager extends AbstractEventManager<AbstractEvent>
 {
     private RaceManager() {
     }

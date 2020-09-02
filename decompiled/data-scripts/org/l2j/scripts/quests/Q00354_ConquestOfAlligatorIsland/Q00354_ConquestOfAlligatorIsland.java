@@ -6,6 +6,7 @@ package org.l2j.scripts.quests.Q00354_ConquestOfAlligatorIsland;
 
 import io.github.joealisson.primitive.HashIntIntMap;
 import io.github.joealisson.primitive.HashIntMap;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.quest.QuestState;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
@@ -77,7 +78,7 @@ public final class Q00354_ConquestOfAlligatorIsland extends Quest
                 giveItemRandomly(st.getPlayer(), npc, 5863, 1L, 0L, (double)Q00354_ConquestOfAlligatorIsland.MOB1.get(npcId), true);
             }
             else {
-                final int itemCount = (getRandom(100) < Q00354_ConquestOfAlligatorIsland.MOB2.get(npcId)) ? 2 : 1;
+                final int itemCount = (Rnd.get(100) < Q00354_ConquestOfAlligatorIsland.MOB2.get(npcId)) ? 2 : 1;
                 giveItemRandomly(st.getPlayer(), npc, 5863, (long)itemCount, 0L, 1.0, true);
             }
         }

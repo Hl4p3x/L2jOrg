@@ -138,7 +138,7 @@ public class ClanRewardManager extends GameXmlReader
             bonus = new ClanRewardBonus(ClanRewardType.HUNTING_MONSTERS, this.parseInt(attrs, "level"), this.parseInt(attrs, "points"));
             this.forEach(hunting, "item", itemsNode -> {
                 itemsAttr = itemsNode.getAttributes();
-                clanRewardBonus.setItemReward(new ItemHolder(this.parseInt(itemsAttr, "id"), this.parselong(itemsAttr, "count")));
+                clanRewardBonus.setItemReward(new ItemHolder(this.parseInt(itemsAttr, "id"), this.parseLong(itemsAttr, "count")));
                 return;
             });
             this.clanRewards.computeIfAbsent(bonus.getType(), key -> new ArrayList()).add(bonus);

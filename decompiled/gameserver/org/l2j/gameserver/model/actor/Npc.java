@@ -19,14 +19,13 @@ import org.l2j.gameserver.engine.item.ItemEngine;
 import org.l2j.gameserver.model.Location;
 import org.l2j.gameserver.model.events.impl.character.npc.OnNpcEventReceived;
 import org.l2j.gameserver.model.events.EventType;
-import org.l2j.gameserver.model.variables.NpcVariables;
+import java.util.Objects;
 import org.l2j.gameserver.util.Broadcast;
 import org.l2j.gameserver.network.serverpackets.MagicSkillUse;
 import org.l2j.gameserver.enums.ShotType;
 import org.l2j.gameserver.enums.Team;
 import org.l2j.gameserver.network.serverpackets.ExChangeNpcState;
 import org.l2j.gameserver.model.events.impl.character.npc.OnNpcSkillFinished;
-import org.l2j.gameserver.engine.skill.api.Skill;
 import org.l2j.commons.threading.ThreadPool;
 import org.l2j.gameserver.network.serverpackets.NpcInfo;
 import org.l2j.gameserver.world.zone.ZoneManager;
@@ -39,7 +38,6 @@ import org.l2j.gameserver.model.events.ListenersContainer;
 import org.l2j.gameserver.model.events.impl.character.npc.OnNpcTeleport;
 import org.l2j.gameserver.model.events.EventDispatcher;
 import org.l2j.gameserver.model.Party;
-import java.util.Iterator;
 import org.l2j.gameserver.model.spawns.NpcSpawnTemplate;
 import org.l2j.gameserver.instancemanager.DBSpawnManager;
 import org.l2j.gameserver.enums.MpRewardAffectType;
@@ -83,11 +81,14 @@ import org.l2j.gameserver.model.actor.stat.NpcStats;
 import org.l2j.gameserver.enums.AIType;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.SocialAction;
+import java.util.Iterator;
+import org.l2j.gameserver.engine.skill.api.Skill;
 import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.Config;
 import org.l2j.gameserver.enums.InstanceType;
 import org.l2j.gameserver.model.actor.templates.CreatureTemplate;
 import org.l2j.gameserver.model.actor.templates.NpcTemplate;
+import org.l2j.gameserver.model.variables.NpcVariables;
 import org.l2j.gameserver.world.zone.type.TaxZone;
 import org.l2j.gameserver.instancemanager.RaidBossStatus;
 import org.l2j.gameserver.model.StatsSet;
@@ -126,6 +127,7 @@ public class Npc extends Creature
     private RaidBossStatus _raidStatus;
     private TaxZone _taxZone;
     private int scriptValue;
+    private NpcVariables variables;
     
     public Npc(final NpcTemplate template) {
         super(template);
@@ -152,6 +154,9 @@ public class Npc extends Creature
         this._currentCollisionRadius = this.getTemplate().getfCollisionRadius();
         this.setIsFlying(template.isFlying());
         this.initStatusUpdateCache();
+        for (final Skill skill : template.getSkills().values()) {
+            this.addSkill(skill);
+        }
     }
     
     public void onRandomAnimation(final int animationId) {
@@ -809,12 +814,14 @@ public class Npc extends Creature
     }
     
     public boolean hasVariables() {
-        return this.getScript(NpcVariables.class) != null;
+        return Objects.nonNull(this.variables);
     }
     
     public NpcVariables getVariables() {
-        final NpcVariables vars = this.getScript(NpcVariables.class);
-        return (vars != null) ? vars : this.addScript(new NpcVariables());
+        if (Objects.isNull(this.variables)) {
+            this.variables = new NpcVariables();
+        }
+        return this.variables;
     }
     
     public void broadcastEvent(final String eventName, final int radius, final WorldObject reference) {

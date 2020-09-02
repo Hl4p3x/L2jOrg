@@ -74,7 +74,7 @@ public final class ShuttleData extends GameXmlReader
                                 for (Node a = b.getFirstChild(); a != null; a = a.getNextSibling()) {
                                     if ("door".equalsIgnoreCase(a.getNodeName())) {
                                         attrs = a.getAttributes();
-                                        data.addDoor(this.parseInteger(attrs, "id"));
+                                        data.addDoor(this.parseInt(attrs, "id"));
                                     }
                                 }
                             }
@@ -82,11 +82,11 @@ public final class ShuttleData extends GameXmlReader
                                 for (Node a = b.getFirstChild(); a != null; a = a.getNextSibling()) {
                                     if ("stop".equalsIgnoreCase(a.getNodeName())) {
                                         attrs = a.getAttributes();
-                                        final ShuttleStop stop = new ShuttleStop(this.parseInteger(attrs, "id"));
+                                        final ShuttleStop stop = new ShuttleStop(this.parseInt(attrs, "id"));
                                         for (Node z = a.getFirstChild(); z != null; z = z.getNextSibling()) {
                                             if ("dimension".equalsIgnoreCase(z.getNodeName())) {
                                                 attrs = z.getAttributes();
-                                                stop.addDimension(new Location(this.parseInteger(attrs, "x"), this.parseInteger(attrs, "y"), this.parseInteger(attrs, "z")));
+                                                stop.addDimension(new Location(this.parseInt(attrs, "x"), this.parseInt(attrs, "y"), this.parseInt(attrs, "z")));
                                             }
                                         }
                                         data.addStop(stop);
@@ -101,7 +101,7 @@ public final class ShuttleData extends GameXmlReader
                                         for (Node z = a.getFirstChild(); z != null; z = z.getNextSibling()) {
                                             if ("loc".equalsIgnoreCase(z.getNodeName())) {
                                                 attrs = z.getAttributes();
-                                                locs.add(new Location(this.parseInteger(attrs, "x"), this.parseInteger(attrs, "y"), this.parseInteger(attrs, "z")));
+                                                locs.add(new Location(this.parseInt(attrs, "x"), this.parseInt(attrs, "y"), this.parseInt(attrs, "z")));
                                             }
                                         }
                                         final VehiclePathPoint[] route = new VehiclePathPoint[locs.size()];

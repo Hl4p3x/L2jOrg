@@ -11,6 +11,7 @@ import org.l2j.gameserver.network.NpcStringId;
 import org.l2j.gameserver.enums.ChatType;
 import org.l2j.gameserver.model.actor.Creature;
 import java.util.Iterator;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.PlaySound;
 import org.l2j.gameserver.model.StatsSet;
@@ -97,7 +98,7 @@ public final class Core extends AbstractNpcAI
         npc.broadcastPacket((ServerPacket)new PlaySound(1, "BS01_A", 1, npc.getObjectId(), npc.getX(), npc.getY(), npc.getZ()));
         for (final Map.Entry<Integer, Location> spawn : Core.MINNION_SPAWNS.entrySet()) {
             final Location spawnLocation = spawn.getValue();
-            final Attackable mob = (Attackable)addSpawn((int)spawn.getKey(), spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), getRandom(61794), false, 0L);
+            final Attackable mob = (Attackable)addSpawn((int)spawn.getKey(), spawnLocation.getX(), spawnLocation.getY(), spawnLocation.getZ(), Rnd.get(61794), false, 0L);
             mob.setIsRaidMinion(true);
             Core._minions.add(mob);
         }
@@ -124,7 +125,7 @@ public final class Core extends AbstractNpcAI
     public String onAttack(final Npc npc, final Player attacker, final int damage, final boolean isSummon) {
         if (npc.getId() == 29006) {
             if (Core._firstAttacked) {
-                if (getRandom(100) == 0) {
+                if (Rnd.get(100) == 0) {
                     npc.broadcastSay(ChatType.NPC_GENERAL, NpcStringId.REMOVING_INTRUDERS, new String[0]);
                 }
             }
@@ -145,7 +146,7 @@ public final class Core extends AbstractNpcAI
             npc.broadcastSay(ChatType.NPC_GENERAL, NpcStringId.EMPTY, new String[0]);
             Core._firstAttacked = false;
             GrandBossManager.getInstance().setBossStatus(29006, 1);
-            final long respawnTime = (Config.CORE_SPAWN_INTERVAL + getRandom(-Config.CORE_SPAWN_RANDOM, Config.CORE_SPAWN_RANDOM)) * 3600000;
+            final long respawnTime = (Config.CORE_SPAWN_INTERVAL + Rnd.get(-Config.CORE_SPAWN_RANDOM, Config.CORE_SPAWN_RANDOM)) * 3600000;
             this.startQuestTimer("core_unlock", respawnTime, (Npc)null, (Player)null);
             final StatsSet info = GrandBossManager.getInstance().getStatsSet(29006);
             info.set("respawn_time", System.currentTimeMillis() + respawnTime);

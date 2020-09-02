@@ -6,6 +6,7 @@ package org.l2j.scripts.quests.Q00331_ArrowOfVengeance;
 
 import io.github.joealisson.primitive.HashIntIntMap;
 import org.l2j.gameserver.enums.QuestSound;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.quest.QuestState;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
@@ -86,7 +87,7 @@ public class Q00331_ArrowOfVengeance extends Quest
     
     public String onKill(final Npc npc, final Player player, final boolean isPet) {
         final QuestState st = this.getQuestState(player, false);
-        if (st != null && getRandom(100) < Q00331_ArrowOfVengeance.MONSTERS.get(npc.getId())) {
+        if (st != null && Rnd.get(100) < Q00331_ArrowOfVengeance.MONSTERS.get(npc.getId())) {
             switch (npc.getId()) {
                 case 20145: {
                     giveItems(player, 1452, 1L);

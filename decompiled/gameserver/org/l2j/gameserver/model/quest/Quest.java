@@ -86,6 +86,8 @@ import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.enums.QuestType;
 import org.l2j.gameserver.cache.HtmCache;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.QuestDAO;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -107,10 +109,8 @@ import org.l2j.gameserver.model.events.AbstractScript;
 
 public class Quest extends AbstractScript implements IIdentifiable
 {
-    public static final Logger LOGGER;
+    private static final Logger LOGGER;
     private static final String DEFAULT_NO_QUEST_MSG = "<html><body>You are either not on a quest that involves this NPC, or you don't meet this NPC's minimum quest requirements.</body></html>";
-    private static final String QUEST_DELETE_FROM_CHAR_QUERY = "DELETE FROM character_quests WHERE charId=? AND name=?";
-    private static final String QUEST_DELETE_FROM_CHAR_QUERY_NON_REPEATABLE_QUERY = "DELETE FROM character_quests WHERE charId=? AND name=? AND var!=?";
     private static final int RESET_HOUR = 6;
     private static final int RESET_MINUTES = 30;
     private static final int STEEL_DOOR_COIN = 37045;
@@ -361,143 +361,19 @@ public class Quest extends AbstractScript implements IIdentifiable
     }
     
     public static void updateQuestVarInDb(final QuestState qs, final String var, final String value) {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement statement = con.prepareStatement("UPDATE character_quests SET value=? WHERE charId=? AND name=? AND var = ?");
-                try {
-                    statement.setString(1, value);
-                    statement.setInt(2, qs.getPlayer().getObjectId());
-                    statement.setString(3, qs.getQuestName());
-                    statement.setString(4, var);
-                    statement.executeUpdate();
-                    if (statement != null) {
-                        statement.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            Quest.LOGGER.warn("could not update char quest:", (Throwable)e);
-        }
+        ((QuestDAO)DatabaseAccess.getDAO((Class)QuestDAO.class)).updateQuestVar(qs.getPlayer().getObjectId(), qs.getQuestName(), var, value);
     }
     
     public static void deleteQuestVarInDb(final QuestState qs, final String var) {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement statement = con.prepareStatement("DELETE FROM character_quests WHERE charId=? AND name=? AND var=?");
-                try {
-                    statement.setInt(1, qs.getPlayer().getObjectId());
-                    statement.setString(2, qs.getQuestName());
-                    statement.setString(3, var);
-                    statement.executeUpdate();
-                    if (statement != null) {
-                        statement.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (statement != null) {
-                        try {
-                            statement.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (Exception e) {
-            Quest.LOGGER.warn("Unable to delete char quest!", (Throwable)e);
-        }
+        ((QuestDAO)DatabaseAccess.getDAO((Class)QuestDAO.class)).deleteQuestVar(qs.getPlayer().getObjectId(), qs.getQuestName(), var);
     }
     
     public static void deleteQuestInDb(final QuestState qs, final boolean repeatable) {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement(repeatable ? "DELETE FROM character_quests WHERE charId=? AND name=?" : "DELETE FROM character_quests WHERE charId=? AND name=? AND var!=?");
-                try {
-                    ps.setInt(1, qs.getPlayer().getObjectId());
-                    ps.setString(2, qs.getQuestName());
-                    if (!repeatable) {
-                        ps.setString(3, "<state>");
-                    }
-                    ps.executeUpdate();
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
+        if (repeatable) {
+            ((QuestDAO)DatabaseAccess.getDAO((Class)QuestDAO.class)).deleteQuest(qs.getPlayer().getObjectId(), qs.getQuestName());
         }
-        catch (Exception e) {
-            Quest.LOGGER.warn("could not delete char quest:", (Throwable)e);
+        else {
+            ((QuestDAO)DatabaseAccess.getDAO((Class)QuestDAO.class)).deleteNonRepeatable(qs.getPlayer().getObjectId(), qs.getQuestName());
         }
     }
     
@@ -682,7 +558,7 @@ public class Quest extends AbstractScript implements IIdentifiable
     }
     
     public final void notifyAttack(final Npc npc, final Player attacker, final int damage, final boolean isSummon, final Skill skill) {
-        String res = null;
+        String res;
         try {
             res = this.onAttack(npc, attacker, damage, isSummon, skill);
         }
@@ -824,7 +700,7 @@ public class Quest extends AbstractScript implements IIdentifiable
                 res = startConditionHtml;
             }
             else {
-                res = this.onTalk(npc, player, false);
+                res = this.onTalk(npc, player);
             }
         }
         catch (Exception e) {
@@ -1064,15 +940,6 @@ public class Quest extends AbstractScript implements IIdentifiable
     public void onCreatureKill(final Creature creature, final Creature killer) {
     }
     
-    public String onTalk(final Npc npc, final Player talker, final boolean simulated) {
-        final QuestState qs = talker.getQuestState(this.getName());
-        if (qs != null) {
-            qs.setSimulated(simulated);
-        }
-        talker.setSimulatedTalking(simulated);
-        return this.onTalk(npc, talker);
-    }
-    
     public String onTalk(final Npc npc, final Player talker) {
         return null;
     }
@@ -1190,10 +1057,7 @@ public class Quest extends AbstractScript implements IIdentifiable
     }
     
     public boolean showError(final Player player, final Throwable t) {
-        Quest.LOGGER.warn(this.getScriptFile().toAbsolutePath().toString(), t);
-        if (t.getMessage() == null) {
-            Quest.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, t.getMessage()));
-        }
+        Quest.LOGGER.warn(this.getScriptName(), t);
         if (player != null && player.getAccessLevel().isGm()) {
             final String res = invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, CommonUtil.getStackTrace(t));
             return this.showResult(player, res);
@@ -1623,7 +1487,7 @@ public class Quest extends AbstractScript implements IIdentifiable
         else {
             int highestRoll = 0;
             for (final Player member : party.getMembers()) {
-                final int rnd = AbstractScript.getRandom(1000);
+                final int rnd = Rnd.get(1000);
                 if (rnd > highestRoll && this.checkPartyMember(member, npc)) {
                     highestRoll = rnd;
                     luckyPlayer = member;
@@ -1664,7 +1528,7 @@ public class Quest extends AbstractScript implements IIdentifiable
         if (candidates.isEmpty()) {
             return null;
         }
-        qs = candidates.get(AbstractScript.getRandom(candidates.size()));
+        qs = (QuestState)Rnd.get((List)candidates);
         return checkDistanceToTarget(qs.getPlayer(), target) ? qs : null;
     }
     
@@ -1999,7 +1863,7 @@ public class Quest extends AbstractScript implements IIdentifiable
     }
     
     static {
-        LOGGER = LoggerFactory.getLogger(Quest.class.getName());
+        LOGGER = LoggerFactory.getLogger((Class)Quest.class);
         STORY_QUEST_REWARD = new SkillHolder(27580, 1);
     }
 }

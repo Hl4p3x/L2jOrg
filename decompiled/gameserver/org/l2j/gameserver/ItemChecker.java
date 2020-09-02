@@ -29,7 +29,6 @@ import org.l2j.gameserver.model.conditions.Condition;
 import java.util.Comparator;
 import org.l2j.gameserver.model.stats.functions.FuncTemplate;
 import org.l2j.gameserver.model.item.type.ArmorType;
-import org.l2j.gameserver.model.ExtractableProduct;
 import java.util.Iterator;
 import org.l2j.gameserver.enums.ItemSkillType;
 import org.l2j.gameserver.model.holders.ItemSkillHolder;
@@ -323,31 +322,200 @@ public class ItemChecker
     }
     
     private static void parseExtractable(final EtcItem template, final StringBuilder content) {
-        content.append("\t\t<extract ");
-        if (template.getExtractableCountMax() > 0) {
-            content.append(" max=\"").append(template.getExtractableCountMax()).append("\"");
-        }
-        content.append(">\n");
-        for (final ExtractableProduct item : template.getExtractableItems()) {
-            content.append("\t\t\t<item id=\"").append(item.getId()).append("\"");
-            if (item.getMin() > 1) {
-                content.append(" min-count=\"").append(item.getMin()).append("\"");
-            }
-            if (item.getMax() > 1) {
-                content.append(" max-count=\"").append(item.getMax()).append("\"");
-            }
-            if (item.getChance() != 100) {
-                content.append(" chance=\"").append(item.getChance()).append("\"");
-            }
-            if (item.getMinEnchant() > 0) {
-                content.append(" min-enchant=\"").append(item.getMinEnchant()).append("\"");
-            }
-            if (item.getMaxEnchant() > 0) {
-                content.append(" max-enchant=\"").append(item.getMaxEnchant()).append("\"");
-            }
-            content.append("/>  <!-- ").append(((Item)ItemChecker.items.get(item.getId())).name).append(" -->\n");
-        }
-        content.append("\t\t</extract>\n");
+        // 
+        // This method could not be decompiled.
+        // 
+        // Original Bytecode:
+        // 
+        //     1: ldc_w           "\t\t<extract "
+        //     4: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //     7: pop            
+        //     8: aload_0         /* template */
+        //     9: invokevirtual   org/l2j/gameserver/model/item/EtcItem.getMaxExtractable:()I
+        //    12: ifle            36
+        //    15: aload_1         /* content */
+        //    16: ldc_w           " max=\""
+        //    19: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //    22: aload_0         /* template */
+        //    23: invokevirtual   org/l2j/gameserver/model/item/EtcItem.getMaxExtractable:()I
+        //    26: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+        //    29: ldc_w           "\""
+        //    32: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //    35: pop            
+        //    36: aload_1         /* content */
+        //    37: ldc_w           ">\n"
+        //    40: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //    43: pop            
+        //    44: aload_0         /* template */
+        //    45: invokevirtual   org/l2j/gameserver/model/item/EtcItem.getExtractableItems:()Ljava/util/List;
+        //    48: invokeinterface java/util/List.iterator:()Ljava/util/Iterator;
+        //    53: astore_2       
+        //    54: aload_2        
+        //    55: invokeinterface java/util/Iterator.hasNext:()Z
+        //    60: ifeq            278
+        //    63: aload_2        
+        //    64: invokeinterface java/util/Iterator.next:()Ljava/lang/Object;
+        //    69: checkcast       checkcast      !!! ERROR
+        //    72: astore_3       
+        //    73: aload_1         /* content */
+        //    74: ldc_w           "\t\t\t<item id=\""
+        //    77: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //    80: aload_3        
+        //    81: invokevirtual   invokevirtual  !!! ERROR
+        //    84: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+        //    87: ldc_w           "\""
+        //    90: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //    93: pop            
+        //    94: aload_3        
+        //    95: invokevirtual   invokevirtual  !!! ERROR
+        //    98: iconst_1       
+        //    99: if_icmple       123
+        //   102: aload_1         /* content */
+        //   103: ldc_w           " min-count=\""
+        //   106: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   109: aload_3        
+        //   110: invokevirtual   invokevirtual  !!! ERROR
+        //   113: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+        //   116: ldc_w           "\""
+        //   119: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   122: pop            
+        //   123: aload_3        
+        //   124: invokevirtual   invokevirtual  !!! ERROR
+        //   127: iconst_1       
+        //   128: if_icmple       152
+        //   131: aload_1         /* content */
+        //   132: ldc_w           " max-count=\""
+        //   135: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   138: aload_3        
+        //   139: invokevirtual   invokevirtual  !!! ERROR
+        //   142: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+        //   145: ldc_w           "\""
+        //   148: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   151: pop            
+        //   152: aload_3        
+        //   153: invokevirtual   invokevirtual  !!! ERROR
+        //   156: ldc2_w          100.0
+        //   159: dcmpl          
+        //   160: ifeq            184
+        //   163: aload_1         /* content */
+        //   164: ldc_w           " chance=\""
+        //   167: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   170: aload_3        
+        //   171: invokevirtual   invokevirtual  !!! ERROR
+        //   174: invokevirtual   java/lang/StringBuilder.append:(D)Ljava/lang/StringBuilder;
+        //   177: ldc_w           "\""
+        //   180: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   183: pop            
+        //   184: aload_3        
+        //   185: invokevirtual   invokevirtual  !!! ERROR
+        //   188: ifle            212
+        //   191: aload_1         /* content */
+        //   192: ldc_w           " min-enchant=\""
+        //   195: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   198: aload_3        
+        //   199: invokevirtual   invokevirtual  !!! ERROR
+        //   202: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+        //   205: ldc_w           "\""
+        //   208: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   211: pop            
+        //   212: aload_3        
+        //   213: invokevirtual   invokevirtual  !!! ERROR
+        //   216: ifle            240
+        //   219: aload_1         /* content */
+        //   220: ldc_w           " max-enchant=\""
+        //   223: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   226: aload_3        
+        //   227: invokevirtual   invokevirtual  !!! ERROR
+        //   230: invokevirtual   java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+        //   233: ldc_w           "\""
+        //   236: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   239: pop            
+        //   240: aload_1         /* content */
+        //   241: ldc_w           "/>  <!-- "
+        //   244: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   247: getstatic       org/l2j/gameserver/ItemChecker.items:Lio/github/joealisson/primitive/IntMap;
+        //   250: aload_3        
+        //   251: invokevirtual   invokevirtual  !!! ERROR
+        //   254: invokeinterface io/github/joealisson/primitive/IntMap.get:(I)Ljava/lang/Object;
+        //   259: checkcast       Lorg/l2j/gameserver/ItemChecker$Item;
+        //   262: getfield        org/l2j/gameserver/ItemChecker$Item.name:Ljava/lang/String;
+        //   265: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   268: ldc_w           " -->\n"
+        //   271: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   274: pop            
+        //   275: goto            54
+        //   278: aload_1         /* content */
+        //   279: ldc_w           "\t\t</extract>\n"
+        //   282: invokevirtual   java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+        //   285: pop            
+        //   286: return         
+        //    MethodParameters:
+        //  Name      Flags  
+        //  --------  -----
+        //  template  
+        //  content   
+        //    StackMapTable: 00 08 24 FC 00 11 07 02 41 FC 00 44 07 02 82 1C 1F 1B 1B F9 00 25
+        // 
+        // The error that occurred was:
+        // 
+        // java.lang.reflect.GenericSignatureFormatError
+        //     at com.strobel.assembler.metadata.signatures.SignatureParser.error(SignatureParser.java:70)
+        //     at com.strobel.assembler.metadata.signatures.SignatureParser.parseFormalParameters(SignatureParser.java:416)
+        //     at com.strobel.assembler.metadata.signatures.SignatureParser.parseMethodTypeSignature(SignatureParser.java:407)
+        //     at com.strobel.assembler.metadata.signatures.SignatureParser.parseMethodSignature(SignatureParser.java:88)
+        //     at com.strobel.assembler.metadata.MetadataParser.parseMethodSignature(MetadataParser.java:234)
+        //     at com.strobel.assembler.metadata.MetadataParser.parseMethod(MetadataParser.java:166)
+        //     at com.strobel.assembler.metadata.ClassFileReader$Scope.lookupMethod(ClassFileReader.java:1303)
+        //     at com.strobel.assembler.metadata.ClassFileReader$Scope.lookupMethodHandle(ClassFileReader.java:1258)
+        //     at com.strobel.assembler.metadata.ClassFileReader$Scope.lookup(ClassFileReader.java:1352)
+        //     at com.strobel.assembler.ir.MetadataReader.readAttributeCore(MetadataReader.java:306)
+        //     at com.strobel.assembler.metadata.ClassFileReader.readAttributeCore(ClassFileReader.java:261)
+        //     at com.strobel.assembler.ir.MetadataReader.inflateAttributes(MetadataReader.java:439)
+        //     at com.strobel.assembler.metadata.ClassFileReader.visitAttributes(ClassFileReader.java:1134)
+        //     at com.strobel.assembler.metadata.ClassFileReader.readClass(ClassFileReader.java:439)
+        //     at com.strobel.assembler.metadata.ClassFileReader.readClass(ClassFileReader.java:377)
+        //     at com.strobel.assembler.metadata.MetadataSystem.resolveType(MetadataSystem.java:129)
+        //     at com.strobel.decompiler.NoRetryMetadataSystem.resolveType(DecompilerDriver.java:476)
+        //     at com.strobel.assembler.metadata.MetadataSystem.resolveCore(MetadataSystem.java:81)
+        //     at com.strobel.assembler.metadata.MetadataResolver.resolve(MetadataResolver.java:104)
+        //     at com.strobel.assembler.metadata.CoreMetadataFactory$UnresolvedType.resolve(CoreMetadataFactory.java:616)
+        //     at com.strobel.assembler.metadata.TypeSubstitutionVisitor.visitClassType(TypeSubstitutionVisitor.java:201)
+        //     at com.strobel.assembler.metadata.TypeSubstitutionVisitor.visitClassType(TypeSubstitutionVisitor.java:25)
+        //     at com.strobel.assembler.metadata.CoreMetadataFactory$UnresolvedType.accept(CoreMetadataFactory.java:577)
+        //     at com.strobel.assembler.metadata.TypeSubstitutionVisitor.visit(TypeSubstitutionVisitor.java:39)
+        //     at com.strobel.assembler.metadata.TypeSubstitutionVisitor.visitParameterizedType(TypeSubstitutionVisitor.java:173)
+        //     at com.strobel.assembler.metadata.TypeSubstitutionVisitor.visitParameterizedType(TypeSubstitutionVisitor.java:25)
+        //     at com.strobel.assembler.metadata.ParameterizedType.accept(ParameterizedType.java:103)
+        //     at com.strobel.assembler.metadata.TypeSubstitutionVisitor.visit(TypeSubstitutionVisitor.java:39)
+        //     at com.strobel.assembler.metadata.TypeSubstitutionVisitor.visitMethod(TypeSubstitutionVisitor.java:276)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.inferCall(TypeAnalysis.java:2591)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.doInferTypeForExpression(TypeAnalysis.java:1029)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.inferTypeForExpression(TypeAnalysis.java:803)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.inferTypeForExpression(TypeAnalysis.java:770)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.doInferTypeForExpression(TypeAnalysis.java:881)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.inferTypeForExpression(TypeAnalysis.java:803)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.runInference(TypeAnalysis.java:672)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.runInference(TypeAnalysis.java:655)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.runInference(TypeAnalysis.java:365)
+        //     at com.strobel.decompiler.ast.TypeAnalysis.run(TypeAnalysis.java:96)
+        //     at com.strobel.decompiler.ast.AstOptimizer.optimize(AstOptimizer.java:109)
+        //     at com.strobel.decompiler.ast.AstOptimizer.optimize(AstOptimizer.java:42)
+        //     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:214)
+        //     at com.strobel.decompiler.languages.java.ast.AstMethodBodyBuilder.createMethodBody(AstMethodBodyBuilder.java:99)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethodBody(AstBuilder.java:782)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createMethod(AstBuilder.java:675)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.addTypeMembers(AstBuilder.java:552)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeCore(AstBuilder.java:519)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createTypeNoCache(AstBuilder.java:161)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.createType(AstBuilder.java:150)
+        //     at com.strobel.decompiler.languages.java.ast.AstBuilder.addType(AstBuilder.java:125)
+        //     at com.strobel.decompiler.languages.java.JavaLanguage.buildAst(JavaLanguage.java:71)
+        //     at com.strobel.decompiler.languages.java.JavaLanguage.decompileType(JavaLanguage.java:59)
+        //     at com.strobel.decompiler.DecompilerDriver.decompileType(DecompilerDriver.java:330)
+        //     at com.strobel.decompiler.DecompilerDriver.decompileJar(DecompilerDriver.java:251)
+        //     at com.strobel.decompiler.DecompilerDriver.main(DecompilerDriver.java:126)
+        // 
+        throw new IllegalStateException("An error occurred while decompiling this method.");
     }
     
     private static void processArmor(final Item item, final StringBuilder content) {

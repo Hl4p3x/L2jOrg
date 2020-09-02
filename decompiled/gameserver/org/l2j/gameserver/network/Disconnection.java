@@ -6,11 +6,8 @@ package org.l2j.gameserver.network;
 
 import org.slf4j.LoggerFactory;
 import org.l2j.commons.threading.ThreadPool;
+import io.github.joealisson.mmocore.WritablePacket;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
-import org.l2j.gameserver.model.events.impl.IBaseEvent;
-import org.l2j.gameserver.model.events.ListenersContainer;
-import org.l2j.gameserver.model.events.impl.character.player.OnPlayerLogout;
-import org.l2j.gameserver.model.events.EventDispatcher;
 import java.util.Objects;
 import org.l2j.gameserver.instancemanager.AntiFeedManager;
 import org.l2j.gameserver.model.actor.instance.Player;
@@ -34,12 +31,6 @@ public final class Disconnection
         this.client = getClient(client, player);
         this.player = getPlayer(client, player);
         AntiFeedManager.getInstance().onDisconnect(this.client);
-        if (this.client != null) {
-            this.client.setPlayer(null);
-        }
-        if (this.player != null) {
-            this.player.setClient(null);
-        }
     }
     
     public static GameClient getClient(final GameClient client, final Player player) {
@@ -92,9 +83,9 @@ public final class Disconnection
     public Disconnection deleteMe() {
         try {
             if (this.player != null && this.player.isOnline()) {
-                EventDispatcher.getInstance().notifyEventAsync(new OnPlayerLogout(this.player), this.player);
                 this.player.deleteMe();
             }
+            this.detachPlayerFromClient();
         }
         catch (RuntimeException e) {
             Disconnection.LOGGER.warn(e.getMessage());
@@ -102,17 +93,25 @@ public final class Disconnection
         return this;
     }
     
+    private void detachPlayerFromClient() {
+        if (this.client != null) {
+            this.client.setPlayer(null);
+        }
+    }
+    
     public Disconnection close(final boolean toLoginScreen) {
         if (this.client != null) {
             this.client.close(toLoginScreen);
         }
+        this.detachPlayerFromClient();
         return this;
     }
     
     public Disconnection close(final ServerPacket packet) {
         if (this.client != null) {
-            this.client.close(packet);
+            this.client.close((WritablePacket)packet);
         }
+        this.detachPlayerFromClient();
         return this;
     }
     

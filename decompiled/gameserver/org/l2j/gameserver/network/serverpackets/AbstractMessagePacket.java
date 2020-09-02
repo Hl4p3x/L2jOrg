@@ -146,15 +146,15 @@ public abstract class AbstractMessagePacket<T extends AbstractMessagePacket<?>> 
         if (skill.getId() != skill.getDisplayId()) {
             return this.addString(skill.getName());
         }
-        return this.addSkillName(skill.getId(), skill.getLevel(), skill.getSubLevel());
+        return this.addSkillName(skill.getId(), skill.getLevel());
     }
     
     public final T addSkillName(final int id) {
-        return this.addSkillName(id, 1, 0);
+        return this.addSkillName(id, 1);
     }
     
-    public final T addSkillName(final int id, final int lvl, final int subLvl) {
-        this.append(new SMParam((byte)4, new int[] { id, lvl, subLvl }));
+    public final T addSkillName(final int id, final int lvl) {
+        this.append(new SMParam((byte)4, new int[] { id, lvl }));
         return (T)this;
     }
     
@@ -246,7 +246,6 @@ public abstract class AbstractMessagePacket<T extends AbstractMessagePacket<?>> 
                     final int[] array = param.getIntArrayValue();
                     this.writeInt(array[0]);
                     this.writeShort(array[1]);
-                    this.writeShort(array[2]);
                     break;
                 }
                 case 7:

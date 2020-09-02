@@ -117,13 +117,13 @@ public final class ItemCrystallizationData extends GameXmlReader
     private List<ItemChanceHolder> parseRewards(final Node templateNode) {
         final List<ItemChanceHolder> crystallizeRewards = new ArrayList<ItemChanceHolder>();
         final NamedNodeMap attrs;
-        final Integer itemId;
-        final Long itemCount;
+        final int itemId;
+        final long itemCount;
         final double itemChance;
         final List<ItemChanceHolder> list;
         this.forEach(templateNode, "item", itemNode -> {
             attrs = itemNode.getAttributes();
-            itemId = this.parseInteger(attrs, "id");
+            itemId = this.parseInt(attrs, "id");
             itemCount = this.parseLong(attrs, "count");
             itemChance = this.parseDouble(attrs, "chance");
             list.add(new ItemChanceHolder(itemId, itemChance, itemCount));
@@ -135,7 +135,7 @@ public final class ItemCrystallizationData extends GameXmlReader
     private void parseItem(final Node node) {
         final int id;
         this.forEach(node, "item", itemNode -> {
-            id = this.parseInteger(itemNode.getAttributes(), "id");
+            id = this.parseInt(itemNode.getAttributes(), "id");
             this.items.put(id, (Object)new CrystallizationDataHolder(id, this.parseRewards(itemNode)));
         });
     }

@@ -5,29 +5,63 @@
 package org.l2j.gameserver.model.events;
 
 import org.slf4j.LoggerFactory;
+import org.l2j.gameserver.model.interfaces.ILocational;
+import org.l2j.gameserver.network.serverpackets.SpecialCamera;
+import org.l2j.gameserver.world.WorldTimeController;
+import org.l2j.gameserver.enums.InventorySlot;
+import org.l2j.gameserver.instancemanager.PcCafePointsManager;
+import org.l2j.gameserver.model.stats.Stat;
+import org.l2j.gameserver.network.serverpackets.PlaySound;
+import org.l2j.gameserver.network.serverpackets.InventoryUpdate;
+import org.l2j.gameserver.model.item.enchant.attribute.AttributeHolder;
+import org.l2j.gameserver.enums.AttributeType;
+import org.l2j.gameserver.enums.QuestSound;
+import org.l2j.gameserver.network.serverpackets.ExBloodyCoinCount;
+import org.l2j.gameserver.network.serverpackets.ExAdenaInvenCount;
+import org.l2j.gameserver.network.serverpackets.ExUserInfoInvenWeight;
+import org.l2j.gameserver.network.serverpackets.SystemMessage;
+import org.l2j.gameserver.model.item.EtcItem;
+import org.l2j.gameserver.Config;
+import org.l2j.gameserver.model.holders.ItemHolder;
+import org.l2j.commons.util.Rnd;
+import org.l2j.gameserver.model.Spawn;
+import org.l2j.gameserver.model.interfaces.IPositionable;
+import org.l2j.gameserver.network.SystemMessageId;
+import org.l2j.gameserver.network.NpcStringId;
+import org.l2j.gameserver.network.serverpackets.ExShowScreenMessage;
+import org.l2j.gameserver.network.serverpackets.ServerPacket;
+import java.util.Set;
 import org.l2j.gameserver.model.holders.MovieHolder;
 import org.l2j.gameserver.enums.Movie;
 import org.l2j.gameserver.model.holders.SkillHolder;
 import org.l2j.gameserver.model.Location;
 import org.l2j.gameserver.ai.CtrlIntention;
 import org.l2j.gameserver.model.actor.Attackable;
+import org.l2j.gameserver.model.WorldObject;
 import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.model.actor.Playable;
+import org.l2j.gameserver.model.instancezone.Instance;
 import org.l2j.gameserver.data.xml.DoorDataManager;
 import org.l2j.gameserver.model.actor.instance.Door;
+import org.l2j.gameserver.model.item.container.PlayerInventory;
+import java.util.Iterator;
 import org.l2j.gameserver.util.MathUtil;
+import org.l2j.gameserver.model.item.instance.Item;
 import org.l2j.gameserver.util.MinionList;
 import org.l2j.gameserver.model.actor.instance.Monster;
 import org.l2j.gameserver.model.actor.instance.Trap;
 import org.l2j.gameserver.engine.skill.api.Skill;
+import org.l2j.gameserver.model.actor.Creature;
 import org.l2j.gameserver.model.spawns.SpawnGroup;
 import org.l2j.gameserver.model.spawns.SpawnTemplate;
 import io.github.joealisson.primitive.Containers;
 import org.l2j.gameserver.model.instancezone.InstanceTemplate;
 import org.l2j.gameserver.model.entity.Castle;
+import org.l2j.gameserver.model.item.ItemTemplate;
 import org.l2j.gameserver.world.zone.Zone;
 import org.l2j.gameserver.instancemanager.InstanceManager;
 import org.l2j.gameserver.instancemanager.CastleManager;
+import org.l2j.gameserver.engine.item.ItemEngine;
 import org.l2j.gameserver.world.zone.ZoneManager;
 import java.util.Collection;
 import java.util.ArrayList;
@@ -83,6 +117,7 @@ import org.l2j.gameserver.model.events.impl.IBaseEvent;
 import org.l2j.gameserver.model.events.impl.character.npc.OnAttackableKill;
 import java.util.function.Consumer;
 import org.l2j.gameserver.model.actor.templates.NpcTemplate;
+import java.util.List;
 import java.lang.reflect.Method;
 import io.github.joealisson.primitive.IntCollection;
 import io.github.joealisson.primitive.CHashIntMap;
@@ -99,45 +134,10 @@ import org.l2j.gameserver.model.events.annotations.RegisterType;
 import java.lang.annotation.Annotation;
 import org.l2j.gameserver.model.events.annotations.RegisterEvent;
 import io.github.joealisson.primitive.HashIntSet;
+import org.l2j.gameserver.model.actor.instance.Player;
+import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.model.StatsSet;
 import org.l2j.gameserver.model.events.timers.TimerHolder;
-import org.l2j.gameserver.model.interfaces.ILocational;
-import org.l2j.gameserver.network.serverpackets.SpecialCamera;
-import org.l2j.gameserver.model.actor.Creature;
-import org.l2j.gameserver.world.WorldTimeController;
-import org.l2j.gameserver.enums.InventorySlot;
-import java.util.List;
-import org.l2j.gameserver.instancemanager.PcCafePointsManager;
-import org.l2j.gameserver.model.stats.Stat;
-import org.l2j.gameserver.network.serverpackets.PlaySound;
-import org.l2j.gameserver.model.instancezone.Instance;
-import java.util.Iterator;
-import java.util.Set;
-import org.l2j.gameserver.model.WorldObject;
-import org.l2j.gameserver.network.serverpackets.InventoryUpdate;
-import org.l2j.gameserver.model.item.enchant.attribute.AttributeHolder;
-import org.l2j.gameserver.enums.AttributeType;
-import org.l2j.gameserver.enums.QuestSound;
-import org.l2j.gameserver.network.serverpackets.ExBloodyCoinCount;
-import org.l2j.gameserver.network.serverpackets.ExAdenaInvenCount;
-import org.l2j.gameserver.network.serverpackets.ExUserInfoInvenWeight;
-import org.l2j.gameserver.network.serverpackets.SystemMessage;
-import org.l2j.gameserver.model.item.ItemTemplate;
-import org.l2j.gameserver.model.item.EtcItem;
-import org.l2j.gameserver.Config;
-import org.l2j.gameserver.engine.item.ItemEngine;
-import org.l2j.gameserver.model.item.instance.Item;
-import org.l2j.gameserver.model.item.container.PlayerInventory;
-import org.l2j.gameserver.model.holders.ItemHolder;
-import org.l2j.commons.util.Rnd;
-import org.l2j.gameserver.model.Spawn;
-import org.l2j.gameserver.model.actor.Npc;
-import org.l2j.gameserver.model.interfaces.IPositionable;
-import org.l2j.gameserver.network.SystemMessageId;
-import org.l2j.gameserver.network.NpcStringId;
-import org.l2j.gameserver.network.serverpackets.ExShowScreenMessage;
-import org.l2j.gameserver.network.serverpackets.ServerPacket;
-import org.l2j.gameserver.model.actor.instance.Player;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.EnumMap;
 import org.l2j.gameserver.model.events.listeners.AbstractEventListener;
@@ -151,7 +151,7 @@ import org.l2j.gameserver.engine.scripting.ManagedScript;
 
 public abstract class AbstractScript extends ManagedScript implements IEventTimerEvent<String>, IEventTimerCancel<String>
 {
-    protected static final Logger LOGGER;
+    private static final Logger LOGGER;
     private final Map<ListenerRegisterType, IntSet> _registeredIds;
     private final Queue<AbstractEventListener> _listeners;
     private volatile TimerExecutor<String> _timerExecutor;
@@ -160,516 +160,6 @@ public abstract class AbstractScript extends ManagedScript implements IEventTime
         this._registeredIds = new EnumMap<ListenerRegisterType, IntSet>(ListenerRegisterType.class);
         this._listeners = new PriorityBlockingQueue<AbstractEventListener>();
         this.initializeAnnotationListeners();
-    }
-    
-    public static void showOnScreenMsg(final Player player, final String text, final int time) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.sendPacket(new ExShowScreenMessage(text, time));
-    }
-    
-    public static void showOnScreenMsg(final Player player, final NpcStringId npcString, final int position, final int time, final String... params) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.sendPacket(new ExShowScreenMessage(npcString, position, time, params));
-    }
-    
-    public static void showOnScreenMsg(final Player player, final NpcStringId npcString, final int position, final int time, final boolean showEffect, final String... params) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.sendPacket(new ExShowScreenMessage(npcString, position, time, showEffect, params));
-    }
-    
-    public static void showOnScreenMsg(final Player player, final SystemMessageId systemMsg, final int position, final int time, final String... params) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.sendPacket(new ExShowScreenMessage(systemMsg, position, time, params));
-    }
-    
-    public static Npc addSpawn(final int npcId, final IPositionable pos) {
-        return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), false, 0L, false, 0);
-    }
-    
-    public static Npc addSpawn(final Npc summoner, final int npcId, final IPositionable pos, final boolean randomOffset, final long despawnDelay) {
-        return addSpawn(summoner, npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, false, 0);
-    }
-    
-    public static Npc addSpawn(final int npcId, final IPositionable pos, final boolean isSummonSpawn) {
-        return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), false, 0L, isSummonSpawn, 0);
-    }
-    
-    public static Npc addSpawn(final int npcId, final IPositionable pos, final boolean randomOffset, final long despawnDelay) {
-        return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, false, 0);
-    }
-    
-    public static Npc addSpawn(final int npcId, final IPositionable pos, final boolean randomOffset, final long despawnDelay, final boolean isSummonSpawn) {
-        return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, isSummonSpawn, 0);
-    }
-    
-    public static Npc addSpawn(final Npc summoner, final int npcId, final IPositionable pos, final boolean randomOffset, final int instanceId) {
-        return addSpawn(summoner, npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, 0L, false, instanceId);
-    }
-    
-    public static Npc addSpawn(final int npcId, final IPositionable pos, final boolean randomOffset, final long despawnDelay, final boolean isSummonSpawn, final int instanceId) {
-        return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, isSummonSpawn, instanceId);
-    }
-    
-    public static Npc addSpawn(final int npcId, final int x, final int y, final int z, final int heading, final boolean randomOffset, final long despawnDelay) {
-        return addSpawn(npcId, x, y, z, heading, randomOffset, despawnDelay, false, 0);
-    }
-    
-    public static Npc addSpawn(final int npcId, final int x, final int y, final int z, final int heading, final boolean randomOffset, final long despawnDelay, final boolean isSummonSpawn) {
-        return addSpawn(npcId, x, y, z, heading, randomOffset, despawnDelay, isSummonSpawn, 0);
-    }
-    
-    public static Npc addSpawn(final int npcId, final int x, final int y, final int z, final int heading, final boolean randomOffset, final long despawnDelay, final boolean isSummonSpawn, final int instanceId) {
-        return addSpawn(null, npcId, x, y, z, heading, randomOffset, despawnDelay, isSummonSpawn, instanceId);
-    }
-    
-    public static Npc addSpawn(final Npc summoner, final int npcId, int x, int y, final int z, final int heading, final boolean randomOffset, final long despawnDelay, final boolean isSummonSpawn, final int instance) {
-        try {
-            final Spawn spawn = new Spawn(npcId);
-            if (x == 0 && y == 0) {
-                AbstractScript.LOGGER.error(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, npcId));
-                return null;
-            }
-            if (randomOffset) {
-                int offset = Rnd.get(50, 100);
-                if (Rnd.nextBoolean()) {
-                    offset *= -1;
-                }
-                x += offset;
-                offset = Rnd.get(50, 100);
-                if (Rnd.nextBoolean()) {
-                    offset *= -1;
-                }
-                y += offset;
-            }
-            spawn.setInstanceId(instance);
-            spawn.setHeading(heading);
-            spawn.setXYZ(x, y, z);
-            spawn.stopRespawn();
-            final Npc npc = spawn.doSpawn(isSummonSpawn);
-            if (despawnDelay > 0L) {
-                npc.scheduleDespawn(despawnDelay);
-            }
-            if (summoner != null) {
-                summoner.addSummonedNpc(npc);
-            }
-            return npc;
-        }
-        catch (Exception e) {
-            AbstractScript.LOGGER.warn(invokedynamic(makeConcatWithConstants:(ILjava/lang/String;)Ljava/lang/String;, npcId, e.getMessage()));
-            return null;
-        }
-    }
-    
-    public static long getQuestItemsCount(final Player player, final int itemId) {
-        return player.getInventory().getInventoryItemCount(itemId, -1);
-    }
-    
-    protected static boolean hasItem(final Player player, final ItemHolder item) {
-        return hasItem(player, item, true);
-    }
-    
-    protected static boolean hasItem(final Player player, final ItemHolder item, final boolean checkCount) {
-        if (item == null) {
-            return false;
-        }
-        if (checkCount) {
-            return getQuestItemsCount(player, item.getId()) >= item.getCount();
-        }
-        return hasQuestItems(player, item.getId());
-    }
-    
-    protected static boolean hasAllItems(final Player player, final boolean checkCount, final ItemHolder... itemList) {
-        if (itemList == null || itemList.length == 0) {
-            return false;
-        }
-        for (final ItemHolder item : itemList) {
-            if (!hasItem(player, item, checkCount)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    public static boolean hasQuestItems(final Player player, final int itemId) {
-        return player.getInventory().getItemByItemId(itemId) != null;
-    }
-    
-    public static boolean hasQuestItems(final Player player, final int... itemIds) {
-        if (itemIds == null || itemIds.length == 0) {
-            return false;
-        }
-        final PlayerInventory inv = player.getInventory();
-        for (final int itemId : itemIds) {
-            if (inv.getItemByItemId(itemId) == null) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    public static int getEnchantLevel(final Player player, final int itemId) {
-        final Item enchantedItem = player.getInventory().getItemByItemId(itemId);
-        if (enchantedItem == null) {
-            return 0;
-        }
-        return enchantedItem.getEnchantLevel();
-    }
-    
-    public static void rewardItems(final Player player, final ItemHolder holder) {
-        rewardItems(player, holder.getId(), holder.getCount());
-    }
-    
-    public static void rewardItems(final Player player, final int itemId, long count) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        if (count <= 0L) {
-            return;
-        }
-        final ItemTemplate item = ItemEngine.getInstance().getTemplate(itemId);
-        if (item == null) {
-            return;
-        }
-        try {
-            if (itemId == 57) {
-                count *= (long)Config.RATE_QUEST_REWARD_ADENA;
-            }
-            else if (Config.RATE_QUEST_REWARD_USE_MULTIPLIERS) {
-                if (item instanceof EtcItem) {
-                    switch (((EtcItem)item).getItemType()) {
-                        case POTION: {
-                            count *= (long)Config.RATE_QUEST_REWARD_POTION;
-                            break;
-                        }
-                        case ENCHANT_WEAPON:
-                        case ENCHANT_ARMOR:
-                        case SCROLL: {
-                            count *= (long)Config.RATE_QUEST_REWARD_SCROLL;
-                            break;
-                        }
-                        case RECIPE: {
-                            count *= (long)Config.RATE_QUEST_REWARD_RECIPE;
-                            break;
-                        }
-                        case MATERIAL: {
-                            count *= (long)Config.RATE_QUEST_REWARD_MATERIAL;
-                            break;
-                        }
-                        default: {
-                            count *= (long)Config.RATE_QUEST_REWARD;
-                            break;
-                        }
-                    }
-                }
-            }
-            else {
-                count *= (long)Config.RATE_QUEST_REWARD;
-            }
-        }
-        catch (Exception e) {
-            count = Long.MAX_VALUE;
-        }
-        final Item itemInstance = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
-        if (itemInstance == null) {
-            return;
-        }
-        sendItemGetMessage(player, itemInstance, count);
-    }
-    
-    private static void sendItemGetMessage(final Player player, final Item item, final long count) {
-        if (item.getId() == 57) {
-            final SystemMessage smsg = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_EARNED_S1_ADENA);
-            smsg.addLong(count);
-            player.sendPacket(smsg);
-        }
-        else if (count > 1L) {
-            final SystemMessage smsg = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_EARNED_S2_S1_S);
-            smsg.addItemName(item);
-            smsg.addLong(count);
-            player.sendPacket(smsg);
-        }
-        else {
-            final SystemMessage smsg = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_EARNED_S1);
-            smsg.addItemName(item);
-            player.sendPacket(smsg);
-        }
-        player.sendPacket(new ExUserInfoInvenWeight(player));
-        player.sendPacket(new ExAdenaInvenCount(player));
-        player.sendPacket(new ExBloodyCoinCount());
-    }
-    
-    public static void giveItems(final Player player, final int itemId, final long count) {
-        giveItems(player, itemId, count, 0, false);
-    }
-    
-    public static void giveItems(final Player player, final int itemId, final long count, final boolean playSound) {
-        giveItems(player, itemId, count, 0, playSound);
-    }
-    
-    protected static void giveItems(final Player player, final ItemHolder holder) {
-        giveItems(player, holder.getId(), holder.getCount());
-    }
-    
-    public static void giveItems(final Player player, final int itemId, final long count, final int enchantlevel, final boolean playSound) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        if (count <= 0L) {
-            return;
-        }
-        final Item item = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
-        if (item == null) {
-            return;
-        }
-        if (enchantlevel > 0 && itemId != 57) {
-            item.setEnchantLevel(enchantlevel);
-        }
-        if (playSound) {
-            playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
-        }
-        sendItemGetMessage(player, item, count);
-    }
-    
-    public static void giveItems(final Player player, final int itemId, final long count, final AttributeType attributeType, final int attributeValue) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        if (count <= 0L) {
-            return;
-        }
-        final Item item = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
-        if (item == null) {
-            return;
-        }
-        if (attributeType != null && attributeValue > 0) {
-            item.setAttribute(new AttributeHolder(attributeType, attributeValue), true);
-            if (item.isEquipped()) {
-                player.getStats().recalculateStats(true);
-            }
-            final InventoryUpdate iu = new InventoryUpdate();
-            iu.addModifiedItem(item);
-            player.sendInventoryUpdate(iu);
-        }
-        sendItemGetMessage(player, item, count);
-    }
-    
-    public static boolean giveItemRandomly(final Player player, final int itemId, final long amountToGive, final long limit, final double dropChance, final boolean playSound) {
-        return giveItemRandomly(player, null, itemId, amountToGive, amountToGive, limit, dropChance, playSound);
-    }
-    
-    public static boolean giveItemRandomly(final Player player, final Npc npc, final int itemId, final long amountToGive, final long limit, final double dropChance, final boolean playSound) {
-        return giveItemRandomly(player, npc, itemId, amountToGive, amountToGive, limit, dropChance, playSound);
-    }
-    
-    public static boolean giveItemRandomly(final Player player, final Npc npc, final int itemId, long minAmount, long maxAmount, final long limit, double dropChance, final boolean playSound) {
-        if (player.isSimulatingTalking()) {
-            return false;
-        }
-        final long currentCount = getQuestItemsCount(player, itemId);
-        if (limit > 0L && currentCount >= limit) {
-            return true;
-        }
-        minAmount *= (long)Config.RATE_QUEST_DROP;
-        maxAmount *= (long)Config.RATE_QUEST_DROP;
-        dropChance *= Config.RATE_QUEST_DROP;
-        if (npc != null && Config.CHAMPION_ENABLE && npc.isChampion()) {
-            if (itemId == 57 || itemId == 5575) {
-                dropChance *= Config.CHAMPION_ADENAS_REWARDS_CHANCE;
-                minAmount *= (long)Config.CHAMPION_ADENAS_REWARDS_AMOUNT;
-                maxAmount *= (long)Config.CHAMPION_ADENAS_REWARDS_AMOUNT;
-            }
-            else {
-                dropChance *= Config.CHAMPION_REWARDS_CHANCE;
-                minAmount *= (long)Config.CHAMPION_REWARDS_AMOUNT;
-                maxAmount *= (long)Config.CHAMPION_REWARDS_AMOUNT;
-            }
-        }
-        long amountToGive = (minAmount == maxAmount) ? minAmount : Rnd.get(minAmount, maxAmount);
-        final double random = Rnd.nextDouble();
-        if (dropChance >= random && amountToGive > 0L && player.getInventory().validateCapacityByItemId(itemId)) {
-            if (limit > 0L && currentCount + amountToGive > limit) {
-                amountToGive = limit - currentCount;
-            }
-            if (player.addItem("Quest", itemId, amountToGive, npc, true) != null) {
-                if (currentCount + amountToGive == limit) {
-                    if (playSound) {
-                        playSound(player, QuestSound.ITEMSOUND_QUEST_MIDDLE);
-                    }
-                    return true;
-                }
-                if (playSound) {
-                    playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
-                }
-                return limit <= 0L;
-            }
-        }
-        return false;
-    }
-    
-    public static boolean takeItems(final Player player, final int itemId, long amount) {
-        if (player.isSimulatingTalking()) {
-            return false;
-        }
-        final Item item = player.getInventory().getItemByItemId(itemId);
-        if (item == null) {
-            return false;
-        }
-        if (amount < 0L || amount > item.getCount()) {
-            amount = item.getCount();
-        }
-        if (item.isEquipped()) {
-            final Set<Item> unequiped = player.getInventory().unEquipItemInBodySlotAndRecord(item.getBodyPart());
-            final InventoryUpdate iu = new InventoryUpdate();
-            for (final Item itm : unequiped) {
-                iu.addModifiedItem(itm);
-            }
-            player.sendInventoryUpdate(iu);
-            player.broadcastUserInfo();
-        }
-        return player.destroyItemByItemId("Quest", itemId, amount, player, true);
-    }
-    
-    protected static boolean takeItem(final Player player, final ItemHolder holder) {
-        return holder != null && takeItems(player, holder.getId(), holder.getCount());
-    }
-    
-    protected static boolean takeAllItems(final Player player, final ItemHolder... itemList) {
-        if (player.isSimulatingTalking()) {
-            return false;
-        }
-        if (itemList == null || itemList.length == 0) {
-            return false;
-        }
-        if (!hasAllItems(player, true, itemList)) {
-            return false;
-        }
-        for (final ItemHolder item : itemList) {
-            if (!takeItem(player, item)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    public static boolean takeItems(final Player player, final int amount, final int... itemIds) {
-        if (player.isSimulatingTalking()) {
-            return false;
-        }
-        boolean check = true;
-        if (itemIds != null) {
-            for (final int item : itemIds) {
-                check &= takeItems(player, item, amount);
-            }
-        }
-        return check;
-    }
-    
-    public static void playSound(final Instance world, final String sound) {
-        world.broadcastPacket(new PlaySound(sound));
-    }
-    
-    public static void playSound(final Player player, final String sound) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.sendPacket(QuestSound.getSound(sound));
-    }
-    
-    public static void playSound(final Player player, final QuestSound sound) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.sendPacket(sound.getPacket());
-    }
-    
-    public static void addExpAndSp(final Player player, final long exp, final int sp) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.addExpAndSp((double)(long)player.getStats().getValue(Stat.EXPSP_RATE, exp * Config.RATE_QUEST_REWARD_XP), (int)player.getStats().getValue(Stat.EXPSP_RATE, sp * Config.RATE_QUEST_REWARD_SP));
-        PcCafePointsManager.getInstance().givePcCafePoint(player, (double)(long)(exp * Config.RATE_QUEST_REWARD_XP));
-    }
-    
-    public static int getRandom(final int max) {
-        return Rnd.get(max);
-    }
-    
-    public static int getRandom(final int min, final int max) {
-        return Rnd.get(min, max);
-    }
-    
-    public static boolean getRandomBoolean() {
-        return Rnd.nextBoolean();
-    }
-    
-    public static <T> T getRandomEntry(final T... array) {
-        if (array.length == 0) {
-            return null;
-        }
-        return array[getRandom(array.length)];
-    }
-    
-    public static <T> T getRandomEntry(final List<T> list) {
-        if (list.isEmpty()) {
-            return null;
-        }
-        return list.get(getRandom(list.size()));
-    }
-    
-    public static int getRandomEntry(final int... array) {
-        return array[getRandom(array.length)];
-    }
-    
-    public static int getItemEquipped(final Player player, final InventorySlot slot) {
-        return player.getInventory().getPaperdollItemId(slot);
-    }
-    
-    public static int getGameTicks() {
-        return WorldTimeController.getInstance().getGameTicks();
-    }
-    
-    public static void specialCamera(final Player player, final Creature creature, final int force, final int angle1, final int angle2, final int time, final int range, final int duration, final int relYaw, final int relPitch, final int isWide, final int relAngle) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.sendPacket(new SpecialCamera(creature, force, angle1, angle2, time, range, duration, relYaw, relPitch, isWide, relAngle));
-    }
-    
-    public static void specialCameraEx(final Player player, final Creature creature, final int force, final int angle1, final int angle2, final int time, final int duration, final int relYaw, final int relPitch, final int isWide, final int relAngle) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.sendPacket(new SpecialCamera(creature, player, force, angle1, angle2, time, duration, relYaw, relPitch, isWide, relAngle));
-    }
-    
-    public static void specialCamera3(final Player player, final Creature creature, final int force, final int angle1, final int angle2, final int time, final int range, final int duration, final int relYaw, final int relPitch, final int isWide, final int relAngle, final int unk) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.sendPacket(new SpecialCamera(creature, force, angle1, angle2, time, range, duration, relYaw, relPitch, isWide, relAngle, unk));
-    }
-    
-    public static void specialCamera(final Instance world, final Creature creature, final int force, final int angle1, final int angle2, final int time, final int range, final int duration, final int relYaw, final int relPitch, final int isWide, final int relAngle, final int unk) {
-        world.broadcastPacket(new SpecialCamera(creature, force, angle1, angle2, time, range, duration, relYaw, relPitch, isWide, relAngle, unk));
-    }
-    
-    public static void addRadar(final Player player, final ILocational loc) {
-        addRadar(player, loc.getX(), loc.getY(), loc.getZ());
-    }
-    
-    public static void addRadar(final Player player, final int x, final int y, final int z) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
-        player.getRadar().addMarker(x, y, z);
     }
     
     @Override
@@ -880,7 +370,7 @@ public abstract class AbstractScript extends ManagedScript implements IEventTime
         return this.registerConsumer(callback, EventType.ON_CREATURE_ATTACKED, ListenerRegisterType.NPC, npcIds);
     }
     
-    protected final List<AbstractEventListener> setCreatureAttackedid(final Consumer<OnCreatureAttacked> callback, final IntCollection npcIds) {
+    protected final List<AbstractEventListener> setCreatureAttackedId(final Consumer<OnCreatureAttacked> callback, final IntCollection npcIds) {
         return this.registerConsumer(callback, EventType.ON_CREATURE_ATTACKED, ListenerRegisterType.NPC, npcIds);
     }
     
@@ -1418,7 +908,7 @@ public abstract class AbstractScript extends ManagedScript implements IEventTime
             }
             for (final int itemId : itemIds) {
                 if (item.getId() == itemId) {
-                    if (MathUtil.checkOverFlow(count, item.getCount())) {
+                    if (MathUtil.checkAddOverFlow(count, item.getCount())) {
                         return Long.MAX_VALUE;
                     }
                     count += item.getCount();
@@ -1448,9 +938,6 @@ public abstract class AbstractScript extends ManagedScript implements IEventTime
     }
     
     public final void executeForEachPlayer(final Player player, final Npc npc, final boolean isSummon, final boolean includeParty, final boolean includeCommandChannel) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
         if ((includeParty || includeCommandChannel) && player.isInParty()) {
             if (includeCommandChannel && player.getParty().isInCommandChannel()) {
                 player.getParty().getCommandChannel().checkEachMember(member -> {
@@ -1551,23 +1038,14 @@ public abstract class AbstractScript extends ManagedScript implements IEventTime
     }
     
     public void removeRadar(final Player player, final int x, final int y, final int z) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
         player.getRadar().removeMarker(x, y, z);
     }
     
     public void clearRadar(final Player player) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
         player.getRadar().removeAllMarkers();
     }
     
     public void playMovie(final Player player, final Movie movie) {
-        if (player.isSimulatingTalking()) {
-            return;
-        }
         new MovieHolder(List.of(player), movie);
     }
     
@@ -1587,6 +1065,432 @@ public abstract class AbstractScript extends ManagedScript implements IEventTime
                 }
             }
         }
+    }
+    
+    public static void showOnScreenMsg(final Player player, final String text, final int time) {
+        player.sendPacket(new ExShowScreenMessage(text, time));
+    }
+    
+    public static void showOnScreenMsg(final Player player, final NpcStringId npcString, final int position, final int time, final String... params) {
+        player.sendPacket(new ExShowScreenMessage(npcString, position, time, params));
+    }
+    
+    public static void showOnScreenMsg(final Player player, final NpcStringId npcString, final int position, final int time, final boolean showEffect, final String... params) {
+        player.sendPacket(new ExShowScreenMessage(npcString, position, time, showEffect, params));
+    }
+    
+    public static void showOnScreenMsg(final Player player, final SystemMessageId systemMsg, final int position, final int time, final String... params) {
+        player.sendPacket(new ExShowScreenMessage(systemMsg, position, time, params));
+    }
+    
+    public static Npc addSpawn(final int npcId, final IPositionable pos) {
+        return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), false, 0L, false, 0);
+    }
+    
+    public static Npc addSpawn(final Npc summoner, final int npcId, final IPositionable pos, final boolean randomOffset, final long despawnDelay) {
+        return addSpawn(summoner, npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, false, 0);
+    }
+    
+    public static Npc addSpawn(final int npcId, final IPositionable pos, final boolean isSummonSpawn) {
+        return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), false, 0L, isSummonSpawn, 0);
+    }
+    
+    public static Npc addSpawn(final int npcId, final IPositionable pos, final boolean randomOffset, final long despawnDelay) {
+        return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, false, 0);
+    }
+    
+    public static Npc addSpawn(final int npcId, final IPositionable pos, final boolean randomOffset, final long despawnDelay, final boolean isSummonSpawn) {
+        return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, isSummonSpawn, 0);
+    }
+    
+    public static Npc addSpawn(final Npc summoner, final int npcId, final IPositionable pos, final boolean randomOffset, final int instanceId) {
+        return addSpawn(summoner, npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, 0L, false, instanceId);
+    }
+    
+    public static Npc addSpawn(final int npcId, final IPositionable pos, final boolean randomOffset, final long despawnDelay, final boolean isSummonSpawn, final int instanceId) {
+        return addSpawn(npcId, pos.getX(), pos.getY(), pos.getZ(), pos.getHeading(), randomOffset, despawnDelay, isSummonSpawn, instanceId);
+    }
+    
+    public static Npc addSpawn(final int npcId, final int x, final int y, final int z, final int heading, final boolean randomOffset, final long despawnDelay) {
+        return addSpawn(npcId, x, y, z, heading, randomOffset, despawnDelay, false, 0);
+    }
+    
+    public static Npc addSpawn(final int npcId, final int x, final int y, final int z, final int heading, final boolean randomOffset, final long despawnDelay, final boolean isSummonSpawn) {
+        return addSpawn(npcId, x, y, z, heading, randomOffset, despawnDelay, isSummonSpawn, 0);
+    }
+    
+    public static Npc addSpawn(final int npcId, final int x, final int y, final int z, final int heading, final boolean randomOffset, final long despawnDelay, final boolean isSummonSpawn, final int instanceId) {
+        return addSpawn(null, npcId, x, y, z, heading, randomOffset, despawnDelay, isSummonSpawn, instanceId);
+    }
+    
+    public static Npc addSpawn(final Npc summoner, final int npcId, int x, int y, final int z, final int heading, final boolean randomOffset, final long despawnDelay, final boolean isSummonSpawn, final int instance) {
+        try {
+            final Spawn spawn = new Spawn(npcId);
+            if (x == 0 && y == 0) {
+                AbstractScript.LOGGER.error(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, npcId));
+                return null;
+            }
+            if (randomOffset) {
+                int offset = Rnd.get(50, 100);
+                if (Rnd.nextBoolean()) {
+                    offset *= -1;
+                }
+                x += offset;
+                offset = Rnd.get(50, 100);
+                if (Rnd.nextBoolean()) {
+                    offset *= -1;
+                }
+                y += offset;
+            }
+            spawn.setInstanceId(instance);
+            spawn.setHeading(heading);
+            spawn.setXYZ(x, y, z);
+            spawn.stopRespawn();
+            final Npc npc = spawn.doSpawn(isSummonSpawn);
+            if (despawnDelay > 0L) {
+                npc.scheduleDespawn(despawnDelay);
+            }
+            if (summoner != null) {
+                summoner.addSummonedNpc(npc);
+            }
+            return npc;
+        }
+        catch (Exception e) {
+            AbstractScript.LOGGER.warn(invokedynamic(makeConcatWithConstants:(ILjava/lang/String;)Ljava/lang/String;, npcId, e.getMessage()));
+            return null;
+        }
+    }
+    
+    public static long getQuestItemsCount(final Player player, final int itemId) {
+        return player.getInventory().getInventoryItemCount(itemId, -1);
+    }
+    
+    protected static boolean hasItem(final Player player, final ItemHolder item) {
+        return hasItem(player, item, true);
+    }
+    
+    protected static boolean hasItem(final Player player, final ItemHolder item, final boolean checkCount) {
+        if (item == null) {
+            return false;
+        }
+        if (checkCount) {
+            return getQuestItemsCount(player, item.getId()) >= item.getCount();
+        }
+        return hasQuestItems(player, item.getId());
+    }
+    
+    protected static boolean hasAllItems(final Player player, final boolean checkCount, final ItemHolder... itemList) {
+        if (itemList == null || itemList.length == 0) {
+            return false;
+        }
+        for (final ItemHolder item : itemList) {
+            if (!hasItem(player, item, checkCount)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public static boolean hasQuestItems(final Player player, final int itemId) {
+        return player.getInventory().getItemByItemId(itemId) != null;
+    }
+    
+    public static boolean hasQuestItems(final Player player, final int... itemIds) {
+        if (itemIds == null || itemIds.length == 0) {
+            return false;
+        }
+        final PlayerInventory inv = player.getInventory();
+        for (final int itemId : itemIds) {
+            if (inv.getItemByItemId(itemId) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public static int getEnchantLevel(final Player player, final int itemId) {
+        final Item enchantedItem = player.getInventory().getItemByItemId(itemId);
+        if (enchantedItem == null) {
+            return 0;
+        }
+        return enchantedItem.getEnchantLevel();
+    }
+    
+    public static void rewardItems(final Player player, final ItemHolder holder) {
+        rewardItems(player, holder.getId(), holder.getCount());
+    }
+    
+    public static void rewardItems(final Player player, final int itemId, long count) {
+        if (count <= 0L) {
+            return;
+        }
+        final ItemTemplate item = ItemEngine.getInstance().getTemplate(itemId);
+        if (item == null) {
+            return;
+        }
+        try {
+            if (itemId == 57) {
+                count *= (long)Config.RATE_QUEST_REWARD_ADENA;
+            }
+            else if (Config.RATE_QUEST_REWARD_USE_MULTIPLIERS) {
+                if (item instanceof EtcItem) {
+                    switch (((EtcItem)item).getItemType()) {
+                        case POTION: {
+                            count *= (long)Config.RATE_QUEST_REWARD_POTION;
+                            break;
+                        }
+                        case ENCHANT_WEAPON:
+                        case ENCHANT_ARMOR:
+                        case SCROLL: {
+                            count *= (long)Config.RATE_QUEST_REWARD_SCROLL;
+                            break;
+                        }
+                        case RECIPE: {
+                            count *= (long)Config.RATE_QUEST_REWARD_RECIPE;
+                            break;
+                        }
+                        case MATERIAL: {
+                            count *= (long)Config.RATE_QUEST_REWARD_MATERIAL;
+                            break;
+                        }
+                        default: {
+                            count *= (long)Config.RATE_QUEST_REWARD;
+                            break;
+                        }
+                    }
+                }
+            }
+            else {
+                count *= (long)Config.RATE_QUEST_REWARD;
+            }
+        }
+        catch (Exception e) {
+            count = Long.MAX_VALUE;
+        }
+        final Item itemInstance = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
+        if (itemInstance == null) {
+            return;
+        }
+        sendItemGetMessage(player, itemInstance, count);
+    }
+    
+    private static void sendItemGetMessage(final Player player, final Item item, final long count) {
+        if (item.getId() == 57) {
+            final SystemMessage smsg = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_EARNED_S1_ADENA);
+            smsg.addLong(count);
+            player.sendPacket(smsg);
+        }
+        else if (count > 1L) {
+            final SystemMessage smsg = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_EARNED_S2_S1_S);
+            smsg.addItemName(item);
+            smsg.addLong(count);
+            player.sendPacket(smsg);
+        }
+        else {
+            final SystemMessage smsg = SystemMessage.getSystemMessage(SystemMessageId.YOU_HAVE_EARNED_S1);
+            smsg.addItemName(item);
+            player.sendPacket(smsg);
+        }
+        player.sendPacket(new ExUserInfoInvenWeight(player));
+        player.sendPacket(new ExAdenaInvenCount(player));
+        player.sendPacket(new ExBloodyCoinCount());
+    }
+    
+    public static void giveItems(final Player player, final int itemId, final long count) {
+        giveItems(player, itemId, count, 0, false);
+    }
+    
+    public static void giveItems(final Player player, final int itemId, final long count, final boolean playSound) {
+        giveItems(player, itemId, count, 0, playSound);
+    }
+    
+    protected static void giveItems(final Player player, final ItemHolder holder) {
+        giveItems(player, holder.getId(), holder.getCount());
+    }
+    
+    public static void giveItems(final Player player, final int itemId, final long count, final int enchantlevel, final boolean playSound) {
+        if (count <= 0L) {
+            return;
+        }
+        final Item item = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
+        if (item == null) {
+            return;
+        }
+        if (enchantlevel > 0 && itemId != 57) {
+            item.setEnchantLevel(enchantlevel);
+        }
+        if (playSound) {
+            playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+        }
+        sendItemGetMessage(player, item, count);
+    }
+    
+    public static void giveItems(final Player player, final int itemId, final long count, final AttributeType attributeType, final int attributeValue) {
+        if (count <= 0L) {
+            return;
+        }
+        final Item item = player.getInventory().addItem("Quest", itemId, count, player, player.getTarget());
+        if (item == null) {
+            return;
+        }
+        if (attributeType != null && attributeValue > 0) {
+            item.setAttribute(new AttributeHolder(attributeType, attributeValue), true);
+            if (item.isEquipped()) {
+                player.getStats().recalculateStats(true);
+            }
+            final InventoryUpdate iu = new InventoryUpdate();
+            iu.addModifiedItem(item);
+            player.sendInventoryUpdate(iu);
+        }
+        sendItemGetMessage(player, item, count);
+    }
+    
+    public static boolean giveItemRandomly(final Player player, final int itemId, final long amountToGive, final long limit, final double dropChance, final boolean playSound) {
+        return giveItemRandomly(player, null, itemId, amountToGive, amountToGive, limit, dropChance, playSound);
+    }
+    
+    public static boolean giveItemRandomly(final Player player, final Npc npc, final int itemId, final long amountToGive, final long limit, final double dropChance, final boolean playSound) {
+        return giveItemRandomly(player, npc, itemId, amountToGive, amountToGive, limit, dropChance, playSound);
+    }
+    
+    public static boolean giveItemRandomly(final Player player, final Npc npc, final int itemId, long minAmount, long maxAmount, final long limit, double dropChance, final boolean playSound) {
+        final long currentCount = getQuestItemsCount(player, itemId);
+        if (limit > 0L && currentCount >= limit) {
+            return true;
+        }
+        minAmount *= (long)Config.RATE_QUEST_DROP;
+        maxAmount *= (long)Config.RATE_QUEST_DROP;
+        dropChance *= Config.RATE_QUEST_DROP;
+        if (npc != null && Config.CHAMPION_ENABLE && npc.isChampion()) {
+            if (itemId == 57) {
+                dropChance *= Config.CHAMPION_ADENAS_REWARDS_CHANCE;
+                minAmount *= (long)Config.CHAMPION_ADENAS_REWARDS_AMOUNT;
+                maxAmount *= (long)Config.CHAMPION_ADENAS_REWARDS_AMOUNT;
+            }
+            else {
+                dropChance *= Config.CHAMPION_REWARDS_CHANCE;
+                minAmount *= (long)Config.CHAMPION_REWARDS_AMOUNT;
+                maxAmount *= (long)Config.CHAMPION_REWARDS_AMOUNT;
+            }
+        }
+        long amountToGive = (minAmount == maxAmount) ? minAmount : Rnd.get(minAmount, maxAmount);
+        final double random = Rnd.nextDouble();
+        if (dropChance >= random && amountToGive > 0L && player.getInventory().validateCapacityByItemId(itemId)) {
+            if (limit > 0L && currentCount + amountToGive > limit) {
+                amountToGive = limit - currentCount;
+            }
+            if (player.addItem("Quest", itemId, amountToGive, npc, true) != null) {
+                if (currentCount + amountToGive == limit) {
+                    if (playSound) {
+                        playSound(player, QuestSound.ITEMSOUND_QUEST_MIDDLE);
+                    }
+                    return true;
+                }
+                if (playSound) {
+                    playSound(player, QuestSound.ITEMSOUND_QUEST_ITEMGET);
+                }
+                return limit <= 0L;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean takeItems(final Player player, final int itemId, long amount) {
+        final Item item = player.getInventory().getItemByItemId(itemId);
+        if (item == null) {
+            return false;
+        }
+        if (amount < 0L || amount > item.getCount()) {
+            amount = item.getCount();
+        }
+        if (item.isEquipped()) {
+            final Set<Item> unequiped = player.getInventory().unEquipItemInBodySlotAndRecord(item.getBodyPart());
+            final InventoryUpdate iu = new InventoryUpdate();
+            for (final Item itm : unequiped) {
+                iu.addModifiedItem(itm);
+            }
+            player.sendInventoryUpdate(iu);
+            player.broadcastUserInfo();
+        }
+        return player.destroyItemByItemId("Quest", itemId, amount, player, true);
+    }
+    
+    protected static boolean takeItem(final Player player, final ItemHolder holder) {
+        return holder != null && takeItems(player, holder.getId(), holder.getCount());
+    }
+    
+    protected static boolean takeAllItems(final Player player, final ItemHolder... itemList) {
+        if (itemList == null || itemList.length == 0) {
+            return false;
+        }
+        if (!hasAllItems(player, true, itemList)) {
+            return false;
+        }
+        for (final ItemHolder item : itemList) {
+            if (!takeItem(player, item)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public static boolean takeItems(final Player player, final int amount, final int... itemIds) {
+        boolean check = true;
+        if (itemIds != null) {
+            for (final int item : itemIds) {
+                check &= takeItems(player, item, amount);
+            }
+        }
+        return check;
+    }
+    
+    public static void playSound(final Instance world, final String sound) {
+        world.broadcastPacket(new PlaySound(sound));
+    }
+    
+    public static void playSound(final Player player, final String sound) {
+        player.sendPacket(QuestSound.getSound(sound));
+    }
+    
+    public static void playSound(final Player player, final QuestSound sound) {
+        player.sendPacket(sound.getPacket());
+    }
+    
+    public static void addExpAndSp(final Player player, final long exp, final int sp) {
+        player.addExpAndSp((double)(long)player.getStats().getValue(Stat.EXPSP_RATE, exp * Config.RATE_QUEST_REWARD_XP), (int)player.getStats().getValue(Stat.EXPSP_RATE, sp * Config.RATE_QUEST_REWARD_SP));
+        PcCafePointsManager.getInstance().givePcCafePoint(player, (double)(long)(exp * Config.RATE_QUEST_REWARD_XP));
+    }
+    
+    public static int getItemEquipped(final Player player, final InventorySlot slot) {
+        return player.getInventory().getPaperdollItemId(slot);
+    }
+    
+    public static int getGameTicks() {
+        return WorldTimeController.getInstance().getGameTicks();
+    }
+    
+    public static void specialCamera(final Player player, final Creature creature, final int force, final int angle1, final int angle2, final int time, final int range, final int duration, final int relYaw, final int relPitch, final int isWide, final int relAngle) {
+        player.sendPacket(new SpecialCamera(creature, force, angle1, angle2, time, range, duration, relYaw, relPitch, isWide, relAngle));
+    }
+    
+    public static void specialCameraEx(final Player player, final Creature creature, final int force, final int angle1, final int angle2, final int time, final int duration, final int relYaw, final int relPitch, final int isWide, final int relAngle) {
+        player.sendPacket(new SpecialCamera(creature, player, force, angle1, angle2, time, duration, relYaw, relPitch, isWide, relAngle));
+    }
+    
+    public static void specialCamera3(final Player player, final Creature creature, final int force, final int angle1, final int angle2, final int time, final int range, final int duration, final int relYaw, final int relPitch, final int isWide, final int relAngle, final int unk) {
+        player.sendPacket(new SpecialCamera(creature, force, angle1, angle2, time, range, duration, relYaw, relPitch, isWide, relAngle, unk));
+    }
+    
+    public static void specialCamera(final Instance world, final Creature creature, final int force, final int angle1, final int angle2, final int time, final int range, final int duration, final int relYaw, final int relPitch, final int isWide, final int relAngle, final int unk) {
+        world.broadcastPacket(new SpecialCamera(creature, force, angle1, angle2, time, range, duration, relYaw, relPitch, isWide, relAngle, unk));
+    }
+    
+    public static void addRadar(final Player player, final ILocational loc) {
+        addRadar(player, loc.getX(), loc.getY(), loc.getZ());
+    }
+    
+    public static void addRadar(final Player player, final int x, final int y, final int z) {
+        player.getRadar().addMarker(x, y, z);
     }
     
     static {

@@ -4,6 +4,7 @@
 
 package org.l2j.scripts.handlers.admincommandhandlers;
 
+import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.model.WorldObject;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.io.PrintStream;
 import java.io.FileOutputStream;
 import java.io.File;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
+import org.l2j.gameserver.network.serverpackets.html.NpcHtmlMessage;
 import java.io.Reader;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -31,14 +33,15 @@ import java.io.InputStream;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import org.l2j.gameserver.Config;
-import org.l2j.gameserver.network.serverpackets.html.NpcHtmlMessage;
 import org.l2j.gameserver.model.entity.Event;
 import java.util.StringTokenizer;
 import org.l2j.gameserver.model.actor.instance.Player;
+import org.slf4j.Logger;
 import org.l2j.gameserver.handler.IAdminCommandHandler;
 
 public class AdminEventEngine implements IAdminCommandHandler
 {
+    private static final Logger LOGGER;
     private static final String[] ADMIN_COMMANDS;
     private static String tempBuffer;
     private static String tempName;
@@ -66,20 +69,43 @@ public class AdminEventEngine implements IAdminCommandHandler
             else if (actualCommand.startsWith("admin_event_see")) {
                 final String eventName = command.substring(16);
                 try {
-                    final NpcHtmlMessage adminReply = new NpcHtmlMessage(0, 1);
                     final DataInputStream in = new DataInputStream(new BufferedInputStream(new FileInputStream(invokedynamic(makeConcatWithConstants:(Ljava/io/File;Ljava/lang/String;)Ljava/lang/String;, Config.DATAPACK_ROOT, eventName))));
-                    final BufferedReader inbr = new BufferedReader(new InputStreamReader(in));
-                    adminReply.setFile((Player)null, "data/html/mods/EventEngine/Participation.htm");
-                    adminReply.replace("%eventName%", eventName);
-                    adminReply.replace("%eventCreator%", inbr.readLine());
-                    adminReply.replace("%eventInfo%", inbr.readLine());
-                    adminReply.replace("npc_%objectId%_event_participate", "admin_event");
-                    adminReply.replace("button value=\"Participate\"", "button value=\"Back\"");
-                    activeChar.sendPacket(new ServerPacket[] { (ServerPacket)adminReply });
-                    inbr.close();
+                    try {
+                        final BufferedReader inbr = new BufferedReader(new InputStreamReader(in));
+                        try {
+                            final NpcHtmlMessage adminReply = new NpcHtmlMessage(0, 1);
+                            adminReply.setFile((Player)null, "data/html/mods/EventEngine/Participation.htm");
+                            adminReply.replace("%eventName%", eventName);
+                            adminReply.replace("%eventCreator%", inbr.readLine());
+                            adminReply.replace("%eventInfo%", inbr.readLine());
+                            adminReply.replace("npc_%objectId%_event_participate", "admin_event");
+                            adminReply.replace("button value=\"Participate\"", "button value=\"Back\"");
+                            activeChar.sendPacket(new ServerPacket[] { (ServerPacket)adminReply });
+                            inbr.close();
+                        }
+                        catch (Throwable t) {
+                            try {
+                                inbr.close();
+                            }
+                            catch (Throwable exception) {
+                                t.addSuppressed(exception);
+                            }
+                            throw t;
+                        }
+                        in.close();
+                    }
+                    catch (Throwable t2) {
+                        try {
+                            in.close();
+                        }
+                        catch (Throwable exception2) {
+                            t2.addSuppressed(exception2);
+                        }
+                        throw t2;
+                    }
                 }
                 catch (Exception e) {
-                    e.printStackTrace();
+                    AdminEventEngine.LOGGER.error(e.getMessage(), (Throwable)e);
                 }
             }
             else if (actualCommand.startsWith("admin_event_del")) {
@@ -99,14 +125,36 @@ public class AdminEventEngine implements IAdminCommandHandler
             else if (actualCommand.startsWith("admin_event_store")) {
                 try {
                     final FileOutputStream file2 = new FileOutputStream(new File(Config.DATAPACK_ROOT, invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, AdminEventEngine.tempName)));
-                    final PrintStream p = new PrintStream(file2);
-                    p.println(activeChar.getName());
-                    p.println(AdminEventEngine.tempBuffer);
-                    file2.close();
-                    p.close();
+                    try {
+                        final PrintStream p = new PrintStream(file2);
+                        try {
+                            p.println(activeChar.getName());
+                            p.println(AdminEventEngine.tempBuffer);
+                            p.close();
+                        }
+                        catch (Throwable t3) {
+                            try {
+                                p.close();
+                            }
+                            catch (Throwable exception3) {
+                                t3.addSuppressed(exception3);
+                            }
+                            throw t3;
+                        }
+                        file2.close();
+                    }
+                    catch (Throwable t4) {
+                        try {
+                            file2.close();
+                        }
+                        catch (Throwable exception4) {
+                            t4.addSuppressed(exception4);
+                        }
+                        throw t4;
+                    }
                 }
                 catch (Exception e2) {
-                    e2.printStackTrace();
+                    AdminEventEngine.LOGGER.error(e2.getMessage(), (Throwable)e2);
                 }
                 AdminEventEngine.tempBuffer = "";
                 AdminEventEngine.tempName = "";
@@ -405,6 +453,7 @@ public class AdminEventEngine implements IAdminCommandHandler
     }
     
     static {
+        LOGGER = LoggerFactory.getLogger((Class)AdminEventEngine.class);
         ADMIN_COMMANDS = new String[] { "admin_event", "admin_event_new", "admin_event_choose", "admin_event_store", "admin_event_set", "admin_event_change_teams_number", "admin_event_announce", "admin_event_panel", "admin_event_control_begin", "admin_event_control_teleport", "admin_add", "admin_event_see", "admin_event_del", "admin_delete_buffer", "admin_event_control_sit", "admin_event_name", "admin_event_control_kill", "admin_event_control_res", "admin_event_control_transform", "admin_event_control_untransform", "admin_event_control_prize", "admin_event_control_chatban", "admin_event_control_kick", "admin_event_control_finish" };
         AdminEventEngine.tempBuffer = "";
         AdminEventEngine.tempName = "";

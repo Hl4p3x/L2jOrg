@@ -24,6 +24,7 @@ import org.l2j.commons.util.Util;
 import java.lang.module.Configuration;
 import java.util.Set;
 import java.lang.module.ModuleFinder;
+import java.util.stream.Stream;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.nio.file.FileVisitOption;
@@ -91,7 +92,25 @@ public final class JavaExecutionContext extends AbstractExecutionContext<JavaScr
     }
     
     private List<Path> findModuleInfo() throws IOException {
-        return Files.find(this.sourcePath, Integer.MAX_VALUE, (path, attributes) -> "module-info.java".equals(path.getFileName().toString()), new FileVisitOption[0]).collect((Collector<? super Path, ?, List<Path>>)Collectors.toList());
+        final Stream<Path> files = Files.find(this.sourcePath, Integer.MAX_VALUE, (path, attributes) -> "module-info.java".equals(path.getFileName().toString()), new FileVisitOption[0]);
+        try {
+            final List<? super Path> list = files.collect((Collector<? super Path, ?, List<? super Path>>)Collectors.toList());
+            if (files != null) {
+                files.close();
+            }
+            return (List<Path>)list;
+        }
+        catch (Throwable t) {
+            if (files != null) {
+                try {
+                    files.close();
+                }
+                catch (Throwable exception) {
+                    t.addSuppressed(exception);
+                }
+            }
+            throw t;
+        }
     }
     
     private void tryConfigureModuleLayer() {
@@ -120,9 +139,26 @@ public final class JavaExecutionContext extends AbstractExecutionContext<JavaScr
     }
     
     private void compile(final Path sourcePath) throws JavaCompilerException, IOException {
-        final List<Path> paths = Files.walk(sourcePath, new FileVisitOption[0]).filter(this::needCompile).collect((Collector<? super Path, ?, List<Path>>)Collectors.toList());
-        if (!Util.isNullOrEmpty((Collection)paths)) {
-            this.compile(paths, this.compileOptions());
+        final Stream<Path> stream = Files.walk(sourcePath, new FileVisitOption[0]).filter(this::needCompile);
+        try {
+            final List<Path> paths = stream.collect((Collector<? super Path, ?, List<Path>>)Collectors.toList());
+            if (!Util.isNullOrEmpty((Collection)paths)) {
+                this.compile(paths, this.compileOptions());
+            }
+            if (stream != null) {
+                stream.close();
+            }
+        }
+        catch (Throwable t) {
+            if (stream != null) {
+                try {
+                    stream.close();
+                }
+                catch (Throwable exception) {
+                    t.addSuppressed(exception);
+                }
+            }
+            throw t;
         }
     }
     

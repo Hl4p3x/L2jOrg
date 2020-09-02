@@ -5,6 +5,8 @@
 package org.l2j.gameserver.instancemanager;
 
 import org.slf4j.LoggerFactory;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.ItemDAO;
 import org.l2j.gameserver.engine.mail.MailEngine;
 import org.l2j.gameserver.model.item.container.Attachment;
 import org.l2j.gameserver.data.database.data.MailData;
@@ -50,7 +52,7 @@ public final class CommissionManager
     private static final Logger LOGGER;
     private static final int INTERACTION_DISTANCE = 250;
     private static final int ITEMS_LIMIT_PER_REQUEST = 999;
-    private static final int MAX_ITEMS_REGISTRED_PER_PLAYER = 10;
+    private static final int MAX_ITEMS_REGISTERED_PER_PLAYER = 10;
     private static final long MIN_REGISTRATION_AND_SALE_FEE = 1000L;
     private static final double REGISTRATION_FEE_PER_DAY = 0.001;
     private static final double SALE_FEE_PER_DAY = 0.005;
@@ -401,57 +403,7 @@ public final class CommissionManager
     }
     
     private boolean deleteItemFromDB(final long commissionId) {
-        try {
-            final Connection con = DatabaseFactory.getInstance().getConnection();
-            try {
-                final PreparedStatement ps = con.prepareStatement("DELETE FROM `commission_items` WHERE `commission_id` = ?");
-                try {
-                    ps.setLong(1, commissionId);
-                    if (ps.executeUpdate() > 0) {
-                        final boolean b = true;
-                        if (ps != null) {
-                            ps.close();
-                        }
-                        if (con != null) {
-                            con.close();
-                        }
-                        return b;
-                    }
-                    if (ps != null) {
-                        ps.close();
-                    }
-                }
-                catch (Throwable t) {
-                    if (ps != null) {
-                        try {
-                            ps.close();
-                        }
-                        catch (Throwable exception) {
-                            t.addSuppressed(exception);
-                        }
-                    }
-                    throw t;
-                }
-                if (con != null) {
-                    con.close();
-                }
-            }
-            catch (Throwable t2) {
-                if (con != null) {
-                    try {
-                        con.close();
-                    }
-                    catch (Throwable exception2) {
-                        t2.addSuppressed(exception2);
-                    }
-                }
-                throw t2;
-            }
-        }
-        catch (SQLException e) {
-            CommissionManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;J)Ljava/lang/String;, this.getClass().getSimpleName(), commissionId), (Throwable)e);
-        }
-        return false;
+        return ((ItemDAO)DatabaseAccess.getDAO((Class)ItemDAO.class)).deleteCommission(commissionId);
     }
     
     private void expireSale(final CommissionItem commissionItem) {

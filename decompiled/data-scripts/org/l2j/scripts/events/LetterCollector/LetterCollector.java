@@ -5,6 +5,7 @@
 package org.l2j.scripts.events.LetterCollector;
 
 import org.l2j.gameserver.model.events.AbstractScript;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.model.quest.LongTimeEvent;
@@ -95,7 +96,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeA": {
                 if (getQuestItemsCount(player, 3875) >= 2L) {
                     takeItems(player, 3875, 2L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -105,7 +106,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeC": {
                 if (getQuestItemsCount(player, 3876) >= 2L) {
                     takeItems(player, 3876, 2L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -115,7 +116,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeE": {
                 if (getQuestItemsCount(player, 3877) >= 2L) {
                     takeItems(player, 3877, 2L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -125,7 +126,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeG": {
                 if (getQuestItemsCount(player, 3879) >= 2L) {
                     takeItems(player, 3879, 2L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -135,7 +136,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeI": {
                 if (getQuestItemsCount(player, 3881) >= 2L) {
                     takeItems(player, 3881, 2L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -145,7 +146,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeL": {
                 if (getQuestItemsCount(player, 3882) >= 2L) {
                     takeItems(player, 3882, 2L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -155,7 +156,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeM": {
                 if (getQuestItemsCount(player, 34956) >= 2L) {
                     takeItems(player, 34956, 2L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -165,7 +166,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeN": {
                 if (getQuestItemsCount(player, 3883) >= 2L) {
                     takeItems(player, 3883, 2L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -175,7 +176,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeO": {
                 if (getQuestItemsCount(player, 3884) >= 2L) {
                     takeItems(player, 3884, 2L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -185,7 +186,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeR": {
                 if (getQuestItemsCount(player, 3885) >= 2L) {
                     takeItems(player, 3885, 2L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -195,7 +196,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeH": {
                 if (getQuestItemsCount(player, 3880) >= 1L) {
                     takeItems(player, 3880, 1L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -205,7 +206,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeS": {
                 if (getQuestItemsCount(player, 3886) >= 1L) {
                     takeItems(player, 3886, 1L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }
@@ -215,7 +216,7 @@ public final class LetterCollector extends LongTimeEvent
             case "exchangeII": {
                 if (getQuestItemsCount(player, 3888) >= 1L) {
                     takeItems(player, 3888, 1L);
-                    giveItems(player, getRandomEntry(LetterCollector.LETTERS), 1L);
+                    giveItems(player, Rnd.get(LetterCollector.LETTERS), 1L);
                     htmltext = "9000-2.htm";
                     break;
                 }

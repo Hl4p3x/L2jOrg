@@ -12,6 +12,7 @@ import org.l2j.gameserver.ai.CtrlIntention;
 import org.l2j.gameserver.model.WorldObject;
 import org.l2j.gameserver.util.GameUtils;
 import org.l2j.gameserver.engine.skill.api.SkillEngine;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.engine.skill.api.Skill;
@@ -76,34 +77,34 @@ public class ScarletVanHalisha extends AbstractNpcAI
     private Skill getRndSkills(final Npc npc) {
         switch (npc.getId()) {
             case 29046: {
-                if (getRandom(100) < 10) {
+                if (Rnd.get(100) < 10) {
                     return SkillEngine.getInstance().getSkill(5015, 2);
                 }
-                if (getRandom(100) < 10) {
+                if (Rnd.get(100) < 10) {
                     return SkillEngine.getInstance().getSkill(5015, 5);
                 }
-                if (getRandom(100) < 2) {
+                if (Rnd.get(100) < 2) {
                     return SkillEngine.getInstance().getSkill(5016, 1);
                 }
                 return SkillEngine.getInstance().getSkill(5014, 2);
             }
             case 29047: {
-                if (getRandom(100) < 10) {
+                if (Rnd.get(100) < 10) {
                     return SkillEngine.getInstance().getSkill(5015, 3);
                 }
-                if (getRandom(100) < 10) {
+                if (Rnd.get(100) < 10) {
                     return SkillEngine.getInstance().getSkill(5015, 6);
                 }
-                if (getRandom(100) < 10) {
+                if (Rnd.get(100) < 10) {
                     return SkillEngine.getInstance().getSkill(5015, 2);
                 }
-                if (this._lastRangedSkillTime + 60000L < System.currentTimeMillis() && getRandom(100) < 10) {
+                if (this._lastRangedSkillTime + 60000L < System.currentTimeMillis() && Rnd.get(100) < 10) {
                     return SkillEngine.getInstance().getSkill(5019, 1);
                 }
-                if (this._lastRangedSkillTime + 60000L < System.currentTimeMillis() && getRandom(100) < 10) {
+                if (this._lastRangedSkillTime + 60000L < System.currentTimeMillis() && Rnd.get(100) < 10) {
                     return SkillEngine.getInstance().getSkill(5018, 1);
                 }
-                if (getRandom(100) < 2) {
+                if (Rnd.get(100) < 2) {
                     return SkillEngine.getInstance().getSkill(5016, 1);
                 }
                 return SkillEngine.getInstance().getSkill(5014, 3);
@@ -118,7 +119,7 @@ public class ScarletVanHalisha extends AbstractNpcAI
         if (npc.isInvul() || npc.isCastingNow()) {
             return;
         }
-        if (getRandom(100) < 30 || this._target == null || this._target.isDead()) {
+        if (Rnd.get(100) < 30 || this._target == null || this._target.isDead()) {
             this._skill = this.getRndSkills(npc);
             this._target = this.getRandomTarget(npc, this._skill);
         }
@@ -189,7 +190,7 @@ public class ScarletVanHalisha extends AbstractNpcAI
                 result.add((Creature)obj);
             }
         }
-        return (Creature)getRandomEntry((List)result);
+        return (Creature)Rnd.get((List)result);
     }
     
     public static void main(final String[] args) {

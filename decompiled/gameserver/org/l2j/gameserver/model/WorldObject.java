@@ -9,7 +9,6 @@ import org.l2j.gameserver.util.MathUtil;
 import org.l2j.gameserver.instancemanager.InstanceManager;
 import org.l2j.commons.util.Util;
 import org.l2j.gameserver.model.interfaces.ILocational;
-import java.util.concurrent.ConcurrentHashMap;
 import org.l2j.gameserver.world.zone.ZoneType;
 import org.l2j.gameserver.network.SystemMessageId;
 import org.l2j.gameserver.model.actor.Creature;
@@ -24,7 +23,6 @@ import java.util.Objects;
 import org.l2j.gameserver.handler.ActionHandler;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.instancezone.Instance;
-import java.util.Map;
 import org.l2j.gameserver.enums.InstanceType;
 import org.l2j.gameserver.world.WorldRegion;
 import org.l2j.gameserver.model.interfaces.IPositionable;
@@ -41,7 +39,6 @@ public abstract class WorldObject extends ListenersContainer implements IIdentif
     protected int objectId;
     private WorldRegion worldRegion;
     private InstanceType instanceType;
-    private volatile Map<String, Object> scripts;
     private volatile int x;
     private volatile int y;
     private volatile int z;
@@ -194,32 +191,6 @@ public abstract class WorldObject extends ListenersContainer implements IIdentif
     
     public boolean isInsideZone(final ZoneType zone) {
         return false;
-    }
-    
-    public final <T> T addScript(final T script) {
-        if (this.scripts == null) {
-            synchronized (this) {
-                if (this.scripts == null) {
-                    this.scripts = new ConcurrentHashMap<String, Object>();
-                }
-            }
-        }
-        this.scripts.put(script.getClass().getName(), script);
-        return script;
-    }
-    
-    public final <T> T removeScript(final Class<T> script) {
-        if (this.scripts == null) {
-            return null;
-        }
-        return (T)this.scripts.remove(script.getName());
-    }
-    
-    public final <T> T getScript(final Class<T> script) {
-        if (this.scripts == null) {
-            return null;
-        }
-        return (T)this.scripts.get(script.getName());
     }
     
     public void removeStatusListener(final Creature object) {

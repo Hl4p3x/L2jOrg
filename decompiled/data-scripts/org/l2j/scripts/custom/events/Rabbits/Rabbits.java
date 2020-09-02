@@ -13,6 +13,7 @@ import org.l2j.gameserver.engine.skill.api.Skill;
 import org.l2j.gameserver.model.actor.Creature;
 import java.util.Iterator;
 import org.l2j.gameserver.util.Broadcast;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.Config;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,14 +57,13 @@ public final class Rabbits extends Event
             return false;
         }
         if (!Config.CUSTOM_NPC_DATA) {
-            Rabbits.LOGGER.info(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getName()));
             eventMaker.sendMessage(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;, this.getName()));
             return false;
         }
         this._isActive = true;
         recordSpawn(this._npcs, 900101, -59227, -56939, -2039, 64106, false, 0L);
         for (int i = 0; i <= 75; ++i) {
-            recordSpawn(this._npcs, 900102, getRandom(-60653, -58772), getRandom(-55830, -58146), -2030, 0, false, 600000L);
+            recordSpawn(this._npcs, 900102, Rnd.get(-60653, -58772), Rnd.get(-55830, -58146), -2030, 0, false, 600000L);
         }
         Broadcast.toAllOnlinePlayers("Rabbits Event: Chests spawned!");
         Broadcast.toAllOnlinePlayers("Rabbits Event: Go to Fantasy Isle and grab some rewards!");
@@ -152,10 +152,10 @@ public final class Rabbits extends Event
     }
     
     private static void dropItem(final Npc npc, final Player player, final int[][] droplist) {
-        final int chance = getRandom(100);
+        final int chance = Rnd.get(100);
         for (final int[] drop : droplist) {
             if (chance > drop[1]) {
-                npc.dropItem((Creature)player, drop[0], (long)getRandom(drop[2], drop[3]));
+                npc.dropItem((Creature)player, drop[0], (long)Rnd.get(drop[2], drop[3]));
                 return;
             }
         }

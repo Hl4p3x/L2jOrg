@@ -43,7 +43,7 @@ public class PlayerNameTable
         }
     }
     
-    private void addName(final int objectId, final String name) {
+    public final void addName(final int objectId, final String name) {
         if (Objects.nonNull(name) && !name.equals(this.playerData.get(objectId))) {
             this.playerData.put(objectId, (Object)name);
         }

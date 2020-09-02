@@ -9,7 +9,7 @@ import org.l2j.gameserver.data.database.data.Shortcut;
 import org.l2j.gameserver.util.BuilderUtil;
 import org.l2j.gameserver.data.xml.impl.AdminData;
 import org.l2j.gameserver.data.xml.impl.SkillTreesData;
-import org.l2j.gameserver.model.holders.AttendanceInfoHolder;
+import java.util.concurrent.TimeUnit;
 import org.l2j.gameserver.network.serverpackets.attendance.ExVipAttendanceItemList;
 import java.util.stream.Stream;
 import java.util.stream.IntStream;
@@ -25,7 +25,6 @@ import org.l2j.gameserver.world.MapRegionManager;
 import org.l2j.commons.threading.ThreadPool;
 import org.l2j.gameserver.network.serverpackets.ExAutoSoulShot;
 import org.l2j.gameserver.network.serverpackets.mission.ExConnectedTimeAndGettableReward;
-import org.l2j.gameserver.settings.RateSettings;
 import org.l2j.gameserver.settings.AttendanceSettings;
 import org.l2j.gameserver.network.serverpackets.ExWorldChatCnt;
 import org.l2j.gameserver.settings.ChatSettings;
@@ -36,7 +35,6 @@ import org.l2j.gameserver.enums.StatusUpdateType;
 import org.l2j.gameserver.network.serverpackets.elementalspirits.ElementalSpiritInfo;
 import org.l2j.gameserver.network.serverpackets.ExBeautyItemList;
 import org.l2j.gameserver.data.xml.impl.BeautyShopData;
-import org.l2j.gameserver.data.sql.impl.OfflineTradersTable;
 import org.l2j.gameserver.network.serverpackets.ExNotifyPremiumItem;
 import org.l2j.gameserver.network.serverpackets.ExShowScreenMessage;
 import org.l2j.gameserver.engine.mail.MailEngine;
@@ -74,12 +72,12 @@ import org.l2j.gameserver.network.serverpackets.ExAdenaInvenCount;
 import org.l2j.gameserver.network.serverpackets.ExUserInfoInvenWeight;
 import org.l2j.gameserver.network.serverpackets.ExSubjobInfo;
 import org.l2j.gameserver.enums.SubclassInfoType;
-import org.l2j.gameserver.network.serverpackets.ExPledgeWaitingListAlarm;
+import org.l2j.gameserver.network.serverpackets.pledge.ExPledgeWaitingListAlarm;
 import org.l2j.gameserver.network.serverpackets.SystemMessage;
 import org.l2j.gameserver.network.SystemMessageId;
 import org.l2j.gameserver.data.xml.impl.ClanHallManager;
 import org.l2j.gameserver.network.serverpackets.PledgeSkillList;
-import org.l2j.gameserver.network.serverpackets.ExPledgeCount;
+import org.l2j.gameserver.network.serverpackets.pledge.ExPledgeCount;
 import org.l2j.gameserver.network.serverpackets.pledge.PledgeShowMemberListAll;
 import org.l2j.gameserver.network.serverpackets.PledgeShowMemberListUpdate;
 import org.l2j.gameserver.model.entity.Siege;
@@ -296,9 +294,6 @@ public class EnterWorld extends ClientPacket
         if (!player.getPremiumItemList().isEmpty()) {
             player.sendPacket(ExNotifyPremiumItem.STATIC_PACKET);
         }
-        if ((Config.OFFLINE_TRADE_ENABLE || Config.OFFLINE_CRAFT_ENABLE) && Config.STORE_OFFLINE_TRADE_IN_REALTIME) {
-            OfflineTradersTable.onTransaction(player, true, false);
-        }
         if (BeautyShopData.getInstance().hasBeautyData(player.getRace(), player.getAppearance().getSexType())) {
             player.sendPacket(new ExBeautyItemList(player));
         }
@@ -317,8 +312,6 @@ public class EnterWorld extends ClientPacket
         if (((AttendanceSettings)Configurator.getSettings((Class)AttendanceSettings.class)).enabled()) {
             this.sendAttendanceInfo(player);
         }
-        final float rateXp = ((RateSettings)Configurator.getSettings((Class)RateSettings.class)).xp();
-        if (rateXp > 1.0f) {}
         player.sendPacket(new ExConnectedTimeAndGettableReward(player));
         player.sendPacket(new ExAutoSoulShot(0, true, 0));
         player.sendPacket(new ExAutoSoulShot(0, true, 1));
@@ -346,23 +339,21 @@ public class EnterWorld extends ClientPacket
         Quest.playerEnter(player);
     }
     
-    private void sendAttendanceInfo(final Player activeChar) {
+    private void sendAttendanceInfo(final Player player) {
         final AttendanceSettings attendanceSettings = (AttendanceSettings)Configurator.getSettings((Class)AttendanceSettings.class);
-        final AttendanceInfoHolder attendanceInfo;
         int lastRewardIndex;
         final AttendanceSettings attendanceSettings2;
         ThreadPool.schedule(() -> {
-            attendanceInfo = activeChar.getAttendanceInfo();
-            if (attendanceInfo.isRewardAvailable()) {
-                lastRewardIndex = attendanceInfo.getRewardIndex() + 1;
-                activeChar.sendPacket(new ExShowScreenMessage(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, lastRewardIndex), 2, 7000, 0, true, true));
-                activeChar.sendMessage(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, lastRewardIndex));
-                activeChar.sendMessage("Click on General Menu -> Attendance Check.");
+            if (player.canReceiveAttendance()) {
+                lastRewardIndex = player.lastAttendanceReward() + 1;
+                player.sendPacket(new ExShowScreenMessage(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, lastRewardIndex), 2, 7000, 0, true, true));
+                player.sendMessage(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, lastRewardIndex));
+                player.sendMessage("Click on General Menu -> Attendance Check.");
                 if (attendanceSettings2.popUpWindow()) {
-                    activeChar.sendPacket(new ExVipAttendanceItemList(activeChar));
+                    player.sendPacket(new ExVipAttendanceItemList(player));
                 }
             }
-        }, (long)(attendanceSettings.delay() * 60 * 1000));
+        }, (long)attendanceSettings.delay(), TimeUnit.MINUTES);
     }
     
     private void onGameMasterEnter(final Player activeChar) {
@@ -372,12 +363,7 @@ public class EnterWorld extends ClientPacket
         if (Config.GM_GIVE_SPECIAL_AURA_SKILLS) {
             SkillTreesData.getInstance().addSkills(activeChar, true);
         }
-        if (Config.GM_STARTUP_AUTO_LIST && AdminData.getInstance().hasAccess("admin_gmliston", activeChar.getAccessLevel())) {
-            AdminData.getInstance().addGm(activeChar, false);
-        }
-        else {
-            AdminData.getInstance().addGm(activeChar, true);
-        }
+        AdminData.getInstance().addGm(activeChar, !Config.GM_STARTUP_AUTO_LIST || !AdminData.getInstance().hasAccess("admin_gmliston", activeChar.getAccessLevel()));
         if (Config.GM_STARTUP_BUILDER_HIDE && AdminData.getInstance().hasAccess("admin_hide", activeChar.getAccessLevel())) {
             BuilderUtil.setHiding(activeChar, true);
             BuilderUtil.sendSysMessage(activeChar, "hide is default for builder.");

@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 
 public interface IPunishmentHandler
 {
-    public static final Logger LOGGER = LoggerFactory.getLogger(IPunishmentHandler.class.getName());
+    public static final Logger LOGGER = LoggerFactory.getLogger((Class)IPunishmentHandler.class);
     
     void onStart(final PunishmentTask task);
     

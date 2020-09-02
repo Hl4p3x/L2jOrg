@@ -10,6 +10,7 @@ import org.l2j.commons.util.Util;
 import org.l2j.gameserver.data.xml.ClanRewardManager;
 import org.l2j.gameserver.model.instancezone.Instance;
 import java.util.Iterator;
+import org.l2j.commons.util.Rnd;
 import org.l2j.commons.threading.ThreadPool;
 import org.l2j.gameserver.model.actor.Creature;
 import org.l2j.gameserver.enums.ChatType;
@@ -149,13 +150,13 @@ public class MonsterArena extends AbstractInstance
                     else {
                         giveItems(player, 70917, 1L);
                     }
-                    if (getRandom(100) < 1) {
+                    if (Rnd.get(100) < 1) {
                         giveItems(player, 90945, 1L);
                     }
-                    else if (getRandom(100) < 1) {
+                    else if (Rnd.get(100) < 1) {
                         giveItems(player, 90946, 1L);
                     }
-                    else if (getRandom(100) < 1) {
+                    else if (Rnd.get(100) < 1) {
                         giveItems(player, 90947, 1L);
                     }
                     break;

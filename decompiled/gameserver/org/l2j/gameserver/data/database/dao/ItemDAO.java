@@ -4,6 +4,7 @@
 
 package org.l2j.gameserver.data.database.dao;
 
+import org.l2j.gameserver.enums.ItemLocation;
 import java.util.Collection;
 import org.l2j.gameserver.data.database.data.ItemData;
 import org.l2j.gameserver.data.database.data.ItemVariationData;
@@ -44,8 +45,8 @@ public interface ItemDAO extends DAO<Object>
     @Query("SELECT mineralId,option1,option2 FROM item_variations WHERE itemId = :itemId:")
     ItemVariationData findItemVariationByItemId(final int itemId);
     
-    @Query("SELECT object_id,item_id,loc_data,enchant_level FROM items WHERE owner_id = :objectId: AND loc='PAPERDOLL'")
-    List<ItemData> findAllPaperDollItemsByObjectId(final int objectId);
+    @Query("SELECT object_id, item_id, loc_data, enchant_level FROM items WHERE owner_id = :ownerId: AND loc='PAPERDOLL'")
+    List<ItemData> findEquipedItemsByOwner(final int ownerId);
     
     void save(final Collection<ItemOnGroundData> datas);
     
@@ -57,4 +58,25 @@ public interface ItemDAO extends DAO<Object>
     
     @Query("DELETE FROM items WHERE owner_id=:playerId:")
     void deleteByOwner(final int playerId);
+    
+    @Query("INSERT INTO items (owner_id, object_id, item_id, count, loc, loc_data, time)\nVALUES (:owner:, :objectId:, :itemId:, :count:, :loc:, :locData:, -1 )")
+    void saveItem(final int owner, final int objectId, final int itemId, final long count, final ItemLocation loc, final int locData);
+    
+    @Query("DELETE FROM item_variations WHERE itemId = :objectId:")
+    void deleteVariations(final int objectId);
+    
+    @Query("DELETE FROM item_elementals WHERE itemId = :objectId:")
+    void deleteElementals(final int objectId);
+    
+    @Query("DELETE FROM items WHERE object_id = :objectId:")
+    void deleteItem(final int objectId);
+    
+    @Query("DELETE FROM `commission_items` WHERE `commission_id` = :commissionId:")
+    boolean deleteCommission(final long commissionId);
+    
+    @Query("DELETE FROM item_auction WHERE auctionId=:auctionId:")
+    void deleteItemAuction(final int auctionId);
+    
+    @Query("DELETE FROM item_auction_bid WHERE auctionId=:auctionId:")
+    void deleteItemAuctionBid(final int auctionId);
 }

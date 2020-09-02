@@ -6,6 +6,7 @@ package org.l2j.scripts.quests.Q00344_1000YearsTheEndOfLamentation;
 
 import io.github.joealisson.primitive.HashIntMap;
 import org.l2j.gameserver.model.quest.QuestState;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
 import io.github.joealisson.primitive.IntCollection;
@@ -132,13 +133,13 @@ public final class Q00344_1000YearsTheEndOfLamentation extends Quest
                         }
                         else {
                             takeItems(player, 4269, -1L);
-                            if (getRandom(1000) >= count) {
+                            if (Rnd.get(1000) >= count) {
                                 this.giveAdena(player, count * 60L, true);
                                 htmltext = event;
                             }
                             else {
                                 qs.setCond(2, true);
-                                switch (getRandom(4)) {
+                                switch (Rnd.get(4)) {
                                     case 0: {
                                         qs.setMemoState(1);
                                         giveItems(player, Q00344_1000YearsTheEndOfLamentation.OLD_HILT);
@@ -232,7 +233,7 @@ public final class Q00344_1000YearsTheEndOfLamentation extends Quest
                 }
                 if (hasItem(talker, Q00344_1000YearsTheEndOfLamentation.OLD_HILT)) {
                     takeItems(talker, Q00344_1000YearsTheEndOfLamentation.OLD_HILT.getId(), -1L);
-                    final int rand = getRandom(100);
+                    final int rand = Rnd.get(100);
                     if (rand <= 52) {
                         rewardItems(talker, Q00344_1000YearsTheEndOfLamentation.ORIHARUKON_ORE);
                     }
@@ -258,7 +259,7 @@ public final class Q00344_1000YearsTheEndOfLamentation extends Quest
                 }
                 if (hasItem(talker, Q00344_1000YearsTheEndOfLamentation.OLD_KEY)) {
                     takeItems(talker, Q00344_1000YearsTheEndOfLamentation.OLD_KEY.getId(), -1L);
-                    final int rand = getRandom(100);
+                    final int rand = Rnd.get(100);
                     if (rand <= 39) {
                         rewardItems(talker, Q00344_1000YearsTheEndOfLamentation.COKES);
                     }
@@ -281,7 +282,7 @@ public final class Q00344_1000YearsTheEndOfLamentation extends Quest
                 }
                 if (hasItem(talker, Q00344_1000YearsTheEndOfLamentation.TOTEM_NECKLACE)) {
                     takeItems(talker, Q00344_1000YearsTheEndOfLamentation.TOTEM_NECKLACE.getId(), -1L);
-                    final int rand = getRandom(100);
+                    final int rand = Rnd.get(100);
                     if (rand <= 47) {
                         rewardItems(talker, Q00344_1000YearsTheEndOfLamentation.LEATHER);
                     }
@@ -304,7 +305,7 @@ public final class Q00344_1000YearsTheEndOfLamentation extends Quest
                 }
                 if (hasItem(talker, Q00344_1000YearsTheEndOfLamentation.CRUCIFIX)) {
                     takeItems(talker, Q00344_1000YearsTheEndOfLamentation.CRUCIFIX.getId(), -1L);
-                    final int rand = getRandom(100);
+                    final int rand = Rnd.get(100);
                     if (rand <= 49) {
                         rewardItems(talker, Q00344_1000YearsTheEndOfLamentation.STONE_OF_PURITY);
                     }

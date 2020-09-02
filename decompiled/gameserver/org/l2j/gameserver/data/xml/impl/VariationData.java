@@ -103,7 +103,7 @@ public class VariationData extends GameXmlReader
         IntMap<VariationFee> fees;
         this.forEach((Node)doc, "list", listNode -> {
             this.forEach(listNode, "variations", variationsNode -> this.forEach(variationsNode, "variation", variationNode -> {
-                mineralId = this.parseInteger(variationNode.getAttributes(), "mineralId");
+                mineralId = this.parseInt(variationNode.getAttributes(), "mineralId");
                 if (ItemEngine.getInstance().getTemplate(mineralId) == null) {
                     VariationData.LOGGER.warn("Mineral with item id {}  was not found.", (Object)mineralId);
                 }
@@ -111,14 +111,14 @@ public class VariationData extends GameXmlReader
                 this.forEach(variationNode, "optionGroup", groupNode -> {
                     weaponTypeString = this.parseString(groupNode.getAttributes(), "weaponType").toUpperCase();
                     weaponType = VariationWeaponType.valueOf(weaponTypeString);
-                    order = this.parseInteger(groupNode.getAttributes(), "order");
+                    order = this.parseInt(groupNode.getAttributes(), "order");
                     sets = new ArrayList<OptionDataCategory>();
                     this.forEach(groupNode, "optionCategory", categoryNode -> {
                         chance = this.parseDouble(categoryNode.getAttributes(), "chance");
                         options = new HashMap<Options, Double>();
                         this.forEach(categoryNode, "option", optionNode -> {
                             optionChance = this.parseDouble(optionNode.getAttributes(), "chance");
-                            optionId = this.parseInteger(optionNode.getAttributes(), "id");
+                            optionId = this.parseInt(optionNode.getAttributes(), "id");
                             opt = AugmentationEngine.getInstance().getOptions(optionId);
                             if (opt == null) {
                                 VariationData.LOGGER.warn(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, optionId));
@@ -131,8 +131,8 @@ public class VariationData extends GameXmlReader
                         });
                         this.forEach(categoryNode, "optionRange", optionNode -> {
                             optionChance2 = this.parseDouble(optionNode.getAttributes(), "chance");
-                            fromId = this.parseInteger(optionNode.getAttributes(), "from");
-                            toId = this.parseInteger(optionNode.getAttributes(), "to");
+                            fromId = this.parseInt(optionNode.getAttributes(), "from");
+                            toId = this.parseInt(optionNode.getAttributes(), "to");
                             id = fromId;
                             while (id <= toId) {
                                 op = AugmentationEngine.getInstance().getOptions(id);
@@ -156,10 +156,10 @@ public class VariationData extends GameXmlReader
             }));
             itemGroups = new HashMap<Integer, List<Integer>>();
             this.forEach(listNode, "itemGroups", variationsNode -> this.forEach(variationsNode, "itemGroup", variationNode -> {
-                id2 = this.parseInteger(variationNode.getAttributes(), "id");
+                id2 = this.parseInt(variationNode.getAttributes(), "id");
                 items = new ArrayList<Integer>();
                 this.forEach(variationNode, "item", itemNode -> {
-                    itemId = this.parseInteger(itemNode.getAttributes(), "id");
+                    itemId = this.parseInt(itemNode.getAttributes(), "id");
                     if (ItemEngine.getInstance().getTemplate(itemId) == null) {
                         VariationData.LOGGER.warn(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, itemId));
                     }
@@ -169,24 +169,24 @@ public class VariationData extends GameXmlReader
                 map3.put(id2, items);
             }));
             this.forEach(listNode, "fees", variationNode -> this.forEach(variationNode, "fee", feeNode -> {
-                itemGroupId = this.parseInteger(feeNode.getAttributes(), "itemGroup");
+                itemGroupId = this.parseInt(feeNode.getAttributes(), "itemGroup");
                 itemGroup = map4.get(itemGroupId);
-                itemId2 = this.parseInteger(feeNode.getAttributes(), "itemId");
-                itemCount = this.parseInteger(feeNode.getAttributes(), "itemCount");
-                cancelFee = this.parseInteger(feeNode.getAttributes(), "cancelFee");
+                itemId2 = this.parseInt(feeNode.getAttributes(), "itemId");
+                itemCount = this.parseInt(feeNode.getAttributes(), "itemCount");
+                cancelFee = this.parseInt(feeNode.getAttributes(), "cancelFee");
                 if (ItemEngine.getInstance().getTemplate(itemId2) == null) {
                     VariationData.LOGGER.warn(invokedynamic(makeConcatWithConstants:(I)Ljava/lang/String;, itemId2));
                 }
                 fee = new VariationFee(itemId2, itemCount, cancelFee);
                 feeByMinerals = (IntMap<VariationFee>)new HashIntMap();
                 this.forEach(feeNode, "mineral", mineralNode -> {
-                    mId = this.parseInteger(mineralNode.getAttributes(), "id");
+                    mId = this.parseInt(mineralNode.getAttributes(), "id");
                     intMap.put(mId, o);
                     return;
                 });
                 this.forEach(feeNode, "mineralRange", mineralNode -> {
-                    fromId2 = this.parseInteger(mineralNode.getAttributes(), "from");
-                    for (toId2 = this.parseInteger(mineralNode.getAttributes(), "to"), id3 = fromId2; id3 <= toId2; ++id3) {
+                    fromId2 = this.parseInt(mineralNode.getAttributes(), "from");
+                    for (toId2 = this.parseInt(mineralNode.getAttributes(), "to"), id3 = fromId2; id3 <= toId2; ++id3) {
                         intMap2.put(id3, o2);
                     }
                     return;

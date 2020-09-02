@@ -67,8 +67,8 @@ public class MissionData extends GameXmlReader
             set = new StatsSet(this.parseAttributes(missionNode));
             items = new ArrayList<ItemHolder>(1);
             this.forEach(missionNode, "reward", itemNode -> {
-                itemId = this.parseInteger(itemNode.getAttributes(), "id");
-                itemCount = this.parseInteger(itemNode.getAttributes(), "count");
+                itemId = this.parseInt(itemNode.getAttributes(), "id");
+                itemCount = this.parseInt(itemNode.getAttributes(), "count");
                 list.add(new ItemHolder(itemId, itemCount));
                 return;
             });

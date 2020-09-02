@@ -20,10 +20,10 @@ public class ReceiveVipInfo extends ServerPacket
         final Player player = client.getPlayer();
         final VipEngine vipData = VipEngine.getInstance();
         final byte vipTier = player.getVipTier();
-        final int vipDuration = (int)ChronoUnit.SECONDS.between(Instant.now(), Instant.ofEpochMilli(client.getVipTierExpiration()));
+        final int vipDuration = (int)ChronoUnit.SECONDS.between(Instant.now(), Instant.ofEpochMilli(player.getVipTierExpiration()));
         this.writeId(ServerExPacketId.EX_VIP_INFO);
         this.writeByte(vipTier);
-        this.writeLong(client.getVipPoints());
+        this.writeLong(player.getVipPoints());
         this.writeInt(vipDuration);
         this.writeLong(vipData.getPointsToLevel(vipTier + 1));
         this.writeLong(vipData.getPointsDepreciatedOnLevel(vipTier));

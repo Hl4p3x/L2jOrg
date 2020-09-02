@@ -7,6 +7,8 @@ package org.l2j.gameserver.instancemanager;
 import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import org.l2j.gameserver.data.xml.impl.NpcData;
+import org.l2j.commons.database.DatabaseAccess;
+import org.l2j.gameserver.data.database.dao.SpawnDAO;
 import org.l2j.gameserver.datatables.SpawnTable;
 import org.l2j.commons.threading.ThreadPool;
 import org.l2j.gameserver.util.GameUtils;
@@ -366,47 +368,7 @@ public class DBSpawnManager
             task.cancel(true);
         }
         if (updateDb) {
-            try {
-                final Connection con = DatabaseFactory.getInstance().getConnection();
-                try {
-                    final PreparedStatement ps = con.prepareStatement("DELETE FROM npc_respawns WHERE id = ?");
-                    try {
-                        ps.setInt(1, npcId);
-                        ps.execute();
-                        if (ps != null) {
-                            ps.close();
-                        }
-                    }
-                    catch (Throwable t) {
-                        if (ps != null) {
-                            try {
-                                ps.close();
-                            }
-                            catch (Throwable exception) {
-                                t.addSuppressed(exception);
-                            }
-                        }
-                        throw t;
-                    }
-                    if (con != null) {
-                        con.close();
-                    }
-                }
-                catch (Throwable t2) {
-                    if (con != null) {
-                        try {
-                            con.close();
-                        }
-                        catch (Throwable exception2) {
-                            t2.addSuppressed(exception2);
-                        }
-                    }
-                    throw t2;
-                }
-            }
-            catch (Exception e) {
-                DBSpawnManager.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;I)Ljava/lang/String;, this.getClass().getSimpleName(), npcId), (Throwable)e);
-            }
+            ((SpawnDAO)DatabaseAccess.getDAO((Class)SpawnDAO.class)).deleteRespawn(npcId);
         }
         SpawnTable.getInstance().deleteSpawn(spawn, false);
     }

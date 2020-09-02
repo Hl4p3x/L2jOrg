@@ -4,6 +4,7 @@
 
 package org.l2j.scripts.ai.others.CastleChamberlain;
 
+import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.model.events.annotations.Id;
 import org.l2j.gameserver.model.events.ListenerRegisterType;
 import org.l2j.gameserver.model.events.annotations.RegisterType;
@@ -40,10 +41,12 @@ import org.l2j.gameserver.network.serverpackets.html.NpcHtmlMessage;
 import org.l2j.gameserver.model.actor.Npc;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.holders.SkillHolder;
+import org.slf4j.Logger;
 import org.l2j.scripts.ai.AbstractNpcAI;
 
 public final class CastleChamberlain extends AbstractNpcAI
 {
+    private static final Logger LOGGER;
     private static final int[] NPC;
     private static final int CROWN = 6841;
     private static final int LORD_CLOAK_OF_LIGHT = 34925;
@@ -833,7 +836,7 @@ public final class CastleChamberlain extends AbstractNpcAI
                     break;
                 }
                 default: {
-                    this.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;II)Ljava/lang/String;, player.getName(), player.getObjectId(), evt.getRequest()));
+                    CastleChamberlain.LOGGER.warn(invokedynamic(makeConcatWithConstants:(Ljava/lang/String;II)Ljava/lang/String;, player.getName(), player.getObjectId(), evt.getRequest()));
                     break;
                 }
             }
@@ -845,6 +848,7 @@ public final class CastleChamberlain extends AbstractNpcAI
     }
     
     static {
+        LOGGER = LoggerFactory.getLogger((Class)CastleChamberlain.class);
         NPC = new int[] { 35100, 36653, 35142, 36654, 35184, 36655, 35226, 36656, 35274, 36657 };
         BUFFS = new SkillHolder[] { new SkillHolder(4342, 2), new SkillHolder(4343, 3), new SkillHolder(4344, 3), new SkillHolder(4346, 4), new SkillHolder(4345, 3), new SkillHolder(4347, 2), new SkillHolder(4349, 1), new SkillHolder(4350, 1), new SkillHolder(4348, 2), new SkillHolder(4351, 2), new SkillHolder(4352, 1), new SkillHolder(4353, 2), new SkillHolder(4358, 1), new SkillHolder(4354, 1), new SkillHolder(4347, 6), new SkillHolder(4349, 2), new SkillHolder(4350, 4), new SkillHolder(4348, 6), new SkillHolder(4351, 6), new SkillHolder(4352, 2), new SkillHolder(4353, 6), new SkillHolder(4358, 3), new SkillHolder(4354, 4), new SkillHolder(4355, 1), new SkillHolder(4356, 1), new SkillHolder(4357, 1), new SkillHolder(4359, 1), new SkillHolder(4360, 1) };
     }

@@ -43,7 +43,7 @@ public class OpCheckResidenceSkillCondition implements SkillCondition
     public static final class Factory extends SkillConditionFactory
     {
         public SkillCondition create(final Node xmlNode) {
-            final Boolean isWithin = this.parseBoolean(xmlNode.getAttributes(), "is-within");
+            final boolean isWithin = this.parseBoolean(xmlNode.getAttributes(), "is-within");
             final IntSet ids = this.parseIntSet(xmlNode.getFirstChild());
             return (SkillCondition)new OpCheckResidenceSkillCondition(ids, isWithin);
         }

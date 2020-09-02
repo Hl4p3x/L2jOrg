@@ -11,16 +11,16 @@ public class ExBRNewIconCashBtnWnd extends ServerPacket
 {
     public static ExBRNewIconCashBtnWnd NOT_SHOW;
     public static ExBRNewIconCashBtnWnd SHOW;
-    private final short show;
+    private final short active;
     
-    private ExBRNewIconCashBtnWnd(final short show) {
-        this.show = show;
+    private ExBRNewIconCashBtnWnd(final short active) {
+        this.active = active;
     }
     
     @Override
     protected void writeImpl(final GameClient client) {
         this.writeId(ServerExPacketId.EX_BR_EXIST_NEW_PRODUCT_ACK);
-        this.writeShort(this.show);
+        this.writeShort(this.active);
     }
     
     static {

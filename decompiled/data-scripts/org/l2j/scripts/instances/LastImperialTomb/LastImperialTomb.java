@@ -6,6 +6,7 @@ package org.l2j.scripts.instances.LastImperialTomb;
 
 import org.slf4j.LoggerFactory;
 import org.l2j.gameserver.ai.CtrlIntention;
+import org.l2j.commons.util.Rnd;
 import java.util.Set;
 import org.l2j.gameserver.network.serverpackets.MagicSkillCanceld;
 import org.l2j.gameserver.model.DamageInfo;
@@ -641,7 +642,7 @@ public class LastImperialTomb extends AbstractInstance
             return;
         }
         world.setParameter("isPlayingSong", (Object)true);
-        final int random = getRandom(1, 5);
+        final int random = Rnd.get(1, 5);
         final SkillHolder skill = new SkillHolder(5007, random);
         final SkillHolder skillEffect = new SkillHolder(5008, random);
         this.broadCastPacket(world, (ServerPacket)new ExShowScreenMessage(2, -1, 2, 0, 0, 0, 0, true, 4000, false, (String)null, (NpcStringId)LastImperialTomb.SKILL_MSG.get(random), (String)null));

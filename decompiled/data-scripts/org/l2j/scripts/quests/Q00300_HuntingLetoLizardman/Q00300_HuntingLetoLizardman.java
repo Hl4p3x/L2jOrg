@@ -7,6 +7,7 @@ package org.l2j.scripts.quests.Q00300_HuntingLetoLizardman;
 import io.github.joealisson.primitive.HashIntIntMap;
 import org.l2j.gameserver.enums.QuestSound;
 import org.l2j.gameserver.model.quest.QuestState;
+import org.l2j.commons.util.Rnd;
 import java.util.Objects;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
@@ -52,7 +53,7 @@ public final class Q00300_HuntingLetoLizardman extends Quest
             case "30126-06.html": {
                 if (getQuestItemsCount(player, 7139) >= 60L) {
                     takeItems(player, 7139, -1L);
-                    final int rand = getRandom(1000);
+                    final int rand = Rnd.get(1000);
                     if (rand < 500) {
                         giveItems(player, Q00300_HuntingLetoLizardman.REWARD_ADENA);
                     }
@@ -77,7 +78,7 @@ public final class Q00300_HuntingLetoLizardman extends Quest
         final Player partyMember = this.getRandomPartyMember(player, 1);
         if (partyMember != null) {
             final QuestState st = this.getQuestState(partyMember, false);
-            if (st.isCond(1) && getRandom(1000) < Q00300_HuntingLetoLizardman.MOBS_SAC.get(npc.getId())) {
+            if (st.isCond(1) && Rnd.get(1000) < Q00300_HuntingLetoLizardman.MOBS_SAC.get(npc.getId())) {
                 giveItems(player, 7139, 1L);
                 if (getQuestItemsCount(player, 7139) == 60L) {
                     st.setCond(2, true);

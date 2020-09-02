@@ -6,7 +6,7 @@ package org.l2j.gameserver.network.clientpackets;
 
 import org.l2j.gameserver.model.Clan;
 import org.l2j.gameserver.model.actor.instance.Player;
-import org.l2j.gameserver.network.serverpackets.ExPledgeCount;
+import org.l2j.gameserver.network.serverpackets.pledge.ExPledgeCount;
 import org.l2j.gameserver.network.serverpackets.PledgeShowMemberListDelete;
 import org.l2j.gameserver.network.serverpackets.ServerPacket;
 import org.l2j.gameserver.network.serverpackets.SystemMessage;

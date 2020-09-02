@@ -52,8 +52,8 @@ public final class PetDataTable extends GameXmlReader
         final Node n = doc.getFirstChild();
         for (Node d = n.getFirstChild(); d != null; d = d.getNextSibling()) {
             if (d.getNodeName().equals("pet")) {
-                final int npcId = this.parseInteger(d.getAttributes(), "id");
-                final int itemId = this.parseInteger(d.getAttributes(), "itemId");
+                final int npcId = this.parseInt(d.getAttributes(), "id");
+                final int itemId = this.parseInt(d.getAttributes(), "itemId");
                 final PetData data = new PetData(npcId, itemId);
                 for (Node p = d.getFirstChild(); p != null; p = p.getNextSibling()) {
                     if (p.getNodeName().equals("set")) {
@@ -65,20 +65,20 @@ public final class PetDataTable extends GameXmlReader
                             }
                         }
                         else if ("load".equals(type)) {
-                            data.setLoad(this.parseInteger(attrs, "val"));
+                            data.setLoad(this.parseInt(attrs, "val"));
                         }
                         else if ("hungry_limit".equals(type)) {
-                            data.setHungryLimit(this.parseInteger(attrs, "val"));
+                            data.setHungryLimit(this.parseInt(attrs, "val"));
                         }
                         else if ("sync_level".equals(type)) {
-                            data.setSyncLevel(this.parseInteger(attrs, "val") == 1);
+                            data.setSyncLevel(this.parseInt(attrs, "val") == 1);
                         }
                     }
                     else if (p.getNodeName().equals("skills")) {
                         for (Node s = p.getFirstChild(); s != null; s = s.getNextSibling()) {
                             if (s.getNodeName().equals("skill")) {
                                 final NamedNodeMap attrs = s.getAttributes();
-                                data.addNewSkill(this.parseInteger(attrs, "skillId"), this.parseInteger(attrs, "skillLvl"), this.parseInteger(attrs, "minLvl"));
+                                data.addNewSkill(this.parseInt(attrs, "skillId"), this.parseInt(attrs, "skillLvl"), this.parseInt(attrs, "minLvl"));
                             }
                         }
                     }

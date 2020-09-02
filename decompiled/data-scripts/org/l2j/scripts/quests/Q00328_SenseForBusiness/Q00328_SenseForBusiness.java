@@ -7,6 +7,7 @@ package org.l2j.scripts.quests.Q00328_SenseForBusiness;
 import io.github.joealisson.primitive.HashIntIntMap;
 import io.github.joealisson.primitive.HashIntMap;
 import org.l2j.gameserver.enums.QuestSound;
+import org.l2j.commons.util.Rnd;
 import org.l2j.gameserver.model.quest.QuestState;
 import org.l2j.gameserver.model.actor.instance.Player;
 import org.l2j.gameserver.model.actor.Npc;
@@ -87,7 +88,7 @@ public class Q00328_SenseForBusiness extends Quest
     public String onKill(final Npc npc, final Player player, final boolean isPet) {
         final QuestState st = this.getQuestState(player, false);
         if (st != null && st.isStarted()) {
-            final int chance = getRandom(100);
+            final int chance = Rnd.get(100);
             if (Q00328_SenseForBusiness.MONSTER_EYES.containsKey(npc.getId())) {
                 if (chance < ((int[])Q00328_SenseForBusiness.MONSTER_EYES.get(npc.getId()))[0]) {
                     giveItems(player, 1347, 1L);

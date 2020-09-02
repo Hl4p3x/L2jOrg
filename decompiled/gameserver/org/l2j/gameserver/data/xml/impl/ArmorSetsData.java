@@ -54,9 +54,9 @@ public final class ArmorSetsData extends GameXmlReader
             if ("list".equalsIgnoreCase(n.getNodeName())) {
                 for (Node setNode = n.getFirstChild(); setNode != null; setNode = setNode.getNextSibling()) {
                     if ("set".equalsIgnoreCase(setNode.getNodeName())) {
-                        final int id = this.parseInteger(setNode.getAttributes(), "id");
-                        final int minimumPieces = this.parseInteger(setNode.getAttributes(), "minimumPieces", Integer.valueOf(0));
-                        final boolean isVisual = this.parseBoolean(setNode.getAttributes(), "visual", Boolean.valueOf(false));
+                        final int id = this.parseInt(setNode.getAttributes(), "id");
+                        final int minimumPieces = this.parseInt(setNode.getAttributes(), "minimumPieces", 0);
+                        final boolean isVisual = this.parseBoolean(setNode.getAttributes(), "visual", false);
                         final ArmorSet set = new ArmorSet(id, minimumPieces, isVisual);
                         if (this._armorSets.putIfAbsent(id, set) != null) {
                             ArmorSetsData.LOGGER.warn(invokedynamic(makeConcatWithConstants:(ILjava/lang/String;)Ljava/lang/String;, id, f.getName()));
@@ -71,7 +71,7 @@ public final class ArmorSetsData extends GameXmlReader
                                     final ArmorSet set2;
                                     this.forEach(innerSetNode, b -> "item".equals(b.getNodeName()), node -> {
                                         attrs = node.getAttributes();
-                                        itemId = this.parseInteger(attrs, "id");
+                                        itemId = this.parseInt(attrs, "id");
                                         item = ItemEngine.getInstance().getTemplate(itemId);
                                         if (item == null) {
                                             ArmorSetsData.LOGGER.warn(invokedynamic(makeConcatWithConstants:(ILjava/lang/String;)Ljava/lang/String;, itemId, f.getName()));
@@ -90,7 +90,7 @@ public final class ArmorSetsData extends GameXmlReader
                                     final ArmorSet set3;
                                     this.forEach(innerSetNode, b -> "item".equals(b.getNodeName()), node -> {
                                         attrs2 = node.getAttributes();
-                                        itemId2 = this.parseInteger(attrs2, "id");
+                                        itemId2 = this.parseInt(attrs2, "id");
                                         item2 = ItemEngine.getInstance().getTemplate(itemId2);
                                         if (item2 == null) {
                                             ArmorSetsData.LOGGER.warn(invokedynamic(makeConcatWithConstants:(ILjava/lang/String;)Ljava/lang/String;, itemId2, f.getName()));
@@ -114,13 +114,13 @@ public final class ArmorSetsData extends GameXmlReader
                                     final int artifactBookSlot;
                                     this.forEach(innerSetNode, b -> "skill".equals(b.getNodeName()), node -> {
                                         attrs3 = node.getAttributes();
-                                        skillId = this.parseInteger(attrs3, "id");
-                                        skillLevel = this.parseInteger(attrs3, "level");
-                                        minPieces = this.parseInteger(attrs3, "minimumPieces", Integer.valueOf(set4.getMinimumPieces()));
-                                        minEnchant = this.parseInteger(attrs3, "minimumEnchant", Integer.valueOf(0));
-                                        isOptional = this.parseBoolean(attrs3, "optional", Boolean.valueOf(false));
-                                        artifactSlotMask = this.parseInteger(attrs3, "slotMask", Integer.valueOf(0));
-                                        artifactBookSlot = this.parseInteger(attrs3, "bookSlot", Integer.valueOf(0));
+                                        skillId = this.parseInt(attrs3, "id");
+                                        skillLevel = this.parseInt(attrs3, "level");
+                                        minPieces = this.parseInt(attrs3, "minimumPieces", set4.getMinimumPieces());
+                                        minEnchant = this.parseInt(attrs3, "minimumEnchant", 0);
+                                        isOptional = this.parseBoolean(attrs3, "optional", false);
+                                        artifactSlotMask = this.parseInt(attrs3, "slotMask", 0);
+                                        artifactBookSlot = this.parseInt(attrs3, "bookSlot", 0);
                                         set4.addSkill(new ArmorsetSkillHolder(skillId, skillLevel, minPieces, minEnchant, isOptional, artifactSlotMask, artifactBookSlot));
                                         return;
                                     });
@@ -131,7 +131,7 @@ public final class ArmorSetsData extends GameXmlReader
                                     final ArmorSet set5;
                                     this.forEach(innerSetNode, b -> "stat".equals(b.getNodeName()), node -> {
                                         attrs4 = node.getAttributes();
-                                        set5.addStatsBonus((BaseStats)this.parseEnum(attrs4, (Class)BaseStats.class, "type"), this.parseInteger(attrs4, "val"));
+                                        set5.addStatsBonus((BaseStats)this.parseEnum(attrs4, (Class)BaseStats.class, "type"), this.parseInt(attrs4, "val"));
                                         return;
                                     });
                                     break;

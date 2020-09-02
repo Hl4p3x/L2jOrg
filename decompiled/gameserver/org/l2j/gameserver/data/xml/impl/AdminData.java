@@ -182,11 +182,11 @@ public final class AdminData extends GameXmlReader
     }
     
     public void showGm(final Player player) {
-        this._gmList.putIfAbsent(player, false);
+        this._gmList.put(player, false);
     }
     
     public void hideGm(final Player player) {
-        this._gmList.putIfAbsent(player, true);
+        this._gmList.put(player, true);
     }
     
     public boolean isGmOnline(final boolean includeHidden) {
